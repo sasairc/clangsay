@@ -6,6 +6,7 @@ TARGET	= clangsay
 PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
 COWPATH	:= $(PREFIX)/share/clangsay/cows
+# COWPATH	:= /usr/share/cowsay/cows
 MAKE	:= make
 CC		:= cc
 RM	 	:= rm
@@ -17,7 +18,7 @@ OBJS	= $(SRCS:.c=.o)
 all: $(TARGET) $(OBJS)
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"  \
-			-DCOWPATH=\"$(DCOWPATH)/\"
+			-DCOWPATH=\"$(COWPATH)/\"
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET)
