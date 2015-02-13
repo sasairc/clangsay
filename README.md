@@ -1,6 +1,9 @@
 clangsay
 =======
 [![license](https://img.shields.io/badge/License-WTFPL2-blue.svg?style=flat)](http://www.wtfpl.net/txt/copying/)	
+
+![default](http://41.media.tumblr.com/dda874e62f22a91a49839874676e3df1/tumblr_njoy8cC8CO1u2jamko1_1280.png)
+
 マルチバイト準対応の*cowsay*クローン（半角カナは駄目）
 
 ### Build
