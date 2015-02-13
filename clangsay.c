@@ -26,23 +26,22 @@ int main(int argc, char* argv[])
 {
     int     i;
     int     res, index;     /* use getopt_long() */
-    int     lines  = 0;
-    int     stdins = 0;
-    bool    block  = false;
+    int     lines  = 0;     /* lines of cowfile*/
+    int     stdins = 0;     /* lines of string */
+    char*   env    = NULL;  /* $COWPATH */
     char*   path   = NULL;  /* .cow file */
-    char**  cowbuf = NULL;  /* string buffer */
-    char**  strbuf = NULL;
+    char**  cowbuf = NULL;  /* string buffer (cow) */
+    char**  strbuf = NULL;  /* string buffer (string) */
     FILE*   fp     = NULL;  /* cow-file */
     struct  stat st;        /* file status */
 
     /* flag and args */
     clangsay_t  clsay = {
-        false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-        0, NULL, NULL, NULL,
+        false, false, false, false, false, false, false, false, false, false, false, false,
+        NULL, NULL, NULL,
     };
     /* option for getopt_long() */
     struct  option opts[] = {
-        {"width",    required_argument, NULL, 'W'},
         {"eye",      required_argument, NULL, 'e'},
         {"tongue",   required_argument, NULL, 'T'},
         {"file",     required_argument, NULL, 'f'},
@@ -57,6 +56,7 @@ int main(int argc, char* argv[])
         {"youtuful", no_argument,       NULL, 'y'},
         {"list",     no_argument,       NULL, 'l'},
         {"help",     no_argument,       NULL, 'h'},
+        {"version",  no_argument,       NULL, 'v'},
         {0, 0, 0, 0},
     };
 
@@ -64,16 +64,12 @@ int main(int argc, char* argv[])
     while ((res = getopt_long(
                     argc,
                     argv,
-                    "nW;bdgpstwye:T:f:lh",
+                    "nW;bdgpstwye:T:f:lhv",
                     opts,
                     &index
                     )
            ) != -1) {
         switch (res) {
-            case    'W':
-                clsay.Warg = atoi(optarg);
-                clsay.Wflag = true;
-                break;
             case    'e':
                 clsay.earg = optarg;
                 clsay.eflag = true;
@@ -85,9 +81,6 @@ int main(int argc, char* argv[])
             case    'f':
                 clsay.farg = optarg;
                 clsay.fflag = true;
-                break;
-            case    'n':
-                clsay.nflag = true;
                 break;
             case    'b':
                 clsay.bflag = true;
@@ -119,28 +112,52 @@ int main(int argc, char* argv[])
             case    'h':
                 print_usage();
                 break;
+            case    'v':
+                fprintf(stdout, "%s %d.%d.%d\n", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL);
+                exit(0);
             case    '?':
                 return -1;
         }
     }
 
-    if (clsay.fflag == true) {
-        path = strlion(2, COWPATH, clsay.farg);
-    } else {
-        path = strlion(2, COWPATH, "default.cow");
-    }
-    if (path == NULL) {
-        fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+    /* catenate file path */
+    if ((env = getenv("COWPATH")) != NULL) {
+        if (clsay.fflag == true) {
+            path = strlion(3, env, "/", clsay.farg);
+        } else {
+            path = strlion(3, env, "/", DEFAULT_COWFILE);
+        }
+        if (path == NULL) {
+            fprintf(stderr, "%s: strlion() failed\n", PROGNAME);
 
-        return 1;
+            return 1;
+        }
+    } else {
+        if (clsay.fflag == true) {
+            path = strlion(2, COWPATH, clsay.farg);
+        } else {
+            path = strlion(2, COWPATH, "default.cow");
+        }
+        if (path == NULL) {
+            fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+
+            return 1;
+        }
     }
 
     /* checking type of file or directory */
     if (stat(path, &st) != 0) {
-        fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
-        free(path);
+        if (stat(clsay.farg, &st) == 0) {
+            if (strlen(clsay.farg) > strlen(path)) {
+                path = (char*)realloc(path, sizeof(char) * (strlen(clsay.farg) + 1));
+            }
+            strcpy(path, clsay.farg);
+        } else {
+            fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
+            free(path);
 
-        return 2;
+            return 2;
+        }
     }
     if ((st.st_mode & S_IFMT) == S_IFDIR) {
         fprintf(stderr, "%s: %s: is a directory\n", PROGNAME, path);
@@ -180,19 +197,33 @@ int main(int argc, char* argv[])
         return 7;
     }
 
-    /* reading stdin to array */
-    if ((stdins = read_file(STLINE, BUFLEN, strbuf, stdin)) == 0) {
-        fprintf(
-            stderr,
-            "%s capacity of buffer is not enough: BUFLEN=%d\n",
-            PROGNAME, BUFLEN
-        );
-        fclose(fp);
-        free(path);
-        free2d(strbuf, (stdins - 2));
+    /* reading stdin or args to array */
+    if (argv[optind] != NULL) {
+        for (i = 0; optind < argc && i < STLINE; optind++, i++) {
+            strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
+            if (strbuf[i] == NULL) {
+                fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
 
-        return 8;
+                return 8;
+            }
+            strcpy(strbuf[i], argv[optind]);
+        }
+        stdins = i;
+    } else {
+        if ((stdins = read_file(STLINE, BUFLEN, strbuf, stdin)) == 0) {
+            fprintf(
+                stderr,
+                "%s capacity of buffer is not enough: BUFLEN=%d\n",
+                PROGNAME, BUFLEN
+            );
+            fclose(fp);
+            free(path);
+            free2d(strbuf, stdins);
+
+            return 9;
+        }
     }
+
     /* reading cow file to array */
     rewind(fp);
     if (read_file(lines, BUFLEN, cowbuf, fp) == 0) {
@@ -203,69 +234,21 @@ int main(int argc, char* argv[])
         );
         fclose(fp);
         free(path);
-        free2d(strbuf, (lines + 1));
+        free2d(strbuf, stdins);
         free2d(cowbuf, (lines + 1));
 
-        return 9;
+        return 10;
     }
 
     /* print string */
     print_string(stdins, strbuf);
-
     /* print cow */
-    for (i = 0; i < lines; i++) {
-        strrep(cowbuf[i], THOUGHTS, DEFAULT_THOUGHTS);
-        strrep(cowbuf[i], "\\\\", "\\");
+    print_cow(lines, cowbuf, &clsay);
 
-        /* relace eyes*/
-        if (clsay.eflag == true) {
-            strrep(cowbuf[i], EYES, clsay.earg);
-        } else if (clsay.bflag == true) {
-            strrep(cowbuf[i], EYES, BORG_EYES);
-        } else if (clsay.dflag == true) {
-            strrep(cowbuf[i], EYES, DEAD_EYES);
-        } else if (clsay.gflag == true) {
-            strrep(cowbuf[i], EYES, GREEDY_EYES);
-        } else if (clsay.pflag == true) {
-            strrep(cowbuf[i], EYES, PARANOID_EYES);
-        } else if (clsay.sflag == true) {
-            strrep(cowbuf[i], EYES, STONED_EYES);
-        } else if (clsay.tflag == true) {
-            strrep(cowbuf[i], EYES, TIRED_EYES);
-        } else if (clsay.wflag == true) {
-            strrep(cowbuf[i], EYES, WIRED_EYES);
-        } else if (clsay.yflag == true) {
-            strrep(cowbuf[i], EYES, YOUTHFUL_EYES);
-        } else {
-            strrep(cowbuf[i], EYES, DEFAULT_EYES);
-        }
-
-        /* relace tongue*/
-        if (clsay.Tflag == true) {
-            strrep(cowbuf[i], TONGUE, clsay.Targ);
-        } else if (clsay.dflag == true || clsay.sflag == true) {
-            strrep(cowbuf[i], TONGUE, DEAD_TONGUE);
-        } else {
-            strrep(cowbuf[i], TONGUE, DEFAULT_TONGUE);
-        } 
-
-        /* EOC - EOC */
-        if (strstr(cowbuf[i], "EOC")) {
-            block = true;
-            continue;
-        } else if (strstr(cowbuf[i], "EOC") && block == true) {
-            block == false;
-        }
-
-        if (block == true) {
-            fprintf(stdout, "%s\n", cowbuf[i]);
-        }
-    }
-
-    fclose(fp);
-    free(path);
-    free2d(strbuf, (stdins - 2));
-    free2d(cowbuf, (lines + 1));
+    fclose(fp);                     /* close cow file */
+    free(path);                     /* release memory (cowfile path) */
+    free2d(strbuf, stdins);         /* release memory (strings) */
+    free2d(cowbuf, (lines + 1));    /* release memory (cow) */
 
     return 0;
 }
@@ -320,15 +303,82 @@ int print_string(int lines, char** str)
     return 0;
 }
 
+int print_cow(int lines, char** str, clangsay_t* clsay)
+{
+    int     i;
+    bool    block = false;
+
+    /* print cow */
+    for (i = 0; i < lines; i++) {
+        strrep(str[i], THOUGHTS, DEFAULT_THOUGHTS);
+        strrep(str[i], "\\\\", "\\");
+
+        /* relace eyes*/
+        if (clsay->eflag == true) {
+            strrep(str[i], EYES, clsay->earg);
+        } else if (clsay->bflag == true) {
+            strrep(str[i], EYES, BORG_EYES);
+        } else if (clsay->dflag == true) {
+            strrep(str[i], EYES, DEAD_EYES);
+        } else if (clsay->gflag == true) {
+            strrep(str[i], EYES, GREEDY_EYES);
+        } else if (clsay->pflag == true) {
+            strrep(str[i], EYES, PARANOID_EYES);
+        } else if (clsay->sflag == true) {
+            strrep(str[i], EYES, STONED_EYES);
+        } else if (clsay->tflag == true) {
+            strrep(str[i], EYES, TIRED_EYES);
+        } else if (clsay->wflag == true) {
+            strrep(str[i], EYES, WIRED_EYES);
+        } else if (clsay->yflag == true) {
+            strrep(str[i], EYES, YOUTHFUL_EYES);
+        } else {
+            strrep(str[i], EYES, DEFAULT_EYES);
+        }
+
+        /* relace tongue*/
+        if (clsay->Tflag == true) {
+            strrep(str[i], TONGUE, clsay->Targ);
+        } else if (clsay->dflag == true || clsay->sflag == true) {
+            strrep(str[i], TONGUE, DEAD_TONGUE);
+        } else {
+            strrep(str[i], TONGUE, DEFAULT_TONGUE);
+        } 
+
+        /* EOC - EOC */
+        if (strstr(str[i], "EOC")) {
+            block = true;
+            continue;
+        } else if (strstr(str[i], "EOC") && block == true) {
+            block = false;
+        }
+        if (block == true) {
+            fprintf(stdout, "%s\n", str[i]);
+        }
+    }
+
+    return 0;
+}
+
 int list_cowfiles(void)
 {
-    int i;
-    int entry;
-    struct dirent** list;
+    int     i;
+    int     entry;
+    char*   path    = NULL;
+    char*   env     = NULL;
+    struct  dirent** list;
 
-    if ((entry = scandir(COWPATH, &list, NULL, alphasort)) == -1) {
+    /* catenate file path */
+    if ((env = getenv("COWPATH")) != NULL) {
+        path = env;
+    } else {
+        path = COWPATH;
+    }
+
+    /* get file entry and sort */
+    if ((entry = scandir(path, &list, NULL, alphasort)) == -1) {
         fprintf(stderr, "%s: scandir() failed\n", PROGNAME);
-        exit(10);
+        exit(11);
     }
     for (i = 0; i < entry; i++) {
         fprintf(stdout, "%s\n", list[i]->d_name);
@@ -346,20 +396,20 @@ Usage: clangsay [OPTION]...\n\
 \n\
 Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
-  -b,  --borg                  borg mode\n\
-  -d,  --dead                  dead mode\n\
-  -g,  --greedy                greedy mode\n\
-  -s,  --stoned                stoned mode\n\
-  -t,  --tired                 tired mode\n\
-  -w,  --wired                 wired mode\n\
-  -y,  --youthful              youthful mode\n\
-  -e,  --eyes=EYES             manually specifies eyes (DEFAULT=oo)\n\
-  -T,  --tongue=TONGUE         manually specifies tongue\n\
-  -f,  --file=COWFILE          select cow file\n\
-  -l,  --list                  display COWPATH directory and exit\n\
+  -b,  --borg                borg mode\n\
+  -d,  --dead                dead mode\n\
+  -g,  --greedy              greedy mode\n\
+  -s,  --stoned              stoned mode\n\
+  -t,  --tired               tired mode\n\
+  -w,  --wired               wired mode\n\
+  -y,  --youthful            youthful mode\n\
+  -e,  --eyes=EYES           manually specifies eyes (DEFAULT=oo)\n\
+  -T,  --tongue=TONGUE       manually specifies tongue\n\
+  -f,  --file=COWFILE        select cow file\n\
+  -l,  --list                display COWPATH directory and exit\n\
 \n\
-  -h,  --help                  display this help and exit\n\
-  -v,  --version               optput version infomation and exit\n\
+  -h,  --help                display this help and exit\n\
+  -v,  --version             optput version infomation and exit\n\
 \n\
 Report %s bugs to %s <%s>\n\
 ", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL,
