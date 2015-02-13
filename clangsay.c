@@ -345,7 +345,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
             strrep(str[i], TONGUE, DEFAULT_TONGUE);
         } 
 
-        /* EOC - EOC */
+        /* EOC to EOC */
         if (strstr(str[i], "EOC")) {
             block = true;
             continue;
@@ -360,28 +360,49 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
     return 0;
 }
 
+int selects_cowfiles(const struct dirent* dir)
+{
+    int     namlen;
+    int*    lp;
+    char    dotcow[] = {".cow"};
+
+    namlen = strlen(dir->d_name);
+    if (namlen < 4) return 0;
+    namlen -= 4;    /* offset 4 bytes from end (.cow) */
+
+    lp = (int*)&(dir->d_name[namlen]);
+
+    /*
+     * comparison on int
+     * true: .cow
+     * false: other
+     */
+    if (*lp == *(int*)&dotcow)
+        return 1;
+
+    return 0;
+}
+
 int list_cowfiles(void)
 {
     int     i;
     int     entry;
     char*   path    = NULL;
-    char*   env     = NULL;
-    struct  dirent** list;
+    struct  dirent**  list;
 
     /* catenate file path */
-    if ((env = getenv("COWPATH")) != NULL) {
-        path = env;
-    } else {
+    if ((path = getenv("COWPATH")) == NULL) {
         path = COWPATH;
     }
 
     /* get file entry and sort */
-    if ((entry = scandir(path, &list, NULL, alphasort)) == -1) {
+    if ((entry = scandir(path, &list, selects_cowfiles, alphasort)) == -1) {
         fprintf(stderr, "%s: scandir() failed\n", PROGNAME);
         exit(11);
     }
     for (i = 0; i < entry; i++) {
         fprintf(stdout, "%s\n", list[i]->d_name);
+        free(list[i]);
     }
     free(list);
 

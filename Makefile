@@ -6,11 +6,10 @@ TARGET	= clangsay
 PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
 COWPATH	:= $(PREFIX)/share/clangsay/cows
-#COWPATH	:= $(PREFIX)/share/cowsay/cows
 MAKE	:= make
 CC		:= cc
 RM	 	:= rm
-CFLAGS	:= -O2 -g -Wall
+CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
 SRCS	= clangsay.c file.c string.c memory.c
 OBJS	= $(SRCS:.c=.o)

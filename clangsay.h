@@ -16,7 +16,7 @@
 #define PROGNAME    "clangsay"
 #define VERSION     0
 #define PATCHLEVEL  0
-#define SUBLEVEL    1
+#define SUBLEVEL    2
 #define AUTHOR      "sasairc"
 #define MAIL_TO     "sasairc@ssiserver.moe.hm"
 
@@ -25,6 +25,8 @@
 #define STLINE      256
 #define true        1
 #define false       0
+
+#include <dirent.h>
 
 /* static variable */
 #define EYES            "$eyes"
@@ -45,27 +47,28 @@
 #define DEAD_TONGUE     " U"
 
 typedef int bool;
-typedef struct CLANGSAY_T {
-    bool bflag;
-    bool dflag;
-    bool gflag;
-    bool pflag;
-    bool sflag;
-    bool tflag;
-    bool wflag;
-    bool yflag;
-    bool eflag;
-    bool Tflag;
-    bool fflag;
-    bool lflag;
-    char* earg;
-    char* Targ;
-    char* farg;
+typedef struct  CLANGSAY_T {
+    bool    bflag;
+    bool    dflag;
+    bool    gflag;
+    bool    pflag;
+    bool    sflag;
+    bool    tflag;
+    bool    wflag;
+    bool    yflag;
+    bool    eflag;
+    bool    Tflag;
+    bool    fflag;
+    bool    lflag;
+    char*   earg;
+    char*   Targ;
+    char*   farg;
 } clangsay_t;
 
 /* This functions is required clangsay.c */
 extern int print_string(int lines, char** str);
 extern int print_cow(int lines, char** str, clangsay_t* clsay);
+extern int selects_cowfiles(const struct dirent* dir);
 extern int list_cowfiles(void);
 extern int print_usage(void);
 
