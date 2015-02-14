@@ -166,6 +166,7 @@ int main(int argc, char* argv[])
         
         return 3;
     }
+
     /* checking file permission */
     if (access(path, R_OK) != 0) {
         fprintf(stderr, "%s: %s: permission denied\n", PROGNAME, path);
@@ -173,6 +174,7 @@ int main(int argc, char* argv[])
 
         return 4;
     }
+
     /* open after checking file type */
     if (check_file_type(path) == 0) {
         fp = fopen(path, "r");
@@ -192,8 +194,11 @@ int main(int argc, char* argv[])
     lines = count_file_lines(fp);                           /* count line for cow-file */
     cowbuf = (char**)malloc(sizeof(char*) * (lines + 1));   /* allocate array for y coordinate (cows) */
     strbuf = (char**)malloc(sizeof(char*) * STLINE);        /* allocate array for y coordinate (strings) */
+
     if (cowbuf == NULL || strbuf == NULL) {
         fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+        fclose(fp);
+        free(path);
 
         return 7;
     }
@@ -204,6 +209,9 @@ int main(int argc, char* argv[])
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
                 fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+                fclose(fp);
+                free(path);
+                free2d(strbuf, i);
 
                 return 8;
             }
@@ -239,17 +247,20 @@ int main(int argc, char* argv[])
         free2d(cowbuf, (lines + 1));
 
         return 10;
+    } else {
+        fclose(fp);     /* close cow file */
     }
+
     /* remove escape sequence */
     for (i = 0; i < stdins; i++) {
         strunesc(strbuf[i]);
     }
+
     /* print string */
     print_string(stdins, strbuf);
     /* print cow */
     print_cow(lines, cowbuf, &clsay);
 
-    fclose(fp);                     /* close cow file */
     free(path);                     /* release memory (cowfile path) */
     free2d(strbuf, stdins);         /* release memory (strings) */
     free2d(cowbuf, (lines + 1));    /* release memory (cow) */
@@ -402,6 +413,7 @@ int list_cowfiles(void)
     /* get file entry and sort */
     if ((entry = scandir(path, &list, selects_cowfiles, alphasort)) == -1) {
         fprintf(stderr, "%s: scandir() failed\n", PROGNAME);
+
         exit(11);
     }
     for (i = 0; i < entry; i++) {
