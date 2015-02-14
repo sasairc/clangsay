@@ -10,6 +10,7 @@
  * for more details.
  */
 
+#include "./config.h"
 #include "./clangsay.h"
 #include "./string.h"
 #include "./file.h"
@@ -239,7 +240,10 @@ int main(int argc, char* argv[])
 
         return 10;
     }
-
+    /* remove escape sequence */
+    for (i = 0; i < stdins; i++) {
+        strunesc(strbuf[i]);
+    }
     /* print string */
     print_string(stdins, strbuf);
     /* print cow */

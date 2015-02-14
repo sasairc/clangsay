@@ -13,38 +13,10 @@
 #ifndef CLANGSAY_H
 #define CLANGSAY_H
 
-#define PROGNAME    "clangsay"
-#define VERSION     0
-#define PATCHLEVEL  0
-#define SUBLEVEL    2
-#define AUTHOR      "sasairc"
-#define MAIL_TO     "sasairc@ssiserver.moe.hm"
-
-#define PROGNAME    "clangsay"
-#define BUFLEN      1024
-#define STLINE      256
-#define true        1
-#define false       0
-
 #include <dirent.h>
 
-/* static variable */
-#define EYES            "$eyes"
-#define THOUGHTS        "$thoughts"
-#define TONGUE          "$tongue"
-#define DEFAULT_COWFILE "default.cow"
-#define DEFAULT_THOUGHTS    "\\"
-#define DEFAULT_EYES    "oo"
-#define BORG_EYES       "=="
-#define DEAD_EYES       "XX"
-#define GREEDY_EYES     "$$"
-#define PARANOID_EYES   "@@"
-#define STONED_EYES     "**"
-#define TIRED_EYES      "--"
-#define WIRED_EYES      "OO"
-#define YOUTHFUL_EYES   ".."
-#define DEFAULT_TONGUE  "  "
-#define DEAD_TONGUE     " U"
+#define true        1
+#define false       0
 
 typedef int bool;
 typedef struct  CLANGSAY_T {

@@ -95,9 +95,6 @@ int mbstrlen(char* src)
     setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
 
     while (src[i] != '\0') {
-        if (src[i] == '\t' || src[i] == '\b') {
-            src[i] = ' ';
-        }
         ch = mblen(&src[i], MB_CUR_MAX);    /* get string length */
         if (ch > 1) {
             len = len + 2;                  /* multi byte */
@@ -108,6 +105,22 @@ int mbstrlen(char* src)
     }
 
     return len;
+}
+
+int strunesc(char* src)
+{
+    int i = 0;
+    int count = 0;
+
+    while (src[i] != '\0') {
+        if (src[i] == '\t' || src[i] == '\b') {
+            src[i] = ' ';
+            count++;
+        }
+        i++;
+    }
+
+    return count;
 }
             
 int strmax(int val, char** src)
