@@ -21,7 +21,7 @@
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
 
 #define BUFLEN          1024
-#define STLINE          256
+#define STLINE          480
 
 #define EYES            "$eyes"
 #define THOUGHTS        "$thoughts"

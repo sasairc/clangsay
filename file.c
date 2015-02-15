@@ -59,7 +59,7 @@ int check_file_type(char* filename)
 int count_file_lines(FILE* fp)
 {
     int i;
-    int lines = -1;
+    int lines = 0;
 
     rewind(fp);     /* seek file-stream to the top */
     while ((i = getc(fp)) != EOF) {

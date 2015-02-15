@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
                 strcpy(path, clsay.farg);
             } else {
                 fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
-                free(path);
+                release(NULL, path, 0, NULL, 0, NULL);
 
                 return 2;
             }
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     }
     if ((st.st_mode & S_IFMT) == S_IFDIR) {
         fprintf(stderr, "%s: %s: is a directory\n", PROGNAME, path);
-        free(path);
+        release(NULL, path, 0, NULL, 0, NULL);
         
         return 3;
     }
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
     /* checking file permission */
     if (access(path, R_OK) != 0) {
         fprintf(stderr, "%s: %s: permission denied\n", PROGNAME, path);
-        free(path);
+        release(NULL, path, 0, NULL, 0, NULL);
 
         return 4;
     }
@@ -180,38 +180,39 @@ int main(int argc, char* argv[])
         fp = fopen(path, "r");
     } else {
         fprintf(stderr, "%s: %s: unknown file type\n", PROGNAME, path);
-        free(path);
+        release(fp, path, 0, NULL, 0, NULL);
 
         return 5;
     }
     if (fp == NULL) {
         fprintf(stderr, "%s: fp is NULL\n", PROGNAME);
-        free(path);
+        release(NULL, path, 0, NULL, 0, NULL);
 
         return 6;
     }
 
-    lines = count_file_lines(fp);                           /* count line for cow-file */
-    cowbuf = (char**)malloc(sizeof(char*) * (lines + 1));   /* allocate array for y coordinate (cows) */
-    strbuf = (char**)malloc(sizeof(char*) * STLINE);        /* allocate array for y coordinate (strings) */
+    lines = count_file_lines(fp);                       /* count line for cow-file */
+    cowbuf = (char**)malloc(sizeof(char*) * lines);     /* allocate array for y coordinate (cows) */
+    strbuf = (char**)malloc(sizeof(char*) * STLINE);    /* allocate array for y coordinate (strings) */
 
     if (cowbuf == NULL || strbuf == NULL) {
         fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
-        fclose(fp);
-        free(path);
+        release(fp, path, 0, NULL, 0, NULL);
 
         return 7;
     }
 
-    /* reading stdin or args to array */
-    if (argv[optind] != NULL) {
+    /* 
+     * reading stdin or args to array
+     * true : arguments
+     * false: pipe
+     */ 
+    if (argv[optind] != NULL) { 
         for (i = 0; optind < argc && i < STLINE; optind++, i++) {
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
                 fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
-                fclose(fp);
-                free(path);
-                free2d(strbuf, i);
+                release(fp, path, stdins, strbuf, 0, NULL);
 
                 return 8;
             }
@@ -225,9 +226,7 @@ int main(int argc, char* argv[])
                 "%s capacity of buffer is not enough: BUFLEN=%d\n",
                 PROGNAME, BUFLEN
             );
-            fclose(fp);
-            free(path);
-            free2d(strbuf, stdins);
+            release(fp, path, stdins, strbuf, 0, NULL);
 
             return 9;
         }
@@ -241,31 +240,40 @@ int main(int argc, char* argv[])
                 "%s capacity of buffer is not enough: BUFLEN=%d\n",
                 PROGNAME, BUFLEN
         );
-        fclose(fp);
-        free(path);
-        free2d(strbuf, stdins);
-        free2d(cowbuf, (lines + 1));
+        release(fp, path, stdins, strbuf, lines, cowbuf);
 
         return 10;
-    } else {
-        fclose(fp);     /* close cow file */
     }
 
     /* remove escape sequence */
     for (i = 0; i < stdins; i++) {
         strunesc(strbuf[i]);
     }
-
     /* print string */
     print_string(stdins, strbuf);
     /* print cow */
     print_cow(lines, cowbuf, &clsay);
-
-    free(path);                     /* release memory (cowfile path) */
-    free2d(strbuf, stdins);         /* release memory (strings) */
-    free2d(cowbuf, (lines + 1));    /* release memory (cow) */
+    /* memory release */
+    release(fp, path, stdins, strbuf, lines, cowbuf);
 
     return 0;
+}
+
+void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** buf2)
+{
+    if (fp != NULL) {
+        fclose(fp);
+    }
+    if (path != NULL) {
+        free(path);
+        path = NULL;
+    }
+    if (buf1 != NULL) {
+        free2d(buf1, lines1);
+    }
+    if (buf2 != NULL) {
+        free2d(buf2, lines2);
+    }
 }
 
 int print_string(int lines, char** str)
