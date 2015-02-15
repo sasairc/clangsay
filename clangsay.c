@@ -326,7 +326,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
     /* print cow */
     for (i = 0; i < lines; i++) {
         strrep(str[i], THOUGHTS, DEFAULT_THOUGHTS);
-        strrep(str[i], "\\\\", "\\");
+        while (strrep(str[i], "\\\\", "\\") == 0);
 
         /* relace eyes*/
         if (clsay->eflag == true) {
