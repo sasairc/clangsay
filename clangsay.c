@@ -137,10 +137,10 @@ int main(int argc, char* argv[])
         if (clsay.fflag == true) {
             path = strlion(2, COWPATH, clsay.farg);
         } else {
-            path = strlion(2, COWPATH, "default.cow");
+            path = strlion(2, COWPATH, DEFAULT_COWFILE);
         }
         if (path == NULL) {
-            fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+            fprintf(stderr, "%s: strlion() failed\n", PROGNAME);
 
             return 1;
         }
@@ -148,16 +148,16 @@ int main(int argc, char* argv[])
 
     /* checking type of file or directory */
     if (stat(path, &st) != 0) {
-        if (stat(clsay.farg, &st) == 0) {
-            if (strlen(clsay.farg) > strlen(path)) {
-                path = (char*)realloc(path, sizeof(char) * (strlen(clsay.farg) + 1));
-            }
-            strcpy(path, clsay.farg);
-        } else {
-            fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
-            free(path);
+        path = strlion(2, path, ".cow");        /* filename + .cow */
+        if (stat(path, &st) != 0) {
+            if (stat(clsay.farg, &st) == 0) {   /* filename */
+                strcpy(path, clsay.farg);
+            } else {
+                fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
+                free(path);
 
-            return 2;
+                return 2;
+            }
         }
     }
     if ((st.st_mode & S_IFMT) == S_IFDIR) {
