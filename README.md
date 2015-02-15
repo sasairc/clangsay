@@ -4,7 +4,7 @@ clangsay
 
 ![default](http://41.media.tumblr.com/d93abecb6fe04a8f6d1c38deba2e963a/tumblr_njt1q0EsZJ1u2jamko1_1280.png)
 
-マルチバイト準対応のcowsayクローン。	
+マルチバイト準対応のcowsayクローン。  
 ただし、半角カナや特殊文字が含まれる場合は、相変わらずズレてしまいます。	
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
 
