@@ -2,12 +2,13 @@ clangsay
 =======
 [![license](https://img.shields.io/badge/License-WTFPL2-blue.svg?style=flat)](http://www.wtfpl.net/txt/copying/)	
 
-![default](http://41.media.tumblr.com/dda874e62f22a91a49839874676e3df1/tumblr_njoy8cC8CO1u2jamko1_1280.png)
+![default](http://41.media.tumblr.com/d93abecb6fe04a8f6d1c38deba2e963a/tumblr_njt1q0EsZJ1u2jamko1_1280.png)
 
-マルチバイト準対応の*cowsay*クローン（半角カナは駄目）	
+マルチバイト準対応のcowsayクローン。	
+ただし、半角カナや特殊文字が含まれる場合は、相変わらずズレてしまいます。	
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
 
-### Build
+### Build & Install
 普通に`make`をします。	
 
 * 全てインストールする場合
@@ -16,35 +17,56 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 # make install
 ```
 
-* 実行ファイルだけをインストールし、cowsayとcowsを共有する場合
+* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合
 ```shellsession
-% make COWPATH="/usr/local/share/cowsay/cows"
+% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください	
 # make install-bin
 ```
 
 ### Usage
-* マルチバイト対応のcowsay的な使い方
+基本的にcowsayのオプションと同様です。
 ```shellsession
-  % export COWPATH="/usr/share/cowsay/cows"	# COWPATHを指定したい場合
-  % yasuna --list | head -n 10 | clangsay
-   ___________________________________________
-  / 0 100円くらいはもらえると思ったのに！      \
-  | 1 100円払うから喋らせて                    |
-  | 2 DVD！？                                  |
-  | 3 UFO・・・とか・・・                      |
-  | 4 Yes                                      |
-  | 5 Yes!!                                    |
-  | 6 「いつも迷惑かけてすいません」           |
-  | 7 「お笑い写真部門」                       |
-  | 8 「千里眼の術」・・・                     |
-  \ 9 「心の冷たい人は手が温かい」の噂の真相は /
-   -------------------------------------------
-          \   ^__^
-           \  (oo)\_______
-              (__)\       )\\/\\
-                  ||----w |
-                  ||     ||
+% export COWPATH="~/.cows"	# COWPATHを指定したい場合
+% clangsay foo bar baz
+ ____
+/ foo \
+| bar |
+\ baz /
+ ----
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+% clangsay "foo bar baz"
+ ____________
+< foo bar baz >
+ ------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+% cat /proc/meminfo | head -n 10 | clangsay
+ ____________________________
+/ MemTotal:        6107204 kB \
+| MemFree:          614952 kB |
+| MemAvailable:    4587172 kB |
+| Buffers:          865520 kB |
+| Cached:           666056 kB |
+| SwapCached:            0 kB |
+| Active:          1873528 kB |
+| Inactive:         765352 kB |
+| Active(anon):    1157912 kB |
+\ Inactive(anon):    37476 kB /
+ ----------------------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
 ```
+詳しくは`clangsay --help`をご覧下さい。
 
 #### License
 [WTFPL version 2](http://www.wtfpl.net/txt/copying/)
