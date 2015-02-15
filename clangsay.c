@@ -328,7 +328,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         strrep(str[i], THOUGHTS, DEFAULT_THOUGHTS);
         while (strrep(str[i], "\\\\", "\\") == 0);
 
-        /* relace eyes*/
+        /* replace eyes*/
         if (clsay->eflag == true) {
             strrep(str[i], EYES, clsay->earg);
         } else if (clsay->bflag == true) {
@@ -351,7 +351,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
             strrep(str[i], EYES, DEFAULT_EYES);
         }
 
-        /* relace tongue*/
+        /* replace tongue*/
         if (clsay->Tflag == true) {
             strrep(str[i], TONGUE, clsay->Targ);
         } else if (clsay->dflag == true || clsay->sflag == true) {
