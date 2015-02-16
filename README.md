@@ -8,20 +8,36 @@ clangsay
 ただし、半角カナや特殊文字が含まれる場合は、相変わらずズレてしまいます。	
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
 
-### Build & Install
-普通に`make`をします。	
-
-* 全てインストールする場合
+### Install
+* Debian/GNU Linux or Debian based system.(amd64)
 ```shellsession
-% make
-# make install
+# echo 'deb http://ssiserver.moe.hm/debian ./' >> /etc/apt/sources.list	
+# apt-get update	
+# apt-get install clangsay
 ```
 
-* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合
+* Debian/GNU Linux or Debian based system.(not amd 64)
 ```shellsession
-% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください	
-# make install-bin
+% cat info.txt
+注意：バージョンは、適時置き換えて下さい。
+% wget -O - http://ssiserver.moe.hm/debian/clangsay_0.0.2-1.tar.gz | tar zxvf -
+% cd clangsay
+% dpkg-buildpackage -uc -us
+# dpkg -i ../clangsay_*.deb
 ```
+
+* Other systems.
+	* 全てインストールする場合
+	```shellsession
+	% make
+	# make install
+	```
+
+	* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合
+	```shellsession
+	% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください	
+	# make install-bin
+	```
 
 ### Usage
 基本的にcowsayのオプションと同様です。
