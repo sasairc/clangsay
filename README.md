@@ -9,14 +9,16 @@ clangsay
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
 
 ### Install
-* Debian/GNU Linux or Debian based system.(amd64)
+* Debian/GNU Linux or Debian based system.(amd64)		
+依存パッケージとしてcowsayがインストールされ、`/usr/share/cowsay/cows`以下が共有されます。
 ```shellsession
 # echo 'deb http://ssiserver.moe.hm/debian ./' >> /etc/apt/sources.list	
 # apt-get update	
 # apt-get install clangsay
 ```
 
-* Debian/GNU Linux or Debian based system.(not amd 64)
+* Debian/GNU Linux or Debian based system.(not amd 64)	
+依存パッケージとしてcowsayがインストールされ、`/usr/share/cowsay/cows`以下が共有されます。	
 ```shellsession
 % cat info.txt
 注意：バージョンは、適時置き換えて下さい。
