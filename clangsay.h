@@ -14,7 +14,6 @@
 #define CLANGSAY_H
 
 #include <stdio.h>
-#include <dirent.h>
 
 #define true        1
 #define false       0
@@ -40,10 +39,6 @@ typedef struct  CLANGSAY_T {
 
 /* This functions is required clangsay.c */
 extern void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** buf2);
-extern int print_string(int lines, char** str);
-extern int print_cow(int lines, char** str, clangsay_t* clsay);
-extern int selects_cowfiles(const struct dirent* dir);
-extern int list_cowfiles(void);
 extern int print_usage(void);
 
 #endif
