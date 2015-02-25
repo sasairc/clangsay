@@ -11,19 +11,22 @@ CC	:= cc
 RM	:= rm
 CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
-SRCS	= clangsay.c file.c string.c memory.c
+SRCS	= clangsay.c subset.c file.c string.c memory.c
 OBJS	= $(SRCS:.c=.o)
 
 all: $(TARGET) $(OBJS)
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"  \
-			-DCOWPATH=\"$(COWPATH)/\"
+		-DCOWPATH=\"$(COWPATH)/\"
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET)
 
 clangsay.o: clangsay.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c clangsay.c -o clangsay.o
+
+subset.o: subset.c
+	$(CC) $(DEFCFLAGS) $(CFLAGS) -c subset.c -o subset.o
 
 file.o: file.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c file.c -o file.o
