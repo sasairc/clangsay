@@ -44,6 +44,9 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	# make install-bin
 	```
 
+### zshでの補完
+\_clangsayのCOWPATH変数を適時修正した後、fpathの通ったディレクトリへ配置して下さい。	
+
 ### Usage
 基本的にcowsayのオプションと同様です。
 ```shellsession
