@@ -6,6 +6,10 @@ TARGET	= clangsay
 PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
 COWPATH	:= $(PREFIX)/share/clangsay/cows
+
+INCLUDE	:= -I/usr/local/include/glib-2.0
+LIBS	:= -l/usr/local/lib/glib-2.0/include
+PKGCFG	:= `pkg-config --cflags --libs glib-2.0`
 MAKE	:= make
 CC	:= cc
 RM	:= rm
@@ -14,13 +18,18 @@ LDFLAGS	:=
 SRCS	= clangsay.c subset.c file.c string.c memory.c
 OBJS	= $(SRCS:.c=.o)
 
-all: $(TARGET) $(OBJS) compdef
+all: $(TARGET) $(OBJS) _clangsay
 
-DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"  \
-		-DCOWPATH=\"$(COWPATH)/\"
+DEFCFLAGS = -DPREFIX=\"$(PREFIX)\" 	  \
+		-DCOWPATH=\"$(COWPATH)/\" \
+	    	$(INCLUDE)		  \
+		$(LIBS)		 	  \
+		$(PKGCFG)
+
+DEFLDFLAGS = $(PKGCFG)
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET)
+	$(CC) $(DEFLDFLAGS) $(LDFLAGS) $(OBJS) -o $(TARGET)
 
 clangsay.o: clangsay.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c clangsay.c -o clangsay.o
@@ -37,7 +46,7 @@ string.o: string.c
 memory.o: memory.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
 
-compdef: _$(TARGET).zsh
+_clangsay: _$(TARGET).zsh
 	@cat _$(TARGET).zsh | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET)
 
 install-bin: $(TARGET)

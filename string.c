@@ -16,6 +16,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <locale.h>
+#include <glib.h>
 
 int strrep(char* src, char* haystack, char* needle)
 {
@@ -88,16 +89,30 @@ char* strlion(int argnum, ...)
 
 int mbstrlen(char* src)
 {
-    int i = 0;
-    int ch = 0;
-    int len = 0;
+    int         i    = 0;
+    int         ch   = 0;
+    int         len  = 0;
+    gunichar*   cpoints;
 
     setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
 
     while (src[i] != '\0') {
         ch = mblen(&src[i], MB_CUR_MAX);    /* get string length */
         if (ch > 1) {
-            len = len + 2;                  /* multi byte */
+            cpoints = g_utf8_to_ucs4_fast(&src[i], sizeof(src[i]), NULL);   /* get unicode code point */
+
+            /*
+             * multi byte
+             * true : hankaku kana
+             * false: other
+             */
+            if (cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) {
+                g_free(cpoints);
+                len++;
+            } else {
+                g_free(cpoints);
+                len = len + 2;
+            }
         } else {
             len++;                          /* ascii */
         }
