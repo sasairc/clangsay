@@ -14,7 +14,7 @@ LDFLAGS	:=
 SRCS	= clangsay.c subset.c file.c string.c memory.c
 OBJS	= $(SRCS:.c=.o)
 
-all: $(TARGET) $(OBJS)
+all: $(TARGET) $(OBJS) compdef
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"  \
 		-DCOWPATH=\"$(COWPATH)/\"
@@ -37,6 +37,9 @@ string.o: string.c
 memory.o: memory.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
 
+compdef: _$(TARGET).zsh
+	@cat _$(TARGET).zsh | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET)
+
 install-bin: $(TARGET)
 	install -pd $(BINDIR)
 	install -pm 755 $(TARGET) $(BINDIR)/
@@ -51,3 +54,4 @@ install: install-bin install-cows
 clean:
 	-$(RM) -f $(OBJS)
 	-$(RM) -f $(TARGET)
+	-$(RM) -f _$(TARGET)

@@ -18,9 +18,7 @@ function _clangsay() {
 }
 
 function _list_cowfile() {
-	if [ -z "${COWPATH+x}" ]; then
-		local COWPATH="/usr/local/share/cowsay/cows"
-	fi
+	local COWPATH="_COWPATH"
 
 	_files -W $COWPATH && \
 		return 0;
