@@ -14,7 +14,7 @@ function _clangsay() {
 		{-f,--file}'[select cow file]:cowfile:_list_cowfile' \
 		{-l,--list}'[display cow list]' \
 		{-h,--help}'[display help]' \
-		{-v,--list}'[output version]'
+		{-v,--version}'[output version]'
 }
 
 function _list_cowfile() {
