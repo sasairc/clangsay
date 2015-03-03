@@ -107,12 +107,12 @@ int mbstrlen(char* src)
              * false: other
              */
             if (cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) {
-                g_free(cpoints);
                 len++;
             } else {
-                g_free(cpoints);
                 len = len + 2;
             }
+
+            g_free(cpoints);
         } else {
             len++;                          /* ascii */
         }

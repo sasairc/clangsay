@@ -7,8 +7,8 @@ PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
 COWPATH	:= $(PREFIX)/share/clangsay/cows
 
-INCLUDE	:= -I/usr/local/include/glib-2.0
-LIBS	:= -l/usr/local/lib/glib-2.0/include
+INCLUDE :=
+LIBS	:=
 PKGCFG	:= `pkg-config --cflags --libs glib-2.0`
 MAKE	:= make
 CC	:= cc
