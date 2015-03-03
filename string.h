@@ -14,6 +14,7 @@
 #ifndef YSTRING_H
 #define YSTRING_H
 
+#define WITH_GLIB   /* use glib */
 #define LOCALE "ja_JP.UTF-8"
 
 /* This functions is required string.c */

@@ -20,7 +20,7 @@ OBJS	= $(SRCS:.c=.o)
 
 all: $(TARGET) $(OBJS) _clangsay
 
-DEFCFLAGS = -DPREFIX=\"$(PREFIX)\" 	  \
+DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 	    	$(INCLUDE)		  \
 		$(LIBS)		 	  \
