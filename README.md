@@ -57,7 +57,7 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	* cowsayとcowファイルを共有せずにインストールする場合	
 	cowsay側のパスではなく	
 	`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`	
-	に対してcowファイルがインストールされます。	
+	に対してcowファイルがインストールされます。		
 	本家cowsayと同様に、シェルの環境変数`$COWPATH`にて動的に切り替えることも可能です。
 	```shellsession
 	% brew tap 844196/Renge	# Tap
