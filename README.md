@@ -52,7 +52,7 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	上記のコマンドを実行した際に、補完関数をインストールしたディレクトリを示す下記のようなメッセージが出ます。	
 	```shellsession
 	zsh completion has been installed to:
-		/usr/local/share/zsh/site-functions	# 一例ですので、Homebrewの導入先により異なります　
+		/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります　
 	```
 	このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。	
 
