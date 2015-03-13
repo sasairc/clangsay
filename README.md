@@ -47,16 +47,18 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	```
 	
 	* zsh補完関数もインストールする場合		
-	環境変数`$fpath`に指定されているパス対して、補完関数ファイルである`_clangsay`がインストールされます。
+	環境変数`$fpath`に指定されているパス対して	
+	補完関数ファイルである`_clangsay`がインストールされます。
 	```shellsession
 	% brew tap 844196/Renge	# Tap
 	% brew install --zsh-completion clangsay	# Install
 	```
 
 	* cowsayとcowファイルを共有せずにインストールする場合	
-	cowsay側のパスではなく、`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`に対して	
-	cowファイルがインストールされます。		
-	本家cowsayと同様に、シェルの環境変数`$COWPATH`にて、動的に切り替えることも可能です。
+	cowsay側のパスではなく	
+	`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`	
+	に対してcowファイルがインストールされます。	
+	本家cowsayと同様に、シェルの環境変数`$COWPATH`にて動的に切り替えることも可能です。
 	```shellsession
 	% brew tap 844196/Renge	# Tap
 	% brew install clangsay --without-cows	# Install
