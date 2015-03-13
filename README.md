@@ -36,7 +36,7 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	# dpkg -i ../clangsay_*.deb
 	```
 
-* Mac OS X/Homebrew	
+* Mac OS X/Homebrew		
   依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
 
 	* 全てインストールする場合（cowファイルを共有）	
@@ -54,7 +54,8 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	```
 
 	* cowsayとcowファイルを共有せずにインストールする場合	
-	cowsay側のパスではなく、`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`に対して、cowファイルがインストールされます。	
+	cowsay側のパスではなく、`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`に対して	
+	cowファイルがインストールされます。	
 	本家cowsayと同様に、シェルの環境変数`$COWPATH`にて、動的に切り替えることも可能です。
 	```shellsession
 	% brew tap 844196/Renge	# Tap
