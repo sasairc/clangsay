@@ -17,6 +17,12 @@
 #include <dirent.h>
 #include "./clangsay.h"
 
+struct reptarg {
+    bool    flag;
+    char*   haystack;
+    char*   needle;
+};
+    
 /* This functions is required subset.c */
 extern int print_string(int lines, char** str);
 extern int print_cow(int lines, char** str, clangsay_t* clsay);

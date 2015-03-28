@@ -71,8 +71,27 @@ int print_string(int lines, char** str)
 
 int print_cow(int lines, char** str, clangsay_t* clsay)
 {
-    int     i;
+    int     i, j;
     bool    block = false;
+
+    /* eyes table */
+    struct  reptarg eyes[] = {
+        {clsay->eflag, EYES, clsay->earg},
+        {clsay->bflag, EYES, BORG_EYES},
+        {clsay->dflag, EYES, DEAD_EYES},
+        {clsay->gflag, EYES, GREEDY_EYES},
+        {clsay->pflag, EYES, PARANOID_EYES},
+        {clsay->sflag, EYES, STONED_EYES},
+        {clsay->tflag, EYES, TIRED_EYES},
+        {clsay->wflag, EYES, WIRED_EYES},
+        {clsay->yflag, EYES, YOUTHFUL_EYES},
+    };
+    /* tongue table */
+    struct  reptarg tongue[] = {
+        {clsay->Tflag, TONGUE, clsay->Targ},
+        {clsay->dflag, TONGUE, DEAD_TONGUE},
+        {clsay->sflag, TONGUE, DEAD_TONGUE},
+    };
 
     /* print cow */
     for (i = 0; i < lines; i++) {
@@ -80,36 +99,20 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         while (strrep(str[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/
-        if (clsay->eflag == true) {
-            strrep(str[i], EYES, clsay->earg);
-        } else if (clsay->bflag == true) {
-            strrep(str[i], EYES, BORG_EYES);
-        } else if (clsay->dflag == true) {
-            strrep(str[i], EYES, DEAD_EYES);
-        } else if (clsay->gflag == true) {
-            strrep(str[i], EYES, GREEDY_EYES);
-        } else if (clsay->pflag == true) {
-            strrep(str[i], EYES, PARANOID_EYES);
-        } else if (clsay->sflag == true) {
-            strrep(str[i], EYES, STONED_EYES);
-        } else if (clsay->tflag == true) {
-            strrep(str[i], EYES, TIRED_EYES);
-        } else if (clsay->wflag == true) {
-            strrep(str[i], EYES, WIRED_EYES);
-        } else if (clsay->yflag == true) {
-            strrep(str[i], EYES, YOUTHFUL_EYES);
-        } else {
-            strrep(str[i], EYES, DEFAULT_EYES);
+        for (j = 0; j < 9; j++) {
+            if (eyes[j].flag == true) {
+                strrep(str[i], eyes[j].haystack, eyes[j].needle);
+            }
         }
+        strrep(str[i], EYES, DEFAULT_EYES);     /* default eyes*/
 
-        /* replace tongue*/
-        if (clsay->Tflag == true) {
-            strrep(str[i], TONGUE, clsay->Targ);
-        } else if (clsay->dflag == true || clsay->sflag == true) {
-            strrep(str[i], TONGUE, DEAD_TONGUE);
-        } else {
-            strrep(str[i], TONGUE, DEFAULT_TONGUE);
-        } 
+        /* replace tongue */
+        for (j = 0; j < 3; j++) {
+            if (tongue[j].flag == true) {
+                strrep(str[i], tongue[j].haystack, tongue[j].needle);
+            }
+        }
+        strrep(str[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
 
         /* EOC to EOC */
         if (strstr(str[i], "EOC")) {
