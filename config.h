@@ -16,7 +16,7 @@
 #define PROGNAME        "clangsay"
 #define VERSION         0
 #define PATCHLEVEL      0
-#define SUBLEVEL        7
+#define SUBLEVEL        8
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
 
