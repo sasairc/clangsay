@@ -76,21 +76,23 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
     /* eyes table */
     struct  reptarg eyes[] = {
-        {clsay->eflag, EYES, clsay->earg},
-        {clsay->bflag, EYES, BORG_EYES},
-        {clsay->dflag, EYES, DEAD_EYES},
-        {clsay->gflag, EYES, GREEDY_EYES},
-        {clsay->pflag, EYES, PARANOID_EYES},
-        {clsay->sflag, EYES, STONED_EYES},
-        {clsay->tflag, EYES, TIRED_EYES},
-        {clsay->wflag, EYES, WIRED_EYES},
-        {clsay->yflag, EYES, YOUTHFUL_EYES},
+        {clsay->eflag,  EYES,   clsay->earg},
+        {clsay->bflag,  EYES,   BORG_EYES},
+        {clsay->dflag,  EYES,   DEAD_EYES},
+        {clsay->gflag,  EYES,   GREEDY_EYES},
+        {clsay->pflag,  EYES,   PARANOID_EYES},
+        {clsay->sflag,  EYES,   STONED_EYES},
+        {clsay->tflag,  EYES,   TIRED_EYES},
+        {clsay->wflag,  EYES,   WIRED_EYES},
+        {clsay->yflag,  EYES,   YOUTHFUL_EYES},
+        {false,         NULL,   NULL},
     };
     /* tongue table */
     struct  reptarg tongue[] = {
-        {clsay->Tflag, TONGUE, clsay->Targ},
-        {clsay->dflag, TONGUE, DEAD_TONGUE},
-        {clsay->sflag, TONGUE, DEAD_TONGUE},
+        {clsay->Tflag,  TONGUE, clsay->Targ},
+        {clsay->dflag,  TONGUE, DEAD_TONGUE},
+        {clsay->sflag,  TONGUE, DEAD_TONGUE},
+        {false,         NULL,   NULL},
     };
 
     /* print cow */
@@ -99,7 +101,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         while (strrep(str[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/
-        for (j = 0; j < 9; j++) {
+        for (j = 0; eyes[j].haystack != NULL || eyes[j].needle != NULL; j++) {
             if (eyes[j].flag == true) {
                 strrep(str[i], eyes[j].haystack, eyes[j].needle);
             }
@@ -107,7 +109,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         strrep(str[i], EYES, DEFAULT_EYES);     /* default eyes*/
 
         /* replace tongue */
-        for (j = 0; j < 3; j++) {
+        for (j = 0; tongue[j].haystack != NULL || tongue[j].needle != NULL; j++) {
             if (tongue[j].flag == true) {
                 strrep(str[i], tongue[j].haystack, tongue[j].needle);
             }
