@@ -113,7 +113,7 @@ int mbstrlen(char* src)
             if (cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) {
                 len++;
             } else {
-                len = len + 2;
+                len += 2;
             }
 
             g_free(cpoints);
@@ -137,7 +137,7 @@ int mbstrlen(char* src)
     while (src[i] != '\0') {
         ch = mblen(&src[i], MB_CUR_MAX);    /* get string length */
         if (ch > 1) {
-            len = len + 2;                  /* multi byte */
+            len += 2;                       /* multi byte */
         } else {
             len++;                          /* ascii */
         }
