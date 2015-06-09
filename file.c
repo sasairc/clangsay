@@ -80,12 +80,13 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
             /* 0: string < BUFLEN */
             str[strlen(str) - 1] = '\0';
             buf[i] = (char*)malloc(         /* Allocate array for X coordinate */
-                    (strlen(str) + 1) * sizeof(char)
+                (strlen(str) + 1) * sizeof(char)
             );
             strcpy(buf[i], str);            /* Copy, str to buffer */
-        } else {
+        } else if (length < strlen(str)) {
             /* 1: string > BUFLEN */
             free(str);
+
             return 0;
         }
         i++;
