@@ -21,7 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <getopt.h>
-#include <sys/stat.h>
 
 int main(int argc, char* argv[])
 {
@@ -160,35 +159,15 @@ int main(int argc, char* argv[])
             }
         }
     }
-    if ((st.st_mode & S_IFMT) == S_IFDIR) {
-        fprintf(stderr, "%s: %s: is a directory\n", PROGNAME, path);
+    if (check_file_stat(path, st.st_mode) != 0) {
         release(NULL, path, 0, NULL, 0, NULL);
-        
+
         return 3;
     }
-
-    /* checking file permission */
-    if (access(path, R_OK) != 0) {
-        fprintf(stderr, "%s: %s: permission denied\n", PROGNAME, path);
+    if ((fp = open_file(path)) == NULL) {
         release(NULL, path, 0, NULL, 0, NULL);
 
         return 4;
-    }
-
-    /* open after checking file type */
-    if (check_file_type(path) == 0) {
-        fp = fopen(path, "r");
-    } else {
-        fprintf(stderr, "%s: %s: unknown file type\n", PROGNAME, path);
-        release(fp, path, 0, NULL, 0, NULL);
-
-        return 5;
-    }
-    if (fp == NULL) {
-        fprintf(stderr, "%s: fp is NULL\n", PROGNAME);
-        release(NULL, path, 0, NULL, 0, NULL);
-
-        return 6;
     }
 
     lines = count_file_lines(fp);                       /* count line for cow-file */
@@ -199,7 +178,7 @@ int main(int argc, char* argv[])
         fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
         release(fp, path, 0, NULL, 0, NULL);
 
-        return 7;
+        return 5;
     }
 
     /* 
@@ -214,7 +193,7 @@ int main(int argc, char* argv[])
                 fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
                 release(fp, path, stdins, strbuf, 0, NULL);
 
-                return 8;
+                return 6;
             }
             strcpy(strbuf[i], argv[optind]);
         }
@@ -228,7 +207,7 @@ int main(int argc, char* argv[])
             );
             release(fp, path, stdins, strbuf, 0, NULL);
 
-            return 9;
+            return 7;
         }
     }
 
@@ -242,7 +221,7 @@ int main(int argc, char* argv[])
         );
         release(fp, path, stdins, strbuf, lines, cowbuf);
 
-        return 10;
+        return 8;
     }
 
     /* remove escape sequence */

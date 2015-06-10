@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include "./clangsay.h"
 
 struct reptarg {
@@ -24,6 +25,8 @@ struct reptarg {
 };
     
 /* This functions is required subset.c */
+extern FILE* open_file(char* path);
+extern int check_file_stat(char* path, mode_t mode);
 extern int print_string(int lines, char** str);
 extern int print_cow(int lines, char** str, clangsay_t* clsay);
 extern int selects_cowfiles(const struct dirent* dir);

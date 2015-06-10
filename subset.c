@@ -14,10 +14,52 @@
 #include "./clangsay.h"
 #include "./subset.h"
 #include "./string.h"
+#include "./file.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <dirent.h>
+#include <sys/stat.h>
+
+FILE* open_file(char* path)
+{
+    FILE* fp;
+
+    /* open after checking file type */
+    if (check_file_type(path) == 0) {
+        fp = fopen(path, "r");
+    } else {
+        fprintf(stderr, "%s: %s: unknown file type\n", PROGNAME, path);
+
+        return NULL;
+    }
+    if (fp == NULL) {
+        fprintf(stderr, "%s: fp is NULL\n", PROGNAME);
+
+        return NULL;;
+    }
+
+    return fp;
+}
+
+int check_file_stat(char* path, mode_t mode)
+{
+    if ((mode & S_IFMT) == S_IFDIR) {
+        fprintf(stderr, "%s: %s: is a directory\n", PROGNAME, path);
+        
+        return 1;
+    }
+
+    /* checking file permission */
+    if (access(path, R_OK) != 0) {
+        fprintf(stderr, "%s: %s: permission denied\n", PROGNAME, path);
+
+        return 2;
+    }
+
+    return 0;
+}
 
 int print_string(int lines, char** str)
 {
@@ -170,7 +212,7 @@ int list_cowfiles(void)
     if ((entry = scandir(path, &list, selects_cowfiles, alphasort)) == -1) {
         fprintf(stderr, "%s: scandir() failed\n", PROGNAME);
 
-        exit(11);
+        exit(9);
     }
     for (i = 0; i < entry; i++) {
         fprintf(stdout, "%s\n", list[i]->d_name);

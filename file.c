@@ -83,7 +83,7 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
                 (strlen(str) + 1) * sizeof(char)
             );
             strcpy(buf[i], str);            /* Copy, str to buffer */
-        } else if (length < strlen(str)) {
+        } else {
             /* 1: string > BUFLEN */
             free(str);
 
