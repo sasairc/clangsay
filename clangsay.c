@@ -224,10 +224,18 @@ int main(int argc, char* argv[])
         return 8;
     }
 
-    /* remove escape sequence */
+    /* 
+     * strunesc():    remove escape sequence
+     * strlftonull(): rf to null
+     */
     for (i = 0; i < stdins; i++) {
+        strlftonull(strbuf[i]);
         strunesc(strbuf[i]);
     }
+    for (i = 0; i < lines; i++) {
+        strlftonull(cowbuf[i]);
+    }
+
     /* print string */
     print_string(stdins, strbuf);
     /* print cow */
