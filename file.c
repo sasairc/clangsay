@@ -73,23 +73,19 @@ int count_file_lines(FILE* fp)
 int read_file(int lines, size_t length, char** buf, FILE* fp)
 {
     int     i = 0;
-    char*   str = (char*)malloc(sizeof(char) * length); /* Allocate buffer */
+    char*   str = (char*)malloc(sizeof(char) * length); /* allocate buffer */
 
     while (i <= lines && fgets(str, sizeof(char) * length, fp) != NULL) {
-        if (str[strlen(str) - 1] == '\n') { /* Checking string length */
-            /* 0: string < BUFLEN */
-            str[strlen(str) - 1] = '\0';
-            buf[i] = (char*)malloc(         /* Allocate array for X coordinate */
+        buf[i] = (char*)malloc(     /* allocate array for X coordinate */
                 (strlen(str) + 1) * sizeof(char)
             );
-            strcpy(buf[i], str);            /* Copy, str to buffer */
-        } else {
-            /* 1: string > BUFLEN */
+        if (buf[i] == NULL) {
             free(str);
-
+            
             return 0;
         }
-        i++;
+        strcpy(buf[i], str);        /* copy, str to buffer */
+        i++;                        /* count line */
     }
     free(str);
 
