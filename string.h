@@ -23,5 +23,6 @@ extern char* strlion(int argnum, ...);
 extern int mbstrlen(char* src);
 extern int strunesc(char* src);
 extern int strmax(int val, char** src);
+extern int strlftonull(char* str);
 
 #endif
