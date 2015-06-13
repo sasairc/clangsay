@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * file.c
+ * clangsay.c
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/select.h>
 
 int check_file_type(char* filename)
 {
@@ -90,4 +92,101 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
     free(str);
 
     return i;
+}
+
+int p_count_file_lines(char** buf)
+{
+    int i;
+
+    for (i = 0; buf[i] != NULL; i++);
+
+    return i;
+}
+
+char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
+{
+    int     lines   = t_lines,
+            length  = t_length;
+    int     i       = 0,
+            x       = 0,
+            y       = 0;
+    char    c;
+    char*   str     = (char*)malloc(sizeof(char) * t_length);   /* allocate temporary array */
+    char**  buf     = (char**)malloc(sizeof(char*) * t_lines);  /* allocate array of Y coordinate */
+
+    if (str == NULL || buf == NULL) {
+
+        return NULL;
+    } else if (t_lines == 0 || t_length == 0 || fp == NULL) {
+        free(str);
+        free(buf);
+
+        return NULL;
+    }
+
+    while ((c = fgetc(fp)) != EOF) {
+        switch (c) {
+            case    '\n':
+                /* reallocate array of Y coordinate */
+                if (y == (lines - 1)) {
+                    lines += t_lines;
+                    if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL)
+                        goto ERR;
+                }
+                /* allocate array for X coordinate */
+                buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1));
+                strcpy(buf[y], str);    /* copy, str to buffer */
+                for (i = 0; i < length; i++) {
+                    str[i] = '\0';      /* refresh temporary array */
+                }
+                x = 0;
+                y++;
+                break;
+            default:
+                /* reallocate temporary array */
+                if (x == (length - 1)) {
+                    length += t_length;
+                    if ((str = (char*)realloc(str, length)) == NULL)
+                        goto ERR;
+                }
+                str[x] = c;
+                x++;
+                continue;
+        }
+    }
+    buf[y] = NULL;
+
+    return buf;
+
+
+ERR:
+    lines   -= t_lines;
+    length  -= t_length;
+
+    if (buf != NULL) {
+        for (i = 0; i < lines; i++) {
+            if (buf[i] != NULL) {
+                free(buf[i]);
+                buf[i] = NULL;
+            }
+        }
+        free(buf);
+    }
+    if (str != NULL)
+        free(str);
+
+    return NULL;
+}
+
+int watch_fd(int fd, long timeout)
+{
+    fd_set  fdset;
+    struct  timeval tm;
+
+    FD_ZERO(&fdset);
+    FD_SET(fd, &fdset);
+
+    tm.tv_sec = tm.tv_usec = timeout;
+
+    return select(fd+1, &fdset, NULL, NULL, &tm);
 }
