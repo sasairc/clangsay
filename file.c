@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * clangsay.c
+ * file.c
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
