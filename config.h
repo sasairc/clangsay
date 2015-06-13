@@ -20,8 +20,13 @@
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
 
-#define BUFLEN          1024
-#define STLINE          480
+/*
+ * # setting of realloc() timing
+ * TH_LINES  : threshold of lines (sizeof(char*) * TH_LINES)
+ * TH_LENGTH : threshold of string (sizeof(char) * TH_LENGTH)
+ */
+#define TH_LINES        128
+#define TH_LENGTH       512
 
 #define EYES            "$eyes"
 #define THOUGHTS        "$thoughts"
