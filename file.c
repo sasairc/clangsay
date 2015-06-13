@@ -127,11 +127,15 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
     while ((c = fgetc(fp)) != EOF) {
         switch (c) {
             case    '\n':
+                str[x] = c;
+
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
                     lines += t_lines;
-                    if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL)
+                    if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL) {
+
                         goto ERR;
+                    }
                 }
                 /* allocate array for X coordinate */
                 buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1));
@@ -139,6 +143,7 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 for (i = 0; i < length; i++) {
                     str[i] = '\0';      /* refresh temporary array */
                 }
+
                 x = 0;
                 y++;
                 break;
@@ -146,13 +151,30 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 /* reallocate temporary array */
                 if (x == (length - 1)) {
                     length += t_length;
-                    if ((str = (char*)realloc(str, length)) == NULL)
+                    if ((str = (char*)realloc(str, length)) == NULL) {
+
                         goto ERR;
+                    }
                 }
+
                 str[x] = c;
                 x++;
                 continue;
         }
+    }
+
+    if (str[0] != '\0') {
+        if (y == (lines - 1)) {
+            str[x] = c;
+            lines += t_lines;
+            if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL) {
+
+                goto ERR;
+            }
+        }
+        buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1));
+        strcpy(buf[y], str);
+        y++;
     }
     buf[y] = NULL;
 
