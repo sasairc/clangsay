@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
             path = strlion(3, env, "/", DEFAULT_COWFILE);
         }
         if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failed\n", PROGNAME);
+            fprintf(stderr, "%s: strlion() failure\n", PROGNAME);
 
             return 1;
         }
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
             path = strlion(2, COWPATH, DEFAULT_COWFILE);
         }
         if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failed\n", PROGNAME);
+            fprintf(stderr, "%s: strlion() failure\n", PROGNAME);
 
             return 1;
         }
@@ -170,27 +170,23 @@ int main(int argc, char* argv[])
         return 4;
     }
 
-    lines = count_file_lines(fp);                       /* count line for cow-file */
-    cowbuf = (char**)malloc(sizeof(char*) * lines);     /* allocate array for y coordinate (cows) */
-    strbuf = (char**)malloc(sizeof(char*) * STLINE);    /* allocate array for y coordinate (strings) */
-
-    if (cowbuf == NULL || strbuf == NULL) {
-        fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
-        release(fp, path, 0, NULL, 0, NULL);
-
-        return 5;
-    }
-
     /* 
      * reading stdin or args to array
      * true : arguments
      * false: pipe
      */ 
     if (argv[optind] != NULL) { 
-        for (i = 0; optind < argc && i < STLINE; optind++, i++) {
+        strbuf = (char**)malloc(sizeof(char*) * (argc - optind));   /* allocate array for y coordinate (strings) */
+        if (strbuf == NULL) {
+            fprintf(stderr, "%s: malloc() failure\n", PROGNAME);
+            release(fp, path, 0, NULL, 0, NULL);
+            
+            return 5;
+        }
+        for (i = 0; optind < argc; optind++, i++) {
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
-                fprintf(stderr, "%s: malloc() failed\n", PROGNAME);
+                fprintf(stderr, "%s: malloc() failure\n", PROGNAME);
                 release(fp, path, stdins, strbuf, 0, NULL);
 
                 return 6;
@@ -199,29 +195,23 @@ int main(int argc, char* argv[])
         }
         stdins = i;
     } else {
-        if ((stdins = read_file(STLINE, BUFLEN, strbuf, stdin)) == 0) {
-            fprintf(
-                stderr,
-                "%s capacity of buffer is not enough: BUFLEN=%d\n",
-                PROGNAME, BUFLEN
-            );
-            release(fp, path, stdins, strbuf, 0, NULL);
+        if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
+            fprintf(stderr, "%s p_read_file_char() failure\n", PROGNAME);
+            release(fp, path, 0, NULL, 0, NULL);
 
             return 7;
         }
+        stdins = p_count_file_lines(strbuf);    /* count file lines */
     }
 
     /* reading cow file to array */
-    rewind(fp);
-    if (read_file(lines, BUFLEN, cowbuf, fp) == 0) {
-        fprintf(
-                stderr,
-                "%s capacity of buffer is not enough: BUFLEN=%d\n",
-                PROGNAME, BUFLEN
-        );
-        release(fp, path, stdins, strbuf, lines, cowbuf);
+    if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
+        fprintf(stderr, "%s p_read_file_char() failure\n", PROGNAME);
+        release(fp, path, stdins, strbuf, 0, NULL);
 
         return 8;
+    } else {
+        lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
 
     /* 
