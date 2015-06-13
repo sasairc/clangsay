@@ -25,7 +25,7 @@
  * TH_LINES  : threshold of lines (sizeof(char*) * TH_LINES)
  * TH_LENGTH : threshold of string (sizeof(char) * TH_LENGTH)
  */
-#define TH_LINES        128
+#define TH_LINES        256
 #define TH_LENGTH       512
 
 #define EYES            "$eyes"
