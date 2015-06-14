@@ -26,11 +26,13 @@ int strrep(char* src, char* haystack, char* needle)
     char* find = NULL;
 
     if (src == NULL || haystack == NULL || needle == NULL) {
+
         return 1;
     }
 
     /* seach strings */
     if ((find = strstr(src, haystack)) == NULL) {
+
         return 3;       /* word not found */
     }
     if (strlen(haystack) < strlen(needle)) {
@@ -176,4 +178,15 @@ int strmax(int val, char** src)
     }
 
     return max;
+}
+
+int strlftonull(char* str)
+{
+    if (str[strlen(str) - 1] == '\n') {
+        str[strlen(str) - 1] = '\0';
+
+        return 1;
+    }
+
+    return 0;
 }
