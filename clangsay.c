@@ -278,7 +278,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
 \n\
 Report %s bugs to %s <%s>\n\
 ", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL,
-AUTHOR, AUTHOR, MAIL_TO);
+PROGNAME, AUTHOR, MAIL_TO);
 
     exit(0);
 }
