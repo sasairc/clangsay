@@ -24,16 +24,17 @@
 
 int main(int argc, char* argv[])
 {
-    int     i;
-    int     res, index;     /* use getopt_long() */
-    int     lines  = 0;     /* lines of cowfile*/
-    int     stdins = 0;     /* lines of string */
-    char*   env    = NULL;  /* $COWPATH */
-    char*   path   = NULL;  /* .cow file */
-    char**  cowbuf = NULL;  /* string buffer (cow) */
-    char**  strbuf = NULL;  /* string buffer (string) */
-    FILE*   fp     = NULL;  /* cow-file */
-    struct  stat st;        /* file status */
+    int     i       = 0,
+            res     = 0,    /* use getopt_long() */
+            index   = 0,
+            lines   = 0,    /* lines of cowfile*/
+            stdins  = 0;    /* lines of string */
+    FILE*   fp      = NULL; /* cow-file */
+    char*   env     = NULL; /* $COWPATH */
+    char*   path    = NULL; /* .cow file */
+    char**  cowbuf  = NULL; /* string buffer (cow) */
+    char**  strbuf  = NULL; /* string buffer (string) */
+    struct  stat    st;     /* file status */
 
     /* flag and args */
     clangsay_t  clsay = {

@@ -18,7 +18,7 @@
 #include <sys/stat.h>
 #include "./clangsay.h"
 
-struct reptarg {
+struct  reptarg {
     bool    flag;
     char*   haystack;
     char*   needle;

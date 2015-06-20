@@ -20,13 +20,14 @@
 
 int check_file_type(char* filename)
 {
-    int     i, c;
-    FILE*   fp = NULL;
+    int     i,
+            c;
+    FILE*   fp  = NULL;
 
     int     rtf[5] = {0x7B, 0x5C, 0x72, 0x74, 0x66};    /* {\rtf is Ritch-test format's header */
 
-    fp = fopen(filename, "rb");
-    if (fp == NULL) {
+    if ((fp = fopen(filename, "rb")) == NULL) {
+
         return -1;
     }
 
@@ -36,6 +37,7 @@ int check_file_type(char* filename)
             break;
         } else if (c <= 8) {        /* binary or Unknown format */
             fclose(fp);
+
             return 1;
         } else if (c == 0x7B) {     /* ritch text format */
             rewind(fp);
@@ -45,6 +47,7 @@ int check_file_type(char* filename)
                     continue;
                 } else {
                     fclose(fp);
+
                     return 0;
                 }
             }
@@ -60,13 +63,13 @@ int check_file_type(char* filename)
 
 int count_file_lines(FILE* fp)
 {
-    int i;
-    int lines = 0;
+    int i       = 0,
+        lines   = 0;
 
     rewind(fp);     /* seek file-stream to the top */
     while ((i = getc(fp)) != EOF) {
-        if (i == '\n')
-            lines++;
+    if (i == '\n')
+        lines++;
     }
 
     return lines;
@@ -74,13 +77,17 @@ int count_file_lines(FILE* fp)
 
 int read_file(int lines, size_t length, char** buf, FILE* fp)
 {
-    int     i = 0;
-    char*   str = (char*)malloc(sizeof(char) * length); /* allocate buffer */
+    int     i   = 0;
+    char*   str = NULL;
 
+    if ((str = (char*)malloc(sizeof(char) * length)) == NULL) { /* allocate buffer */
+
+        return 0;
+    }
     while (i <= lines && fgets(str, sizeof(char) * length, fp) != NULL) {
         buf[i] = (char*)malloc(     /* allocate array for X coordinate */
-                (strlen(str) + 1) * sizeof(char)
-            );
+                    (strlen(str) + 1) * sizeof(char)
+                );
         if (buf[i] == NULL) {
             free(str);
             
@@ -106,8 +113,8 @@ int p_count_file_lines(char** buf)
 char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
 {
     int     lines   = t_lines,
-            length  = t_length;
-    int     i       = 0,
+            length  = t_length,
+            i       = 0,
             x       = 0,
             y       = 0;
     char    c;
@@ -128,7 +135,6 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
         switch (c) {
             case    '\n':
                 str[x] = c;
-
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
                     lines += t_lines;
@@ -138,12 +144,14 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                     }
                 }
                 /* allocate array for X coordinate */
-                buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1));
+                if ((buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1))) == NULL) {
+
+                    goto ERR;
+                }
                 strcpy(buf[y], str);    /* copy, str to buffer */
                 for (i = 0; i < length; i++) {
                     str[i] = '\0';      /* refresh temporary array */
                 }
-
                 x = 0;
                 y++;
                 break;
@@ -156,7 +164,6 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                         goto ERR;
                     }
                 }
-
                 str[x] = c;
                 x++;
                 continue;
@@ -172,7 +179,10 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 goto ERR;
             }
         }
-        buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1));
+        if ((buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1))) == NULL) {
+
+            goto ERR;
+        }
         strcpy(buf[y], str);
         y++;
     }
