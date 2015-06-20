@@ -24,5 +24,6 @@ extern int mbstrlen(char* src);
 extern int strunesc(char* src);
 extern int strmax(int val, char** src);
 extern int strlftonull(char* str);
+extern char** str_to_args(char* str);
 
 #endif

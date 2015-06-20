@@ -201,3 +201,84 @@ int strlftonull(char* str)
 
     return 0;
 }
+
+char** str_to_args(char* str)
+{
+    /*
+     * # note
+     *
+     *  sx   : current strings array pointer
+     *  xt   : temporary string array pointer
+     *  ax   : args array pointer (X)
+     *  ay   : args array pointer (Y)
+     *  elmc : elements counter
+     *  dspf : double space flag
+     */
+    int     i,
+            sx, xt, ax, ay,
+            elmc,
+            dspf;
+    char**  args;
+    
+    /* count elements */
+    for (i = dspf = 0, elmc = 1; str[i] != '\0'; i++) {
+        if (str[i] == ' ' || str[i] == '\t') {
+            if (dspf == 1)
+                continue;
+
+            elmc++;
+            dspf = 1;
+        } else {
+            dspf = 0;
+        }
+    }
+
+    if (elmc >= 1) {
+        args = (char**)malloc(sizeof(char*) * (elmc + 1));
+        if (args == NULL)
+            return NULL;
+    } else {
+        return NULL;
+    }
+    /* string to args */
+    for (dspf = sx = ay = ax = xt = 0; sx <= strlen(str); sx++) {
+        if (str[sx] == ' ' || str[sx] == '\t' || str[sx] == '\0') {
+            if (dspf == 1) {
+                xt++;
+                continue;
+            }
+            if ((args[ay] = (char*)malloc(sizeof(char) * (sx - xt + 1))) == NULL)
+                goto ERR;
+
+            for (ax = 0; xt < sx; xt++, ax++) {
+                    args[ay][ax] = str[xt];
+            }
+            args[ay][ax] = '\0';
+            xt++;
+            ay++;
+            dspf = 1;
+        } else {
+            dspf = 0;
+        }
+    }
+
+#ifdef  DEBUG
+    fprintf(stderr, "DEBUG: str_to_args(): args(%p)\n", args);
+    for (i = 0; i <= elmc; i++)
+        fprintf(stderr, "DEBUG: str_to_args(): args[%d](%p) = %s\n", i, args[i], args[i]);
+#endif
+
+    return args;
+
+
+ERR:
+    for (i = 0; i < elmc; i++) {
+        if (args[i] != NULL) {
+            free(args[i]);
+            args[i] = NULL;
+        }
+    }
+    free(args);
+
+    return NULL;
+}
