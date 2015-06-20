@@ -23,7 +23,7 @@
 
 int strrep(char* src, char* haystack, char* needle)
 {
-    char* find = NULL;
+    char*   find = NULL;
 
     if (src == NULL || haystack == NULL || needle == NULL) {
 
@@ -33,10 +33,17 @@ int strrep(char* src, char* haystack, char* needle)
     /* seach strings */
     if ((find = strstr(src, haystack)) == NULL) {
 
-        return 3;       /* word not found */
+        return 2;       /* word not found */
     }
     if (strlen(haystack) < strlen(needle)) {
-        src = (char*)realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack)); /* reallocate memory */
+        /* reallocate memory */
+        if ((src = (char*)realloc(
+                        src,
+                        strlen(src) + strlen(needle) + 1 - strlen(haystack))
+            ) == NULL) {
+
+            return 3;
+        }
         /* move match word to specified location in memory */
         memmove(
             find + strlen(needle),
@@ -67,9 +74,10 @@ char* strlion(int argnum, ...)
     size_t  size    = 0;    /* string size */
     va_list list;           /* list of variable arguments */
 
-    argmnt = (char**)malloc(sizeof(char*) * argnum);
-    if (argmnt == NULL)
+    if ((argmnt = (char**)malloc(sizeof(char*) * argnum)) == NULL) {
+
         return NULL;
+    }
 
     /* processing of variable arguments */
     va_start(list, argnum);
@@ -82,8 +90,10 @@ char* strlion(int argnum, ...)
     for (i = 0; i < argnum; i++) {
         size = size + strlen(argmnt[i]);
     }
-    buf = (char*)malloc(sizeof(char) * (size + 1)); /* memory allocation */
+    if ((buf = (char*)malloc(sizeof(char) * (size + 1))) == NULL) { /* memory allocation */
 
+        return NULL;
+    }
     for (i = 0; i < argnum; i++) {
         strcat(buf, argmnt[i]);     /* string concatenate */
     }
@@ -95,9 +105,9 @@ char* strlion(int argnum, ...)
 #ifdef  WITH_GLIB
 int mbstrlen(char* src)
 {
-    int         i    = 0;
-    int         ch   = 0;
-    int         len  = 0;
+    int         i   = 0,
+                ch  = 0,
+                len = 0;
     gunichar*   cpoints;
 
     setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
@@ -130,9 +140,9 @@ int mbstrlen(char* src)
 #else
 int mbstrlen(char* src)
 {
-    int i = 0;
-    int ch = 0;
-    int len = 0;
+    int i   = 0,
+        ch  = 0,
+        len = 0;
 
     setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
 
@@ -152,8 +162,8 @@ int mbstrlen(char* src)
 
 int strunesc(char* src)
 {
-    int i = 0;
-    int count = 0;
+    int i       = 0,
+        count   = 0;
 
     while (src[i] != '\0') {
         if (src[i] == '\t' || src[i] == '\b') {
@@ -168,13 +178,14 @@ int strunesc(char* src)
             
 int strmax(int val, char** src)
 {
-    int i;
-    int len = 0;
-    int max = 0;
+    int i   = 0,
+        len = 0,
+        max = 0;
 
     for (i = 0; i < val; i++) {
         len = mbstrlen(src[i]);
-        if (max < len)  max = len;
+        if (max < len)
+            max = len;
     }
 
     return max;

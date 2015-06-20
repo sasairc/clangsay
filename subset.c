@@ -24,7 +24,7 @@
 
 FILE* open_file(char* path)
 {
-    FILE* fp;
+    FILE*   fp;
 
     /* open after checking file type */
     if (check_file_type(path) == 0) {
@@ -63,8 +63,9 @@ int check_file_stat(char* path, mode_t mode)
 
 int print_string(int lines, char** str)
 {
-    int i, j;
-    int len = strmax(lines, str);       /* get max length */
+    int i   = 0,
+        j   = 0,
+        len = strmax(lines, str);   /* get max length */
 
     /* one line */
     fprintf(stdout, " ");
@@ -113,8 +114,9 @@ int print_string(int lines, char** str)
 
 int print_cow(int lines, char** str, clangsay_t* clsay)
 {
-    int     i, j;
-    bool    block = false;
+    int     i       = 0,
+            j       = 0;
+    bool    block   = false;
 
     /* eyes table */
     struct  reptarg eyes[] = {
@@ -190,16 +192,18 @@ int selects_cowfiles(const struct dirent* dir)
      * true: .cow
      * false: other
      */
-    if (*lp == *(int*)&dotcow)
+    if (*lp == *(int*)&dotcow) {
+
         return 1;
+    }
 
     return 0;
 }
 
 int list_cowfiles(void)
 {
-    int     i;
-    int     entry;
+    int     i       = 0,
+            entry   = 0;
     char*   path    = NULL;
     struct  dirent**  list;
 

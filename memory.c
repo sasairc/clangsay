@@ -16,11 +16,11 @@
 
 char** malloc2d(int x, int y)
 {
-    char**  buf;
-    int     i;
+    int     i   = 0;
+    char**  buf = NULL;;
 
-    buf = (char**) malloc(sizeof(char*) * y);       /* Allocate array for Y coordinate */
-    if (buf == NULL) {
+    if ((buf = (char**) malloc(sizeof(char*) * y)) == NULL) {   /* Allocate array for Y coordinate */
+
         return NULL;
     }
     for (i = 0; i < y; i++) {
@@ -32,7 +32,8 @@ char** malloc2d(int x, int y)
 
 int init2d(char** buf, int x, int y)
 {
-    int i, j;
+    int i = 0,
+        j = 0;
 
     /* Initialize each element of array */
     for (i = 0; i < y; i++) {
@@ -47,7 +48,7 @@ int init2d(char** buf, int x, int y)
             
 void free2d(char** buf, int y)
 {
-    int i;
+    int i = 0;
 
     for (i = 0; i < y; i++) {
         if (buf[i] != NULL) {
