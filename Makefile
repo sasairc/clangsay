@@ -17,11 +17,13 @@ CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
 SRCS	= clangsay.c subset.c file.c string.c memory.c
 OBJS	= $(SRCS:.c=.o)
+ARCH	:= $(shell gcc -print-multiarch)
 
 all: $(TARGET) $(OBJS) _clangsay
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
+		-DARCH=\"$(ARCH)\"	  \
 	    	$(INCLUDE)		  \
 		$(LIBS)		 	  \
 		$(PKGCFG)
