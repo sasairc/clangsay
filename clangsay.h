@@ -39,6 +39,7 @@ typedef struct  CLANGSAY_T {
 
 /* This functions is required clangsay.c */
 extern void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** buf2);
+extern int print_version(void);
 extern int print_usage(void);
 
 #endif

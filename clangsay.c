@@ -109,13 +109,10 @@ int main(int argc, char* argv[])
                 break;
             case    'l':
                 list_cowfiles();
-                break;
             case    'h':
                 print_usage();
-                break;
             case    'v':
-                fprintf(stdout, "%s %d.%d.%d\n", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL);
-                exit(0);
+                print_version();
             case    '?':
                 return -1;
         }
@@ -252,6 +249,13 @@ void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** b
     if (buf2 != NULL) {
         free2d(buf2, lines2);
     }
+}
+
+int print_version(void)
+{
+    fprintf(stdout, "%s %d.%d.%d (%s)\n", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL, ARCH);
+
+    exit(0);
 }
 
 int print_usage(void)
