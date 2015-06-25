@@ -1,4 +1,6 @@
 language: c
+before-install: sudo apt-get update
+before-install: libglib2.0-dev pkg-config
 compiler:
     - gcc
     - clang
