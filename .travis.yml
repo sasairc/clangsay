@@ -1,0 +1,13 @@
+language: c
+compiler:
+    - gcc
+    - clang
+brefore_install:
+    - sudo add-apt-repository ppa:lyrasis/precise-backports -y
+    - sudo apt-get update
+    - sudo apt-get -y install build-essential pkg-config glib2.0 libglib2.0-dev
+    - gcc --version
+    - clang --version
+script:
+    - make
+    - make clean
