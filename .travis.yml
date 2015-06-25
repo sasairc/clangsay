@@ -2,7 +2,7 @@ language: c
 compiler:
     - gcc
     - clang
-brefore_install:
+before_install:
     - sudo add-apt-repository ppa:lyrasis/precise-backports -y
     - sudo apt-get update
     - sudo apt-get -y install pkg-config glib2.0 libglib2.0-dev
