@@ -8,5 +8,5 @@ before_install:
     - gcc --version
     - clang --version
 script:
-    - make `pkg-config --cflags --libs glib-2.0`
+    - make PKGCFG="`pkg-config --cflags --libs glib-2.0`"
     - make clean
