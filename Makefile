@@ -31,7 +31,7 @@ DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 DEFLDFLAGS = $(PKGCFG)
 
 $(TARGET): $(OBJS)
-	$(CC) $(DEFLDFLAGS) $(LDFLAGS) $(OBJS) -o $(TARGET)
+	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
 
 clangsay.o: clangsay.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c clangsay.c -o clangsay.o
@@ -43,7 +43,7 @@ file.o: file.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c file.c -o file.o
 
 string.o: string.c
-	$(CC) $(CFLAGS) -c string.c -o string.o $(DEFCFLAGS) 
+	$(CC) $(DEFCFLAGS) $(CFLAGS) -c string.c -o string.o
 
 memory.o: memory.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
