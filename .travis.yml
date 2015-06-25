@@ -1,0 +1,9 @@
+language: c
+compiler:
+    - gcc
+    - clang
+script:
+    - clang --version
+    - make CC="clang" && make clean
+    - gcc --version
+    - make && make clean
