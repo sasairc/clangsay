@@ -3,13 +3,10 @@ compiler:
     - gcc
     - clang
 before_install:
-    - sudo add-apt-repository ppa:lyrasis/precise-backports -y
     - sudo apt-get update
     - sudo apt-get -y install pkg-config glib2.0 libglib2.0-dev
-    - pkg-config --cflags --libs glib-2.0
     - gcc --version
     - clang --version
-    - find . -name libglib-2.0.so
 script:
-    - make
+    - make `pkg-config --cflags --libs glib-2.0`
     - make clean
