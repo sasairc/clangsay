@@ -4,7 +4,7 @@ compiler:
     - clang
 before_install:
     - sudo apt-get update
-    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev libglib2.0-data
+    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev libglib2.0-data libgtk2.0-dev
     - gcc --version
     - clang --version
 script:
