@@ -1,5 +1,7 @@
 language: c
-before-install: libglib2.0-dev pkg-config
+install:
+    - sudo apt-get update
+    - sudo apt-get -y install glib2.0 libglib2.0-dev
 compiler:
     - gcc
     - clang
