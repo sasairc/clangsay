@@ -4,9 +4,9 @@ compiler:
     - clang
 before_install:
     - sudo apt-get update
-    - sudo apt-get -y install pkg-config glib2.0 libglib2.0-dev
+    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev libglib2.0-data
     - gcc --version
     - clang --version
 script:
-    - make PKGCFG="`pkg-config --cflags --libs glib-2.0`"
+    - make
     - make clean
