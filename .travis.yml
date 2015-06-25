@@ -9,6 +9,7 @@ brefore_install:
     - pkg-config --cflags --libs glib-2.0
     - gcc --version
     - clang --version
+    - find . -name libglib-2.0.so
 script:
     - make
     - make clean
