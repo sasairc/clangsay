@@ -8,5 +8,5 @@ before_install:
     - sudo apt-get install pkg-config glib2.0 libglib2.0-dev
     - pkg-config pkg-config --libs glib-2.0 
 script:
-    - make
-    - male clean
+    - make PKGCFG='`pkg-config --cflags --libs glib-2.0`"
+    - make clean
