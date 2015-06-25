@@ -43,7 +43,7 @@ file.o: file.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c file.c -o file.o
 
 string.o: string.c
-	$(CC) $(DEFCFLAGS) $(CFLAGS) -c string.c -o string.o
+	$(CC) $(CFLAGS) -c string.c -o string.o $(DEFCFLAGS) 
 
 memory.o: memory.c
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
