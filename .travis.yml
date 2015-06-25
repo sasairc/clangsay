@@ -10,6 +10,6 @@ before_install:
     - pkg-config pkg-config --libs glib-2.0 
 script:
     - clang --version
-    - make && make clean
+    - PKG_CONFIG_PATH="$PKG_CONFIG_PATH" make && make clean
     - gcc --version
-    - make && make clean
+    - PKG_CONFIG_PATH="$PKG_CONFIG_PATH" make && make clean
