@@ -5,9 +5,11 @@ compiler:
 before_install:
     - sudo add-apt-repository ppa:lyrasis/precise-backports -y
     - sudo apt-get update
-    - sudo apt-get -y install pkg-config glib2.0 libglib2.0-dev
+    - sudo apt-get -y install build-essential pkg-config glib2.0 libglib2.0-dev
+    - export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/lib/pkgconfig:/usr/local/lib/pkgconfig"
+    - pkg-config pkg-config --libs glib-2.0 
 script:
     - clang --version
-    - make LIBS="-lglib-2.0" CC="clang" && make clean
+    - make && make clean
     - gcc --version
-    - make LIBS="-lglib-2.0" && make clean
+    - make && make clean
