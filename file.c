@@ -117,9 +117,9 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
             i       = 0,
             x       = 0,
             y       = 0;
-    char    c;
-    char*   str     = (char*)malloc(sizeof(char) * t_length);   /* allocate temporary array */
-    char**  buf     = (char**)malloc(sizeof(char*) * t_lines);  /* allocate array of Y coordinate */
+    char    c,
+        *   str     = (char*)malloc(sizeof(char) * t_length),   /* allocate temporary array */
+        **  buf     = (char**)malloc(sizeof(char*) * t_lines);  /* allocate array of Y coordinate */
 
     if (str == NULL || buf == NULL) {
 

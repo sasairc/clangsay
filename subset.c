@@ -177,8 +177,8 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
 int selects_cowfiles(const struct dirent* dir)
 {
-    int     namlen;
-    int*    lp;
+    int     namlen,
+        *   lp;
     char    dotcow[] = {".cow"};
 
     namlen = strlen(dir->d_name);

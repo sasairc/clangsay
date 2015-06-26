@@ -30,10 +30,10 @@ int main(int argc, char* argv[])
             lines   = 0,    /* lines of cowfile*/
             stdins  = 0;    /* lines of string */
     FILE*   fp      = NULL; /* cow-file */
-    char*   env     = NULL; /* $COWPATH */
-    char*   path    = NULL; /* .cow file */
-    char**  cowbuf  = NULL; /* string buffer (cow) */
-    char**  strbuf  = NULL; /* string buffer (string) */
+    char*   env     = NULL, /* $COWPATH */
+        *   path    = NULL, /* .cow file */
+        **  cowbuf  = NULL, /* string buffer (cow) */
+        **  strbuf  = NULL; /* string buffer (string) */
     struct  stat    st;     /* file status */
 
     /* flag and args */

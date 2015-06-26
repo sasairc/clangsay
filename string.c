@@ -68,8 +68,8 @@ int strrep(char* src, char* haystack, char* needle)
 
 char* strlion(int argnum, ...)
 {
-    char*   buf     = NULL;
-    char**  argmnt  = NULL;
+    char*   buf     = NULL,
+        **  argmnt  = NULL;
     int     i       = 0;
     size_t  size    = 0;    /* string size */
     va_list list;           /* list of variable arguments */
