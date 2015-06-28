@@ -6,7 +6,6 @@ TARGET	= clangsay
 PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
 COWPATH	:= $(PREFIX)/share/clangsay/cows
-
 INCLUDE :=
 LIBS	:=
 PKGCFG	:= `pkg-config --cflags --libs glib-2.0`
@@ -15,11 +14,9 @@ CC	:= cc
 RM	:= rm
 CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
-SRCS	= clangsay.c subset.c file.c string.c memory.c
+SRCS	= $(wildcard *.c)
 OBJS	= $(SRCS:.c=.o)
 ARCH	:= $(shell gcc -print-multiarch)
-
-all: $(TARGET) $(OBJS) _clangsay
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
@@ -30,22 +27,24 @@ DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 
 DEFLDFLAGS = $(PKGCFG)
 
+all: $(TARGET) $(OBJS) _clangsay
+
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
 
-clangsay.o: clangsay.c
+clangsay.o: clangsay.c clangsay.h config.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c clangsay.c -o clangsay.o
 
-subset.o: subset.c
+subset.o: subset.c subset.h config.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c subset.c -o subset.o
 
-file.o: file.c
+file.o: file.c file.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c file.c -o file.o
 
-string.o: string.c
+string.o: string.c string.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c string.c -o string.o
 
-memory.o: memory.c
+memory.o: memory.c memory.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
 
 _clangsay: _$(TARGET).zsh
