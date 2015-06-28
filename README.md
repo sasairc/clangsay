@@ -1,7 +1,7 @@
 clangsay
 =======
 [![build](https://img.shields.io/travis/sasairc/clangsay.svg?style=flat)](https://travis-ci.org/sasairc/clangsay)
-[![version](http://img.shields.io/github/tag/sasairc/clangsay.svg?style=flat&label=version)](https://github.com/sasairc/clangsay/clangsay)
+[![version](http://img.shields.io/github/tag/sasairc/clangsay.svg?style=flat&label=version)](https://github.com/sasairc/clangsay/releases)
 [![license](https://img.shields.io/badge/License-WTFPL2-blue.svg?style=flat)](http://www.wtfpl.net/txt/copying/)	
 
 ![default](http://41.media.tumblr.com/d93abecb6fe04a8f6d1c38deba2e963a/tumblr_njt1q0EsZJ1u2jamko1_1280.png)
