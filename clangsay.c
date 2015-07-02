@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
      * true : arguments
      * false: pipe
      */ 
-    if (argv[optind] != NULL) { 
+    if (optind < argc) {    
         strbuf = (char**)malloc(sizeof(char*) * (argc - optind));   /* allocate array for y coordinate (strings) */
         if (strbuf == NULL) {
             fprintf(stderr, "%s: malloc() failure\n", PROGNAME);
