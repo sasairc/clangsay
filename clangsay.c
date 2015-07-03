@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
         stdins = i;
     } else {
         if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
-            fprintf(stderr, "%s p_read_file_char() failure\n", PROGNAME);
+            fprintf(stderr, "%s: p_read_file_char() failure\n", PROGNAME);
             release(fp, path, 0, NULL, 0, NULL);
 
             return 7;
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 
     /* reading cow file to array */
     if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
-        fprintf(stderr, "%s p_read_file_char() failure\n", PROGNAME);
+        fprintf(stderr, "%s: p_read_file_char() failure\n", PROGNAME);
         release(fp, path, stdins, strbuf, 0, NULL);
 
         return 8;
