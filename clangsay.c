@@ -12,6 +12,7 @@
 
 #include "./config.h"
 #include "./clangsay.h"
+#include "./info.h"
 #include "./subset.h"
 #include "./string.h"
 #include "./file.h"
@@ -249,41 +250,4 @@ void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** b
     if (buf2 != NULL) {
         free2d(buf2, lines2);
     }
-}
-
-int print_version(void)
-{
-    fprintf(stdout, "%s %d.%d.%d (%s)\n", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL, ARCH);
-
-    exit(0);
-}
-
-int print_usage(void)
-{
-    fprintf(stdout, "\
-%s %d.%d.%d The classic cowsay program, written in C.\n\
-Usage: clangsay [OPTION]...\n\
-\n\
-Mandatory arguments to long options are mandatory for short options too.\n\
-\n\
-  -b,  --borg                borg mode\n\
-  -d,  --dead                dead mode\n\
-  -g,  --greedy              greedy mode\n\
-  -s,  --stoned              stoned mode\n\
-  -t,  --tired               tired mode\n\
-  -w,  --wired               wired mode\n\
-  -y,  --youthful            youthful mode\n\
-  -e,  --eyes=EYES           manually specifies eyes (DEFAULT=oo)\n\
-  -T,  --tongue=TONGUE       manually specifies tongue\n\
-  -f,  --file=COWFILE        select cow file\n\
-  -l,  --list                display COWPATH directory and exit\n\
-\n\
-       --help                display this help and exit\n\
-       --version             optput version infomation and exit\n\
-\n\
-Report %s bugs to %s <%s>\n\
-", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL,
-PROGNAME, AUTHOR, MAIL_TO);
-
-    exit(0);
 }
