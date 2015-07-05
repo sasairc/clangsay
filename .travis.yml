@@ -8,5 +8,6 @@ before_install:
 script:
     - make CC="$CC"
     - ./clangsay --version
+    - ./clangsay -f cows/zen-noh-milk.cow
     - ./clangsay --help
     - make clean
