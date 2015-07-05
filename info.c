@@ -43,12 +43,13 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -f,  --file=COWFILE        select cow file\n\
   -l,  --list                display COWPATH directory and exit\n\
 \n\
-       --help                display this help and exit\n\
-       --version             optput version infomation and exit\n\
+  -h,  --help                display this help and exit\n\
+  -v,  --version             optput version infomation and exit\n\
 \n\
 Report %s bugs to %s <%s>\n\
-", PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL, EXTRAVERSION,
-PROGNAME, AUTHOR, MAIL_TO);
+",
+        PROGNAME, VERSION, PATCHLEVEL, SUBLEVEL, EXTRAVERSION,
+        PROGNAME, AUTHOR, MAIL_TO);
 
     exit(0);
 }
