@@ -35,6 +35,9 @@ $(TARGET): $(OBJS)
 clangsay.o: clangsay.c clangsay.h config.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c clangsay.c -o clangsay.o
 
+info.o: info.c info.h config.h
+	$(CC) $(DEFCFLAGS) $(CFLAGS) -c info.c -o info.o
+
 subset.o: subset.c subset.h config.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c subset.c -o subset.o
 
@@ -48,7 +51,7 @@ memory.o: memory.c memory.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
 
 _clangsay: _$(TARGET).zsh
-	@cat _$(TARGET).zsh | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET)
+	cat _$(TARGET).zsh | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET)
 
 install-bin: $(TARGET)
 	install -pd $(BINDIR)

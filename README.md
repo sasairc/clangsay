@@ -12,7 +12,7 @@ clangsay
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
 ### Requirements
 * GNU Make
-* gcc
+* gcc or clang
 * pkg-config
 * glib-2.0	
 
@@ -131,9 +131,8 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 ### Thanks
 * [Masaya Tk](https://github.com/844196)	
 	yasunaに続き、clangsayのHomebrew用リポジトリまで提供して頂き  
-	更にはユニークな`cowfile`まで作って頂きました。  
-	本当にありがとうございます。
-
+	更にはユニークな`cowfile`まで作って頂きました。本当に有難うございました。  
+  詳細は`AUTHORS`のクレジットをご覧下さい。
 
 #### License
 [WTFPL version 2](http://www.wtfpl.net/txt/copying/)

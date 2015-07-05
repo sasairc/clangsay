@@ -7,4 +7,7 @@ before_install:
     - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev
 script:
     - make CC="$CC"
+    - ./clangsay --version
+    - ls | ./clangsay -f ./cows/zen-noh-milk.cow
+    - ./clangsay --help
     - make clean
