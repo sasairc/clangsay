@@ -26,7 +26,7 @@ int print_version(void)
 int print_usage(void)
 {
     fprintf(stdout, "\
-%s %d.%d.%d%s The classic cowsay program, written in C.\n\
+%s %d.%d.%d%s, The classic cowsay program, written in C.\n\
 Usage: clangsay [OPTION]...\n\
 \n\
 Mandatory arguments to long options are mandatory for short options too.\n\
