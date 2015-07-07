@@ -14,8 +14,9 @@
 #ifndef YSTRING_H
 #define YSTRING_H
 
+#undef  DEBUG
 #define WITH_GLIB   /* use glib */
-#define LOCALE "ja_JP.UTF-8"
+#define LOCALE  "ja_JP.UTF-8"
 
 /* This functions is required string.c */
 extern int strrep(char* src, char* haystack, char* needle);

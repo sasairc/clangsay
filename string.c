@@ -262,6 +262,8 @@ char** str_to_args(char* str)
             dspf = 0;
         }
     }
+    /* null-terminated */
+    args[elmc] = NULL;
 
 #ifdef  DEBUG
     fprintf(stderr, "DEBUG: str_to_args(): args(%p)\n", args);
