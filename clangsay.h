@@ -32,6 +32,8 @@ typedef struct  CLANGSAY_T {
     bool    Tflag;
     bool    fflag;
     bool    lflag;
+    bool    syflag; /* say */
+    bool    thflag; /* think */
     char*   earg;
     char*   Targ;
     char*   farg;
