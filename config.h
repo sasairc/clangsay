@@ -34,9 +34,11 @@
 #define TONGUE          "$tongue"
 
 #define DEFAULT_COWFILE "default.cow"
-#define DEFAULT_THOUGHTS    "\\"
 #define DEFAULT_EYES    "oo"
 #define DEFAULT_TONGUE  "  "
+
+#define SAY_THOUGHTS    "\\"
+#define THINK_THOUGHTS  "o"
 
 #define BORG_EYES       "=="
 #define DEAD_EYES       "XX"
