@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
         false, false, false, false, false, false, false, false, false, false, false, false, false, false,
         NULL, NULL, NULL,
     };
+
     /* option for getopt_long() */
     struct  option opts[] = {
         {"eye",      required_argument, NULL, 'e'},
