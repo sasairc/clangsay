@@ -15,8 +15,8 @@
 
 #define PROGNAME        "clangsay"
 #define VERSION         1
-#define PATCHLEVEL      3
-#define SUBLEVEL        3
+#define PATCHLEVEL      4
+#define SUBLEVEL        0
 #define EXTRAVERSION    ""
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
@@ -34,9 +34,11 @@
 #define TONGUE          "$tongue"
 
 #define DEFAULT_COWFILE "default.cow"
-#define DEFAULT_THOUGHTS    "\\"
 #define DEFAULT_EYES    "oo"
 #define DEFAULT_TONGUE  "  "
+
+#define SAY_THOUGHTS    "\\"
+#define THINK_THOUGHTS  "o"
 
 #define BORG_EYES       "=="
 #define DEAD_EYES       "XX"

@@ -116,6 +116,7 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 {
     int     i       = 0,
             j       = 0;
+    char*   though  = NULL;
     bool    block   = false;
 
     /* eyes table */
@@ -139,9 +140,20 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         {false,         NULL,   NULL},
     };
 
+    /* setting thoughts */
+    if (clsay->syflag == false && clsay->thflag == false) {
+        though = SAY_THOUGHTS;      /* default */
+    } else if (clsay->syflag == true){
+        though = SAY_THOUGHTS;      /* --say switch */
+    } else if (clsay->thflag == true) {
+        though = THINK_THOUGHTS;    /* --think switch */
+    }
+
     /* print cow */
     for (i = 0; i < lines; i++) {
-        strrep(str[i], THOUGHTS, DEFAULT_THOUGHTS);
+        /* replace thoughts */
+        strrep(str[i], THOUGHTS, though);
+
         while (strrep(str[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/

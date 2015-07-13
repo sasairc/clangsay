@@ -39,9 +39,10 @@ int main(int argc, char* argv[])
 
     /* flag and args */
     clangsay_t  clsay = {
-        false, false, false, false, false, false, false, false, false, false, false, false,
+        false, false, false, false, false, false, false, false, false, false, false, false, false, false,
         NULL, NULL, NULL,
     };
+
     /* option for getopt_long() */
     struct  option opts[] = {
         {"eye",      required_argument, NULL, 'e'},
@@ -57,8 +58,10 @@ int main(int argc, char* argv[])
         {"wired",    no_argument,       NULL, 'w'},
         {"youtuful", no_argument,       NULL, 'y'},
         {"list",     no_argument,       NULL, 'l'},
-        {"help",     no_argument,       NULL, 'h'},
-        {"version",  no_argument,       NULL, 'v'},
+        {"say",      no_argument,       NULL,  0 },
+        {"think",    no_argument,       NULL,  1 },
+        {"help",     no_argument,       NULL,  2 },
+        {"version",  no_argument,       NULL,  3 },
         {0, 0, 0, 0},
     };
 
@@ -66,7 +69,7 @@ int main(int argc, char* argv[])
     while ((res = getopt_long(
                     argc,
                     argv,
-                    "nW;bdgpstwye:T:f:lhv",
+                    "nW;bdgpstwye:T:f:l",
                     opts,
                     &index
                     )
@@ -110,9 +113,15 @@ int main(int argc, char* argv[])
                 break;
             case    'l':
                 list_cowfiles();
-            case    'h':
+            case    0:
+                clsay.syflag = true;
+                break;
+            case    1:
+                clsay.thflag = true;
+                break;
+            case    2:
                 print_usage();
-            case    'v':
+            case    3:
                 print_version();
             case    '?':
                 return -1;

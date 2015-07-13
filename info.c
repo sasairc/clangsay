@@ -26,7 +26,7 @@ int print_version(void)
 int print_usage(void)
 {
     fprintf(stdout, "\
-%s %d.%d.%d%s The classic cowsay program, written in C.\n\
+%s %d.%d.%d%s, The classic cowsay program, written in C.\n\
 Usage: clangsay [OPTION]...\n\
 \n\
 Mandatory arguments to long options are mandatory for short options too.\n\
@@ -38,13 +38,16 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -t,  --tired               tired mode\n\
   -w,  --wired               wired mode\n\
   -y,  --youthful            youthful mode\n\
-  -e,  --eyes=EYES           manually specifies eyes (DEFAULT=oo)\n\
+  -e,  --eyes=EYES           manually specifies eyes\n\
   -T,  --tongue=TONGUE       manually specifies tongue\n\
   -f,  --file=COWFILE        select cow file\n\
   -l,  --list                display COWPATH directory and exit\n\
 \n\
-  -h,  --help                display this help and exit\n\
-  -v,  --version             optput version infomation and exit\n\
+       --say                 speaking mode (default)\n\
+       --think               thinking mode\n\
+\n\
+       --help                display this help and exit\n\
+       --version             optput version infomation and exit\n\
 \n\
 Report %s bugs to %s <%s>\n\
 ",
