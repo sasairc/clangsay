@@ -136,7 +136,8 @@ int main(int argc, char* argv[])
             path = strlion(3, env, "/", DEFAULT_COWFILE);
         }
         if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n", PROGNAME);
+            fprintf(stderr, "%s: strlion() failure\n",
+                    PROGNAME);
 
             return 1;
         }
@@ -147,7 +148,8 @@ int main(int argc, char* argv[])
             path = strlion(2, COWPATH, DEFAULT_COWFILE);
         }
         if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n", PROGNAME);
+            fprintf(stderr, "%s: strlion() failure\n",
+                    PROGNAME);
 
             return 1;
         }
@@ -160,7 +162,8 @@ int main(int argc, char* argv[])
             if (stat(clsay.farg, &st) == 0) {   /* filename */
                 strcpy(path, clsay.farg);
             } else {
-                fprintf(stderr, "%s: %s: no such file or directory\n", PROGNAME, path);
+                fprintf(stderr, "%s: %s: no such file or directory\n",
+                        PROGNAME, path);
                 release(NULL, path, 0, NULL, 0, NULL);
 
                 return 2;
@@ -186,7 +189,8 @@ int main(int argc, char* argv[])
     if (optind < argc) {    
         strbuf = (char**)malloc(sizeof(char*) * (argc - optind));   /* allocate array for y coordinate (strings) */
         if (strbuf == NULL) {
-            fprintf(stderr, "%s: malloc() failure\n", PROGNAME);
+            fprintf(stderr, "%s: malloc() failure\n",
+                    PROGNAME);
             release(fp, path, 0, NULL, 0, NULL);
             
             return 5;
@@ -194,7 +198,8 @@ int main(int argc, char* argv[])
         for (i = 0; optind < argc; optind++, i++) {
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
-                fprintf(stderr, "%s: malloc() failure\n", PROGNAME);
+                fprintf(stderr, "%s: malloc() failure\n",
+                        PROGNAME);
                 release(fp, path, stdins, strbuf, 0, NULL);
 
                 return 6;
@@ -204,7 +209,8 @@ int main(int argc, char* argv[])
         stdins = i;
     } else {
         if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
-            fprintf(stderr, "%s: p_read_file_char() failure\n", PROGNAME);
+            fprintf(stderr, "%s: p_read_file_char() failure\n",
+                    PROGNAME);
             release(fp, path, 0, NULL, 0, NULL);
 
             return 7;
@@ -214,7 +220,8 @@ int main(int argc, char* argv[])
 
     /* reading cow file to array */
     if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
-        fprintf(stderr, "%s: p_read_file_char() failure\n", PROGNAME);
+        fprintf(stderr, "%s: p_read_file_char() failure\n",
+                PROGNAME);
         release(fp, path, stdins, strbuf, 0, NULL);
 
         return 8;
