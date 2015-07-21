@@ -10,55 +10,54 @@ clangsay
 マルチバイト準対応のUnicode環境専用cowsayクローン。  
 ただし、特殊文字が含まれる場合は、相変わらずズレてしまいます。	
 cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
-### Requirements
+
+## Requirements
 * GNU Make
 * gcc or clang
 * pkg-config
 * glib-2.0	
 
-### Install
-* Debian/GNU Linux or Debian based system.(amd64)		
-	依存パッケージとしてcowsayがインストールされ	
-	`/usr/share/cowsay/cows`以下が共有されます。
-	```shellsession
-	# echo 'deb http://ssiserver.moe.hm/debian ./' >> /etc/apt/sources.list	
-	# apt-get update	
-	# apt-get install clangsay
-	```
+## Install
+#### Debian/GNU Linux or Debian based system.(amd64)		
+依存パッケージとしてcowsayがインストールされ、`/usr/share/cowsay/cows`以下が共有されます。
+```shellsession
+# echo 'deb http://ssiserver.moe.hm/debian ./' >> /etc/apt/sources.list	
+# apt-get update	
+# apt-get install clangsay
+```
 
-* Debian/GNU Linux or Debian based system.(not amd 64)	
-	依存パッケージとしてcowsayがインストールされ	
-	`/usr/share/cowsay/cows以下が共有されます。	
-	```shellsession
-	% cat info.txt
-	注意：バージョンは、適時置き換えて下さい。
-	% wget -O - http://ssiserver.moe.hm/debian/clangsay_0.0.2-1.tar.gz | tar zxvf -
-	% cd clangsay
-	% dpkg-buildpackage -uc -us
-	# dpkg -i ../clangsay_*.deb
-	```
+#### Debian/GNU Linux or Debian based system.(not amd 64)	
+依存パッケージとしてcowsayがインストールされ、`/usr/share/cowsay/cows`以下が共有されます。	
+```shellsession
+% cat info.txt
+注意：バージョンは、適時置き換えて下さい。
+% wget -O - http://ssiserver.moe.hm/debian/clangsay_0.0.2-1.tar.gz | tar zxvf -
+% cd clangsay
+% dpkg-buildpackage -uc -us
+# dpkg -i ../clangsay_*.deb
+```
 
-* Mac OS X/Homebrew		
-  依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
+#### Mac OS X/Homebrew		
+依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
 
-	* 全てインストールする場合（cowファイルを共有）	
+* 全てインストールする場合（cowファイルを共有）	
 	cowsay側のパスに対して、cowファイルのインストールが行われます。	
 	```shellsession
 	% brew install 844196/Renge/clangsay
 	```
 	
-	* zsh補完関数もインストールする場合		
+* zsh補完関数もインストールする場合		
 	```shellsession
 	% brew install --zsh-completion 844196/Renge/clangsay
 	```
 	上記のコマンドを実行した際に、補完関数をインストールしたディレクトリを示す下記のようなメッセージが出ます。	
 	```shellsession
 	zsh completion has been installed to:
-		/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります　
+	/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります　
 	```
 	このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。	
 
-	* cowsayとcowファイルを共有せずにインストールする場合	
+* cowsayとcowファイルを共有せずにインストールする場合	
 	cowsay側のパスではなく	
 	`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`	
 	に対してcowファイルがインストールされます。		
@@ -67,23 +66,23 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	% brew install --without-cows 844196/Renge/clangsay
 	```
 
-* Other systems.
-	* 全てインストールする場合
+#### Other systems.
+* 全てインストールする場合	
 	```shellsession
 	% make
 	# make install
 	```
 
-	* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合
+* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合	
 	```shellsession
-	% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください	
+	% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください
 	# make install-bin
 	```
 
-### zshでの補完
+## zshでの補完
 \_clangsayの`COWPATH`変数を適時修正した後、`$fpath`の通ったディレクトリへ配置して下さい。	
 
-### Usage
+## Usage
 基本的にcowsayのオプションと同様です。
 ```shellsession
 % export COWPATH="~/.cows"	# COWPATHを指定したい場合
@@ -128,6 +127,7 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 ```
 
 `--think`オプションでは、cowthinkのような「牛さんが考える」動作になります。
+
 ```shellsession
 % echo "ﾌﾟｶﾌﾟｶ" | clangsay --think -f iwashi.cow
  _______
@@ -144,14 +144,14 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 ```
 詳しくは`clangsay --help`をご覧下さい。
 
-### Thanks
+## Thanks
 * [Masaya Tk](https://github.com/844196)	
 	yasunaに続き、clangsayのHomebrew用リポジトリまで提供して頂き  
 	更にはユニークな`cowfile`まで作って頂きました。本当に有難うございました。  
-  詳細は`AUTHORS`のクレジットをご覧下さい。
+	詳細は`AUTHORS`のクレジットをご覧下さい。
 
-#### License
+## License
 [WTFPL version 2](http://www.wtfpl.net/txt/copying/)
 
-### Author
+## Author
 sasairc (https://github.com/sasairc)
