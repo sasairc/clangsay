@@ -5,7 +5,7 @@
 TARGET	= clangsay
 PREFIX	:= /usr/local
 BINDIR	:= $(PREFIX)/bin
-COWPATH	:= $(PREFIX)/share/clangsay/cows
+COWPATH	:= $(PREFIX)/share/$(TARGET)/cows
 INCLUDE :=
 LIBS	:=
 PKGCFG	:= `pkg-config --cflags --libs glib-2.0`
@@ -27,7 +27,7 @@ DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 
 DEFLDFLAGS = $(PKGCFG)
 
-all: $(TARGET) $(OBJS) _clangsay
+all: $(TARGET) $(OBJS) _$(TARGET).zsh
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
@@ -50,8 +50,8 @@ string.o: string.c string.h
 memory.o: memory.c memory.h
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c memory.c -o memory.o
 
-_clangsay: _$(TARGET).zsh
-	cat _$(TARGET).zsh | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET)
+_$(TARGET).zsh: _$(TARGET).zsh.src
+	cat _$(TARGET).zsh.src | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET).zsh
 
 install-bin: $(TARGET)
 	install -pd $(BINDIR)
@@ -61,10 +61,14 @@ install-cows:
 	install -pd $(COWPATH)
 	install -pm 644 ./cows/* $(COWPATH)/
 
-install: install-bin install-cows
+install-zsh-compdef:
+	install -pd $(PREFIX)/share/$(TARGET)/zsh
+	install -pm 644 _$(TARGET).zsh $(PREFIX)/share/$(TARGET)/zsh
+
+install: install-bin install-cows install-zsh-compdef
 
 .PHONY: clean
 clean:
 	-$(RM) -f $(OBJS)
 	-$(RM) -f $(TARGET)
-	-$(RM) -f _$(TARGET)
+	-$(RM) -f _$(TARGET).zsh
