@@ -197,8 +197,10 @@ int selects_cowfiles(const struct dirent* dir)
         *   lp;
     char    dotcow[] = {".cow"};
 
-    namlen = strlen(dir->d_name);
-    if (namlen < 4) return 0;
+    if ((namlen = strlen(dir->d_name)) < 4) {
+
+        return 0;
+    }
     namlen -= 4;    /* offset 4 bytes from end (.cow) */
 
     lp = (int*)&(dir->d_name[namlen]);
