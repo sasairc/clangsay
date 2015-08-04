@@ -14,6 +14,7 @@ RM	:= rm
 CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
 
+CMDLINE	:= 0
 PKGCFG	= `pkg-config --cflags --libs glib-2.0`
 SRCS	= $(wildcard *.c)
 OBJS	= $(SRCS:.c=.o)
@@ -31,13 +32,28 @@ DEFLDFLAGS = $(PKGCFG)
 all: $(TARGET) $(OBJS) _$(TARGET).zsh
 
 $(TARGET): $(OBJS)
+ifeq ($(CMDLINE), 0)
+	@echo "  BUILD   $@"
+	@$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
+else
 	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
+endif
 
 %.o: %.c %.h
+ifeq ($(CMDLINE), 0)
+	@echo "  CC      $@"
+	@$(CC) $(DEFCFLAGS) $(CFLAGS) -c $< -o $@
+else
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c $< -o $@
+endif
 
 _$(TARGET).zsh: _$(TARGET).zsh.src
+ifeq ($(CMDLINE), 0)
+	@echo "  BUILD   $@"
+	@cat _$(TARGET).zsh.src | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET).zsh
+else
 	cat _$(TARGET).zsh.src | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET).zsh
+endif
 
 install-bin: $(TARGET)
 	install -pd $(BINDIR)
