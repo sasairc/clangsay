@@ -61,7 +61,7 @@ install-bin: $(TARGET)
 
 install-cows:
 	install -pd $(COWPATH)
-	install -pm 644 ./cows/* $(COWPATH)/
+	install -pm 644 cows/* $(COWPATH)/
 
 install-zsh-compdef: _$(TARGET).zsh
 	install -pd $(PREFIX)/share/$(TARGET)/zsh
