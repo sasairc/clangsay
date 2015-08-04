@@ -13,8 +13,8 @@ CC	:= cc
 RM	:= rm
 CFLAGS	:= -O2 -g -Wall -fno-strict-aliasing
 LDFLAGS	:=
-
 CMDLINE	:= 0
+
 PKGCFG	= `pkg-config --cflags --libs glib-2.0`
 SRCS	= $(wildcard *.c)
 OBJS	= $(SRCS:.c=.o)
@@ -34,9 +34,9 @@ all: $(TARGET) $(OBJS) _$(TARGET).zsh
 $(TARGET): $(OBJS)
 ifeq ($(CMDLINE), 0)
 	@echo "  BUILD   $@"
-	@$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
+	@$(CC) $(LDFLAGS) $^ -o $@ $(DEFLDFLAGS)
 else
-	$(CC) $(LDFLAGS) $(OBJS) -o $(TARGET) $(DEFLDFLAGS)
+	$(CC) $(LDFLAGS) $^ -o $@ $(DEFLDFLAGS)
 endif
 
 %.o: %.c %.h
@@ -50,14 +50,14 @@ endif
 _$(TARGET).zsh: _$(TARGET).zsh.src
 ifeq ($(CMDLINE), 0)
 	@echo "  BUILD   $@"
-	@cat _$(TARGET).zsh.src | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET).zsh
+	@cat $< | sed -e 's%_COWPATH%${COWPATH}%g' > $@
 else
-	cat _$(TARGET).zsh.src | sed -e 's%_COWPATH%${COWPATH}%g' > _$(TARGET).zsh
+	cat $< | sed -e 's%_COWPATH%${COWPATH}%g' > $@
 endif
 
 install-bin: $(TARGET)
 	install -pd $(BINDIR)
-	install -pm 755 $(TARGET) $(BINDIR)/
+	install -pm 755 $< $(BINDIR)/
 
 install-cows:
 	install -pd $(COWPATH)
@@ -65,7 +65,7 @@ install-cows:
 
 install-zsh-compdef: _$(TARGET).zsh
 	install -pd $(PREFIX)/share/$(TARGET)/zsh
-	install -pm 644 _$(TARGET).zsh $(PREFIX)/share/$(TARGET)/zsh
+	install -pm 644 $< $(PREFIX)/share/$(TARGET)/zsh
 
 install: install-bin install-cows install-zsh-compdef
 
