@@ -4,10 +4,16 @@ compiler:
     - clang
 before_install:
     - sudo apt-get update
-    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev
+    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev tree
 script:
-    - make CC="$CC"
-    - ./clangsay --version
-    - ls | ./clangsay -f ./cows/zen-noh-milk.cow
-    - ./clangsay --help
+    - export CC="$CC" TEST_PREFIX="`pwd`/test_prefix"
+    - make PREFIX="${TEST_PREFIX}"
+    - make PREFIX="${TEST_PREFIX}" install
+    - tree ${TEST_PREFIX}
+    - ${TEST_PREFIX}/bin/clangsay --version
+    - ls -l | ${TEST_PREFIX}/bin/clangsay -f zen-noh-milk.cow
+    - ${TEST_PREFIX}/bin/clangsay --list
+    - ${TEST_PREFIX}/bin/clangsay --help
     - make clean
+    - rm -rf ${TEST_PREFIX}
+    - unset TEST_PREFIX
