@@ -16,12 +16,26 @@ LDFLAGS	:=
 CMDLINE	:= 0
 export
 
-all clean install-bin install-zsh-compdef:
+all clean:
 	@$(MAKE) -C ./src	$@
+	@$(MAKE) -C ./compdef	$@
+
+install-bin:
+	@$(MAKE) -C ./src	$@
+
+install-zsh-compdef:
+	@$(MAKE) -C ./compdef	$@
 
 install-cows:
 	@$(MAKE) -C ./cows	$@
 
-install: install-bin install-cows install-zsh-compdef
+install: install-bin		\
+	 install-cows		\
+	 install-zsh-compdef
 
-.PHONY: all install install-bin install-cows install-zsh-compdef clean
+.PHONY: all			\
+	install			\
+	install-bin		\
+	install-cows		\
+	install-zsh-compdef	\
+	clean
