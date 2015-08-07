@@ -19,7 +19,7 @@ DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 
 DEFLDFLAGS = $(PKGCFG)
 
-all: $(TARGET) $(OBJS) _$(TARGET).zsh
+all: $(TARGET) $(OBJS)
 
 $(TARGET): $(OBJS)
 ifeq ($(CMDLINE), 0)
@@ -37,27 +37,12 @@ else
 	$(CC) $(DEFCFLAGS) $(CFLAGS) -c $< -o $@
 endif
 
-_$(TARGET).zsh: _$(TARGET).zsh.src
-ifeq ($(CMDLINE), 0)
-	@echo "  BUILD   $@"
-	@cat $< | sed -e 's%_COWPATH%${COWPATH}%g' > $@
-else
-	cat $< | sed -e 's%_COWPATH%${COWPATH}%g' > $@
-endif
-
 install-bin: $(TARGET)
 	install -pd $(BINDIR)
 	install -pm 755 $< $(BINDIR)/
 
-install-zsh-compdef: _$(TARGET).zsh
-	install -pd $(PREFIX)/share/$(TARGET)/zsh
-	install -pm 644 $< $(PREFIX)/share/$(TARGET)/zsh
-
-install: install-bin install-zsh-compdef
-
 clean:
 	-$(RM) -f $(OBJS)
 	-$(RM) -f $(TARGET)
-	-$(RM) -f _$(TARGET).zsh
 
-.PHONY: all install install-bin install-zsh-compdef clean
+.PHONY: all install-bin clean
