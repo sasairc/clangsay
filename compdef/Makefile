@@ -19,4 +19,6 @@ install-zsh-compdef: _$(TARGET).zsh
 clean:
 	-$(RM) -f _$(TARGET).zsh
 
-.PHONY: all install-zsh-compdef clean
+.PHONY: all			\
+	install-zsh-compdef	\
+	clean
