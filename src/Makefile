@@ -45,4 +45,6 @@ clean:
 	-$(RM) -f $(OBJS)
 	-$(RM) -f $(TARGET)
 
-.PHONY: all install-bin clean
+.PHONY: all		\
+	install-bin	\
+	clean
