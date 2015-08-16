@@ -39,7 +39,7 @@ FILE* open_file(char* path)
         fprintf(stderr, "%s: fp is NULL\n",
                 PROGNAME);
 
-        return NULL;;
+        return NULL;
     }
 
     return fp;
