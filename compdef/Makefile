@@ -13,8 +13,8 @@ else
 endif
 
 install-zsh-compdef: _$(TARGET).zsh
-	install -pd $(PREFIX)/share/$(TARGET)/zsh
-	install -pm 644 $< $(PREFIX)/share/$(TARGET)/zsh
+	install -pd $(PREFIX)/share/$(TARGET)/compdef
+	install -pm 644 $< $(PREFIX)/share/$(TARGET)/compdef/
 
 clean:
 	-$(RM) -f _$(TARGET).zsh
