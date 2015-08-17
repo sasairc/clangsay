@@ -80,7 +80,7 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	```
 
 ## zshでの補完
-`$(PREFIX)/share/clangsay/zsh/_clangsay.zsh`を`_clangsay`として、`$fpath`の通ったディレクトリにコピーして下さい。
+`$(PREFIX)/share/clangsay/compdef/_clangsay.zsh`を`_clangsay`として、`$fpath`の通ったディレクトリにコピーして下さい。
 
 ## Usage
 基本的にcowsayのオプションと同様です。
