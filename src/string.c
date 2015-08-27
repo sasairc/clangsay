@@ -95,7 +95,11 @@ char* strlion(int argnum, ...)
         return NULL;
     }
     for (i = 0; i < argnum; i++) {
-        strcat(buf, argmnt[i]);     /* string concatenate */
+        if (i == 0) {
+            strcpy(buf, argmnt[i]);
+        } else {
+            strcat(buf, argmnt[i]);     /* string concatenate */
+        }
     }
     free(argmnt);
 
