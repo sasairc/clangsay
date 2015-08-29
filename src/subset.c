@@ -15,6 +15,7 @@
 #include "./subset.h"
 #include "./string.h"
 #include "./file.h"
+#include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -61,10 +62,8 @@ int check_file_exists(char* path, char* file)
     }
 
     tmp = strlion(2, file, ".cow");
-    if ((dp = opendir(path)) == NULL) {
-
+    if ((dp = opendir(path)) == NULL)
         return 0;
-    }
 
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {
         if (strcmp(list->d_name, file) == 0) {
@@ -266,27 +265,42 @@ int selects_cowfiles(const struct dirent* dir)
 int list_cowfiles(void)
 {
     int     i       = 0,
+            j       = 0,
             entry   = 0;
-    char*   path    = NULL;
+    char*   env     = NULL;
+    env_t*  envt    = NULL;
     struct  dirent**  list;
 
     /* catenate file path */
-    if ((path = getenv("COWPATH")) == NULL) {
-        path = COWPATH;
+    if ((env = getenv("COWPATH")) == NULL) {
+        env = COWPATH;
+    }
+    if ((envt = split_env(env)) == NULL) {
+        fprintf(stderr, "%s: split_env() failure\n",
+                PROGNAME);
+
+        exit(10);
     }
 
     /* get file entry and sort */
-    if ((entry = scandir(path, &list, selects_cowfiles, alphasort)) == -1) {
-        fprintf(stderr, "%s: scandir() failed\n",
-                PROGNAME);
+    do {
+        if ((entry = scandir(envt->envc[i], &list, selects_cowfiles, alphasort)) == -1) {
+            fprintf(stderr, "%s: %s: scandir() failed\n",
+                PROGNAME, envt->envc[i]);
+            release_env_t(envt);
 
-        exit(9);
-    }
-    for (i = 0; i < entry; i++) {
-        fprintf(stdout, "%s\n", list[i]->d_name);
-        free(list[i]);
-    }
-    free(list);
+            exit(9);
+        } else {
+            fprintf(stdout, "=== %s ===\n", envt->envc[i]);
+        }
+        for (j = 0; j < entry; j++) {
+            fprintf(stdout, "%s\n", list[j]->d_name);
+            free(list[j]);
+        }
+        free(list);
+        i++;
+    } while (i < envt->envs);
+    release_env_t(envt);
 
     exit(0);
 }
