@@ -17,6 +17,7 @@
 #include "./string.h"
 #include "./file.h"
 #include "./memory.h"
+#include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,11 +32,14 @@ int main(int argc, char* argv[])
             lines   = 0,    /* lines of cowfile*/
             stdins  = 0;    /* lines of string */
     FILE*   fp      = NULL; /* cow-file */
-    char*   env     = NULL, /* $COWPATH */
-        *   path    = NULL, /* .cow file */
+    char*   path    = NULL, /* .cow file */
+        *   env     = NULL,
+        *   envp    = NULL,
         **  cowbuf  = NULL, /* string buffer (cow) */
         **  strbuf  = NULL; /* string buffer (string) */
-    struct  stat    st;     /* file status */
+
+    /* environment variable */
+    env_t*  envt    = NULL;
 
     /* flag and args */
     clangsay_t  clsay = {
@@ -128,53 +132,63 @@ int main(int argc, char* argv[])
         }
     }
 
-    /* catenate file path */
-    if ((env = getenv("COWPATH")) != NULL) {
-        if (clsay.fflag == true) {
-            path = strlion(3, env, "/", clsay.farg);
-        } else {
-            path = strlion(3, env, "/", DEFAULT_COWFILE);
-        }
-        if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n",
-                    PROGNAME);
+    if (clsay.fflag == false)
+        clsay.farg = DEFAULT_COWFILE;
 
-            return 1;
-        }
-    } else {
-        if (clsay.fflag == true) {
-            path = strlion(2, COWPATH, clsay.farg);
-        } else {
-            path = strlion(2, COWPATH, DEFAULT_COWFILE);
-        }
-        if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n",
-                    PROGNAME);
+    if ((env = getenv("COWPATH")) == NULL)
+        env = COWPATH;
 
-            return 1;
-        }
+    if ((envt = split_env(env)) == NULL) {
+        fprintf(stdout, "%s: split_env() failure\n",
+                PROGNAME);
+
+        return 1;
     }
+    do {
+        if ((res = check_file_exists(envt->envc[i], clsay.farg)) != 0) {
+            envp = envt->envc[i];
 
-    /* checking type of file or directory */
-    if (stat(path, &st) != 0) {
-        path = strlion(2, path, ".cow");        /* filename + .cow */
-        if (stat(path, &st) != 0) {
-            if (stat(clsay.farg, &st) == 0) {   /* filename */
+            break;
+        }
+        i++;
+    } while (i < envt->envs);
+
+    switch (res) {
+        case    0:
+            fprintf(stderr, "%s: %s: no such file or directory\n",
+                PROGNAME, clsay.farg);
+
+            return 1;
+        case    1:
+            if ((path = (char*)malloc(
+                            sizeof(char) * strlen(clsay.farg)
+                    )) != NULL)
+            {
                 strcpy(path, clsay.farg);
-            } else {
-                fprintf(stderr, "%s: %s: no such file or directory\n",
-                        PROGNAME, path);
-                release(NULL, path, 0, NULL, 0, NULL);
-
-                return 2;
             }
-        }
+            break;
+        case    2:
+            path = strlion(3, envp, "/", clsay.farg);
+            break;
+        case    3:
+            path = strlion(4, envp, "/", clsay.farg, ".cow");
+            break;
+        case    -1:
+            return 1;
     }
-    if (check_file_stat(path, st.st_mode) != 0) {
+    if (path == NULL) {
+        fprintf(stderr, "%s: strlion() failure\n",
+                PROGNAME);
+
+        return 2;
+    }
+
+    if (check_file_stat(path) != 0) {
         release(NULL, path, 0, NULL, 0, NULL);
 
         return 3;
     }
+
     if ((fp = open_file(path)) == NULL) {
         release(NULL, path, 0, NULL, 0, NULL);
 
@@ -246,6 +260,7 @@ int main(int argc, char* argv[])
     /* print cow */
     print_cow(lines, cowbuf, &clsay);
     /* memory release */
+    release_env_t(envt);
     release(fp, path, stdins, strbuf, lines, cowbuf);
 
     return 0;
