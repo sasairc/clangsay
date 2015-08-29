@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 
     /* env string to struct */
     if ((envt = split_env(env)) == NULL) {
-        fprintf(stdout, "%s: split_env() failure\n",
+        fprintf(stderr, "%s: split_env() failure\n",
                 PROGNAME);
 
         return 1;
