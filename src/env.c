@@ -56,7 +56,6 @@ env_t* split_env(char* env)
         tail++;
     } while (y < buf->envs);
 
-
     return buf;
 }
 
