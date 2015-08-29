@@ -26,6 +26,8 @@ FILE* open_file(char* path)
 {
     FILE*   fp;
 
+    fp = fopen(path, "r");
+
     /* open after checking file type */
     if (check_file_type(path) == 0) {
         fp = fopen(path, "r");
@@ -45,13 +47,56 @@ FILE* open_file(char* path)
     return fp;
 }
 
-int check_file_stat(char* path, mode_t mode)
+int check_file_exists(char* path, char* file)
 {
-    if ((mode & S_IFMT) == S_IFDIR) {
+    int     ret     = 0;
+    char*   tmp     = NULL;
+    DIR*    dp      = NULL;
+    struct  stat    st;
+    struct  dirent* list;
+
+    if (stat(file, &st) == 0) {
+
+        return 1;
+    }
+
+    tmp = strlion(2, file, ".cow");
+    if ((dp = opendir(path)) == NULL) {
+
+        return 0;
+    }
+
+    for (list = readdir(dp); list != NULL; list = readdir(dp)) {
+        if (strcmp(list->d_name, file) == 0) {
+            ret = 2;
+            break;
+        } else if (strcmp(list->d_name, tmp) == 0) {
+            ret = 3;
+            break;
+        }
+    }
+    closedir(dp);
+    free(tmp);
+
+    return ret;
+}
+
+int check_file_stat(char* path)
+{
+    struct  stat st;
+
+    if (stat(path, &st) != 0) {
+        fprintf(stderr, "%s: %s: stat failure\n",
+                PROGNAME, path);
+
+        return 1;
+    }
+
+    if (S_ISDIR(st.st_mode & S_IFMT)) {
         fprintf(stderr, "%s: %s: is a directory\n",
                 PROGNAME, path);
         
-        return 1;
+        return 2;
     }
 
     /* checking file permission */
@@ -59,7 +104,7 @@ int check_file_stat(char* path, mode_t mode)
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
-        return 2;
+        return 3;
     }
 
     return 0;
