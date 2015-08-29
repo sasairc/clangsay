@@ -14,8 +14,8 @@
 #define ENV_H
 
 typedef struct ENV_T {
-    int     envs;
-    char**  envc;
+    int     envc;
+    char**  envs;
 } env_t;
 
 extern env_t* split_env(char* env);
