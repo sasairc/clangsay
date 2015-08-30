@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
             path = strlion(3, envp, "/", clsay.farg);
             break;
         case    3:
-            path = strlion(4, envp, "/", clsay.farg, ".cow");
+            path = strlion(4, envp, "/", clsay.farg, ".cow\0");
             break;
     }
 
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
      */
     for (i = 0; i < stdins; i++) {
         strlftonull(strbuf[i]);
-        strunesc(strbuf[i]);
+        strlftonull(strbuf[i]);
     }
     for (i = 0; i < lines; i++) {
         strlftonull(cowbuf[i]);

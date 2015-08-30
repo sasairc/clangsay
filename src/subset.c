@@ -53,17 +53,21 @@ int check_file_exists(char* path, char* file)
     int     ret     = 0;
     char*   tmp     = NULL;
     DIR*    dp      = NULL;
+
     struct  stat    st;
     struct  dirent* list;
 
-    if (stat(file, &st) == 0) {
-
+    if (stat(file, &st) == 0)
         return 1;
-    }
 
-    tmp = strlion(2, file, ".cow");
-    if ((dp = opendir(path)) == NULL)
+    if ((tmp = strlion(2, file, ".cow")) == NULL)
         return 0;
+
+    if ((dp = opendir(path)) == NULL) {
+        free(tmp);
+
+        return 0;
+    }
 
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {
         if (strcmp(list->d_name, file) == 0) {
