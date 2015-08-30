@@ -284,14 +284,11 @@ int list_cowfiles(void)
 
     /* get file entry and sort */
     do {
-        if ((entry = scandir(envt->envc[i], &list, selects_cowfiles, alphasort)) == -1) {
-            fprintf(stderr, "%s: %s: scandir() failed\n",
-                PROGNAME, envt->envc[i]);
-            release_env_t(envt);
-
-            exit(9);
+        if ((entry = scandir(envt->envs[i], &list, selects_cowfiles, alphasort)) == -1) {
+            i++;
+            continue;
         } else {
-            fprintf(stdout, "=== %s ===\n", envt->envc[i]);
+            fprintf(stdout, "<=== %s ===>\n", envt->envs[i]);
         }
         for (j = 0; j < entry; j++) {
             fprintf(stdout, "%s\n", list[j]->d_name);
@@ -299,7 +296,7 @@ int list_cowfiles(void)
         }
         free(list);
         i++;
-    } while (i < envt->envs);
+    } while (i < envt->envc);
     release_env_t(envt);
 
     exit(0);
