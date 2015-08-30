@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
      */
     for (i = 0; i < stdins; i++) {
         strlftonull(strbuf[i]);
-        strlftonull(strbuf[i]);
+        strunesc(strbuf[i]);
     }
     for (i = 0; i < lines; i++) {
         strlftonull(cowbuf[i]);
