@@ -25,16 +25,6 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 # apt-get install clangsay
 ```
 
-#### Debian/GNU Linux or Debian based system.(not amd 64)	
-```shellsession
-% cat info.txt
-注意：バージョンは、適時置き換えて下さい。
-% wget -O - http://ssiserver.moe.hm/pub/debian/clangsay_1.4.4-1.tar.gz | tar zxvf -
-% cd clangsay
-% dpkg-buildpackage -uc -us
-# dpkg -i ../clangsay_*.deb
-```
-
 #### Mac OS X/Homebrew		
 依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
 
