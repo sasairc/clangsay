@@ -16,7 +16,7 @@
 
 #undef  DEBUG
 #define WITH_GLIB   /* use glib */
-#define LOCALE      "ja_JP.UTF-8"
+#define LOCALE      ""
 
 /* This functions is required string.c */
 extern int strrep(char* src, char* haystack, char* needle);
