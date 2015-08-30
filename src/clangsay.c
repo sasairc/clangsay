@@ -153,17 +153,17 @@ int main(int argc, char* argv[])
      * 3: short argument(filename)
      */
     do {
-        if ((res = check_file_exists(envt->envc[i], clsay.farg)) != 0) {
-            envp = envt->envc[i];
+        if ((res = check_file_exists(envt->envs[i], clsay.farg)) != 0) {
+            envp = envt->envs[i];
 
             break;
         }
         i++;
-    } while (i < envt->envs);
+    } while (i < envt->envc);
 
     switch (res) {
         case    0:
-            fprintf(stderr, "%s: %s: no such file or directory\n",
+            fprintf(stderr, "%s: %s: cowfile not found\n",
                     PROGNAME, clsay.farg);
             release(NULL, envt, NULL, 0, NULL, 0, NULL);
 
