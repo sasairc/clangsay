@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     /*
      * # check_file_exists()
      *
-     * 0: error
+     * 0: not found
      * 1: keep argument(path)
      * 2: long argument(filename.cow)
      * 3: short argument(filename)
@@ -161,31 +161,15 @@ int main(int argc, char* argv[])
         i++;
     } while (i < envt->envc);
 
-    switch (res) {
-        case    0:
-            fprintf(stderr, "%s: %s: cowfile not found\n",
-                    PROGNAME, clsay.farg);
-            release(NULL, envt, NULL, 0, NULL, 0, NULL);
+    if (res == 0) {
+        fprintf(stderr, "%s: %s: cowfile not found\n",
+                PROGNAME, clsay.farg);
+        release(NULL, envt, NULL, 0, NULL, 0, NULL);
 
-            return 2;
-        case    1:
-            if ((path = (char*)malloc(
-                            sizeof(char) * strlen(clsay.farg)
-                            )) != NULL) {
-                strcpy(path, clsay.farg);
-            }
-            break;
-        case    2:
-            path = strlion(3, envp, "/", clsay.farg);
-            break;
-        case    3:
-            path = strlion(4, envp, "/", clsay.farg, ".cow\0");
-            break;
+        return 2;
     }
 
-    if (path == NULL) {
-        fprintf(stderr, "%s: strlion() failure\n",
-                PROGNAME);
+    if ((path = concat_file_path(res, envp, clsay.farg)) == NULL) {
         release(NULL, envt, NULL, 0, NULL, 0, NULL);
 
         return 3;
