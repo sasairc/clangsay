@@ -84,6 +84,32 @@ int check_file_exists(char* path, char* file)
     return ret;
 }
 
+char* concat_file_path(int mode, char* path, char* file)
+{
+    char*   buf = NULL;
+
+    switch (mode) {
+        case    1:
+            if ((buf = (char*)malloc(
+                            sizeof(char) * strlen(file)
+            )) != NULL) {
+                strcpy(buf, file);
+            }
+            break;
+        case    2:
+            buf = strlion(3, path, "/", file);
+            break;
+        case    3:
+            buf = strlion(4, path, "/", file, ".cow");
+            break;
+    }
+    if (buf == NULL)
+        fprintf(stderr, "%s: concat_file_path() failure\n",
+                PROGNAME);
+
+    return buf;
+}
+
 int check_file_stat(char* path)
 {
     struct  stat st;
@@ -292,7 +318,10 @@ int list_cowfiles(void)
             i++;
             continue;
         } else {
-            fprintf(stdout, "<=== %s ===>\n", envt->envs[i]);
+            if (i != 0)
+                putchar('\n');
+
+            fprintf(stdout, "%s:\n", envt->envs[i]);
         }
         for (j = 0; j < entry; j++) {
             fprintf(stdout, "%s\n", list[j]->d_name);
