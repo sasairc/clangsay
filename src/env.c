@@ -11,7 +11,6 @@
  */
 
 #include "./env.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -66,13 +65,16 @@ void release_env_t(env_t* env)
     for (i = 0; i < env->envc; i++) {
         if (env->envs[i] != NULL) {
             free(env->envs[i]);
+            env->envs[i] = NULL;
         }
     }
     if (env->envs != NULL) {
         free(env->envs);
+        env->envs = NULL;
     }
     if (env != NULL) {
         free(env);
+        env = NULL;
     }
 
     return;
