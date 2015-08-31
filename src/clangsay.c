@@ -263,7 +263,6 @@ void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lin
     }
     if (envt != NULL) {
         release_env_t(envt);
-        envt = NULL;
     }
     if (path != NULL) {
         free(path);
