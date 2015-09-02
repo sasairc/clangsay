@@ -60,14 +60,11 @@ int check_file_exists(char* path, char* file)
     if (stat(file, &st) == 0)
         return 1;
 
-    if ((tmp = strlion(2, file, ".cow\0")) == NULL)
+    if ((dp = opendir(path)) == NULL)
         return 0;
 
-    if ((dp = opendir(path)) == NULL) {
-        free(tmp);
-
+    if ((tmp = strlion(2, file, ".cow")) == NULL)
         return 0;
-    }
 
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {
         if (strcmp(list->d_name, file) == 0) {
