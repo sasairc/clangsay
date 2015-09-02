@@ -57,14 +57,6 @@ int check_file_exists(char* path, char* file)
     struct  stat    st;
     struct  dirent* list;
 
-    /* outside of env */
-    if (strlen(file) > 1) {
-        if (file[0] == '.')
-            if (file[1] == '/')
-                if (stat(file, &st) == 0)
-                    return 1;
-    }
-
     /* open directory */
     if ((dp = opendir(path)) == NULL)
         return 0;
@@ -85,6 +77,12 @@ int check_file_exists(char* path, char* file)
     }
     closedir(dp);
     free(tmp);
+
+    /* outside of env */
+    if (ret == 0) {
+        if (stat(file, &st) == 0)
+            ret = 1;
+    }
 
     return ret;
 }
