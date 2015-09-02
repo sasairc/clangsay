@@ -13,6 +13,7 @@
 #ifndef CLANGSAY_H
 #define CLANGSAY_H
 
+#include "./env.h"
 #include <stdio.h>
 
 #define true        1
@@ -40,6 +41,6 @@ typedef struct  CLANGSAY_T {
 } clangsay_t;
 
 /* This functions is required clangsay.c */
-extern void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** buf2);
+extern void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lines2, char** buf2);
 
 #endif

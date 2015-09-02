@@ -24,7 +24,7 @@ function _list_cowfile() {
         local COWPATH="_COWPATH"
     fi
 
-    _files -W $COWPATH && \
+    _files -W `echo "$COWPATH" | sed 's/:/ /g'` && \
         return 0;
 
     return 1;

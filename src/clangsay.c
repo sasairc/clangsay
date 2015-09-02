@@ -17,6 +17,7 @@
 #include "./string.h"
 #include "./file.h"
 #include "./memory.h"
+#include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -27,15 +28,16 @@ int main(int argc, char* argv[])
 {
     int     i       = 0,
             res     = 0,    /* use getopt_long() */
-            index   = 0,
+            index   = 0,    
             lines   = 0,    /* lines of cowfile*/
             stdins  = 0;    /* lines of string */
     FILE*   fp      = NULL; /* cow-file */
-    char*   env     = NULL, /* $COWPATH */
-        *   path    = NULL, /* .cow file */
+    char*   path    = NULL, /* .cow file */
+        *   env     = NULL, /* string of $COWPATH */
+        *   envp    = NULL,
         **  cowbuf  = NULL, /* string buffer (cow) */
         **  strbuf  = NULL; /* string buffer (string) */
-    struct  stat    st;     /* file status */
+    env_t*  envt    = NULL; /* environment variable */
 
     /* flag and args */
     clangsay_t  clsay = {
@@ -128,57 +130,59 @@ int main(int argc, char* argv[])
         }
     }
 
-    /* catenate file path */
-    if ((env = getenv("COWPATH")) != NULL) {
-        if (clsay.fflag == true) {
-            path = strlion(3, env, "/", clsay.farg);
-        } else {
-            path = strlion(3, env, "/", DEFAULT_COWFILE);
-        }
-        if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n",
-                    PROGNAME);
+    if (clsay.fflag == false)
+        clsay.farg = DEFAULT_COWFILE;
 
-            return 1;
-        }
-    } else {
-        if (clsay.fflag == true) {
-            path = strlion(2, COWPATH, clsay.farg);
-        } else {
-            path = strlion(2, COWPATH, DEFAULT_COWFILE);
-        }
-        if (path == NULL) {
-            fprintf(stderr, "%s: strlion() failure\n",
-                    PROGNAME);
+    if ((env = getenv("COWPATH")) == NULL)
+        env = COWPATH;
 
-            return 1;
-        }
+    /* env string to struct */
+    if ((envt = split_env(env)) == NULL) {
+        fprintf(stderr, "%s: split_env() failure\n",
+                PROGNAME);
+
+        return 1;
     }
 
-    /* checking type of file or directory */
-    if (stat(path, &st) != 0) {
-        path = strlion(2, path, ".cow");        /* filename + .cow */
-        if (stat(path, &st) != 0) {
-            if (stat(clsay.farg, &st) == 0) {   /* filename */
-                strcpy(path, clsay.farg);
-            } else {
-                fprintf(stderr, "%s: %s: no such file or directory\n",
-                        PROGNAME, path);
-                release(NULL, path, 0, NULL, 0, NULL);
+    /*
+     * # check_file_exists()
+     *
+     * 0: not found
+     * 1: keep argument(path)
+     * 2: long argument(filename.cow)
+     * 3: short argument(filename)
+     */
+    do {
+        if ((res = check_file_exists(envt->envs[i], clsay.farg)) != 0) {
+            envp = envt->envs[i];
 
-                return 2;
-            }
+            break;
         }
+        i++;
+    } while (i < envt->envc);
+
+    if (res == 0) {
+        fprintf(stderr, "%s: %s: cowfile not found\n",
+                PROGNAME, clsay.farg);
+        release(NULL, envt, NULL, 0, NULL, 0, NULL);
+
+        return 2;
     }
-    if (check_file_stat(path, st.st_mode) != 0) {
-        release(NULL, path, 0, NULL, 0, NULL);
+
+    if ((path = concat_file_path(res, envp, clsay.farg)) == NULL) {
+        release(NULL, envt, NULL, 0, NULL, 0, NULL);
 
         return 3;
     }
-    if ((fp = open_file(path)) == NULL) {
-        release(NULL, path, 0, NULL, 0, NULL);
+    if (check_file_stat(path) != 0) {
+        release(NULL, envt, path, 0, NULL, 0, NULL);
 
         return 4;
+    }
+    if ((fp = open_file(path)) == NULL) {
+        release(NULL, envt, path, 0, NULL, 0, NULL);
+
+        return 5;
     }
 
     /* 
@@ -191,18 +195,18 @@ int main(int argc, char* argv[])
         if (strbuf == NULL) {
             fprintf(stderr, "%s: malloc() failure\n",
                     PROGNAME);
-            release(fp, path, 0, NULL, 0, NULL);
+            release(fp, envt, path, 0, NULL, 0, NULL);
             
-            return 5;
+            return 6;
         }
         for (i = 0; optind < argc; optind++, i++) {
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
                 fprintf(stderr, "%s: malloc() failure\n",
                         PROGNAME);
-                release(fp, path, stdins, strbuf, 0, NULL);
+                release(fp, envt, path, stdins, strbuf, 0, NULL);
 
-                return 6;
+                return 7;
             }
             strcpy(strbuf[i], argv[optind]);
         }
@@ -211,9 +215,9 @@ int main(int argc, char* argv[])
         if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
             fprintf(stderr, "%s: p_read_file_char() failure\n",
                     PROGNAME);
-            release(fp, path, 0, NULL, 0, NULL);
+            release(fp, envt, path, 0, NULL, 0, NULL);
 
-            return 7;
+            return 8;
         }
         stdins = p_count_file_lines(strbuf);    /* count file lines */
     }
@@ -222,9 +226,9 @@ int main(int argc, char* argv[])
     if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
         fprintf(stderr, "%s: p_read_file_char() failure\n",
                 PROGNAME);
-        release(fp, path, stdins, strbuf, 0, NULL);
+        release(fp, envt, path, stdins, strbuf, 0, NULL);
 
-        return 8;
+        return 9;
     } else {
         lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
@@ -246,15 +250,19 @@ int main(int argc, char* argv[])
     /* print cow */
     print_cow(lines, cowbuf, &clsay);
     /* memory release */
-    release(fp, path, stdins, strbuf, lines, cowbuf);
+    release(fp, envt, path, stdins, strbuf, lines, cowbuf);
 
     return 0;
 }
 
-void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** buf2)
+void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lines2, char** buf2)
 {
     if (fp != NULL) {
         fclose(fp);
+        fp = NULL;
+    }
+    if (envt != NULL) {
+        release_env_t(envt);
     }
     if (path != NULL) {
         free(path);
@@ -266,4 +274,6 @@ void release(FILE* fp, char* path, int lines1, char** buf1, int lines2, char** b
     if (buf2 != NULL) {
         free2d(buf2, lines2);
     }
+
+    return;
 }

@@ -49,7 +49,6 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	cowsay側のパスではなく	
 	`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`	
 	に対してcowファイルがインストールされます。		
-	本家cowsayと同様に、シェルの環境変数`$COWPATH`にて動的に切り替えることも可能です。
 	```shellsession
 	% brew install --without-cows 844196/Renge/clangsay
 	```
@@ -68,7 +67,8 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 	```
 
 ## zshでの補完
-`$(PREFIX)/share/clangsay/compdef/_clangsay.zsh`を`_clangsay`として、`$fpath`の通ったディレクトリにコピーして下さい。
+`$(PREFIX)/share/clangsay/compdef/_clangsay.zsh`を`_clangsay`として、`$fpath`の通ったディレクトリにコピーして下さい。	
+現状では、シェルの環境変数`$COWPATH`に対して複数のディレクトリを登録している場合、優先順位の一番高いディレクトリの補完しかできません。（ごめんなさい）
 
 ## Usage
 基本的にcowsayのオプションと同様です。
@@ -130,10 +130,18 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
                  ｀¨  ‐= . ＿＿＿_.. ﾆ=-‐‐`'´｀ﾐ､   三＞
                                                  ￣￣
 ```
-
 cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.jp/projects/nkf/)の`-f`オプションを介すことで、同等の機能を実現できます。  
 
 詳しくは`clangsay --help`をご覧下さい。
+
+### COWPATH
+環境変数`$COWPATH`は、シェルの様々な検索パスと同様に`:`区切りで、複数ディレクトリの指定ができます。	
+```shellsession
+% export COWPATH="/foo/bar/baz:/hoge/fuga/piyo:~/body_sensor"
+```
+しかし「zshでの補完」で書いた通り、同補完ファイルを利用する際には優先順位の一番高いディレクトリしか補完されません。	
+補完対象外のファイルの詳細は、`-l, --list`オプションにてご確認下さい。	
+なお、環境変数`$COWPATH`に存在しないディレクトリが登録されている場合は無視されます。
 
 ## Thanks
 * [Masaya Tk](https://github.com/844196)	
