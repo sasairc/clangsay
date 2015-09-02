@@ -197,13 +197,17 @@ int strmax(int val, char** src)
 
 int strlftonull(char* str)
 {
-    if (str[strlen(str) - 1] == '\n') {
-        str[strlen(str) - 1] = '\0';
+    int i   = 0,
+        ret = 0;
 
-        return 1;
+    for (i = 0; i <= strlen(str); i++) {
+        if (str[i] == '\n') {
+            str[i] = '\0';
+            ret++;
+        }
     }
 
-    return 0;
+    return ret;
 }
 
 char** str_to_args(char* str)
