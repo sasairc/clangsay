@@ -60,7 +60,7 @@ int check_file_exists(char* path, char* file)
     if (stat(file, &st) == 0)
         return 1;
 
-    if ((tmp = strlion(2, file, ".cow")) == NULL)
+    if ((tmp = strlion(2, file, ".cow\0")) == NULL)
         return 0;
 
     if ((dp = opendir(path)) == NULL) {
