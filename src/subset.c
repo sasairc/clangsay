@@ -57,15 +57,23 @@ int check_file_exists(char* path, char* file)
     struct  stat    st;
     struct  dirent* list;
 
-    if (stat(file, &st) == 0)
-        return 1;
+    /* outside of env */
+    if (strlen(file) > 1) {
+        if (file[0] == '.')
+            if (file[1] == '/')
+                if (stat(file, &st) == 0)
+                    return 1;
+    }
 
+    /* open directory */
     if ((dp = opendir(path)) == NULL)
         return 0;
 
+    /* concat filename + .cow */
     if ((tmp = strlion(2, file, ".cow")) == NULL)
         return 0;
 
+    /* search cowfile from directory */
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {
         if (strcmp(list->d_name, file) == 0) {
             ret = 2;
