@@ -134,7 +134,7 @@ cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.j
 
 詳しくは`clangsay --help`をご覧下さい。
 
-### COWPATH
+## Environment variable
 環境変数`$COWPATH`は、シェルの様々な検索パスと同様に`:`区切りで、複数ディレクトリの指定ができます。	
 ```shellsession
 % export COWPATH="/foo/bar/baz:/hoge/fuga/piyo:~/body_sensor"
