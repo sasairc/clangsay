@@ -169,6 +169,13 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 continue;
         }
     }
+    /* no data */
+    if (x == 0 && y == 0) {
+        buf[y] = NULL;
+        free(str);
+
+        return buf;
+    }
 
     if (str[0] != '\0') {
         if (y == (lines - 1)) {
@@ -187,6 +194,7 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
         y++;
     }
     buf[y] = NULL;
+    free(str);
 
     return buf;
 
