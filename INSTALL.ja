@@ -1,0 +1,99 @@
+インストール方法
+================
+
+* 動作環境
+
+  UTF-8 環境であることが前提であり、動作確認がとれているもの、
+
+  * GNU/Linux (i386/amd64/armhf/ppc64)
+
+    Arch Linux
+    Debian GNU/Linux 6.x (squeeze)
+    Debian GNU/Linux 7.x (wheezy)
+    Debian GNU/Linux 8.x (jessie)
+
+  * MacOS X/Homebrew
+
+* make に必要なツール及びライブラリ
+
+  * pkg-config
+  * glib-2.0
+  * make
+  * gcc または llvm+clang
+
+
+make の方法
+===========
+
+% make
+% su
+Password: [パスワードを入力]
+# make install
+
+
+make に関する追加情報
+=====================
+
+* make のオプション
+
+  * PREFIX
+  インストール先を指定するオプション。
+  未指定の場合は、 PREFIX=/usr/local となる。
+
+  * BINDIR
+  実行ファイルのインストール先を指定するオプション。
+  未指定の場合は、 BINDIR=$(PREFIX)/bin となる。
+
+  * MANDIR
+  日本語manページのインストール先を指定するオプション。
+  未指定の場合は、 MANDIR=$(PREFIX)/man/ja/man6 となる。
+
+  * COWPATH
+  COWFILE のインストール先を指定するオプション。
+  このオプションは、上記の役割を担うのに加えて、規定の COWPATH として実行ファイルに対して組み込まれる。
+  未指定の場合は、 COWPATH=$(PREFIX)/share/clangsay/cows となる。
+
+  * CC
+  Cコンパイラを指定するオプション。
+  gcc と llvm+clang 両方を導入していて、かつ明示的にコンパイラを切り替えたい場合は、
+  CC=clang または CC=gcc と指定すると良いだろう。
+  未指定の場合は、 CC=cc となる。
+
+  * CFLAGS
+  コンパイラに渡すオプション。
+  例として、ビルド環境に合わせて実行ファイルの最適化を行う場合は、
+  CFLAGS="-O3 -march=native -mtune=native" と指定すると良い。
+  指定できるオプションに関しては、 gcc の最適化オプションに関してのドキュメントを参照。
+  未指定の場合は、 CFLAGS="-O2 -g -Wall" となる。
+
+  * CMDLINE
+  make 時のメッセージを抑制する為のオプション。
+  未指定の場合の値は 0 であり、その他の値がセットされた場合は、抑制せずに出力される。
+
+* make のターゲット
+
+  * all（未指定）
+  全てのターゲットに対しビルドを実行する。
+
+  * clean
+  生成された実行ファイル及び、オブジェクトファイルを削除する。
+
+  * install-bin
+  実行ファイルのみをインストールする。
+
+  * install-man
+  manページのみをインストールする。
+
+  * install-zsh-compdef
+  zsh 用の補完ファイルをインストールする。
+  インストール先は $(PREFIX)/share/clangsay/compdef であり、
+  本補完ファイルを利用する為に必要な設定に関しては、 zsh のドキュメントを参照してほしい。
+
+  * install-cows
+  COWFILE のみをインストールする。
+
+  * install
+  上記の install-* を実行する。
+
+
+-- sasairc <sasairc@ssiserver.moe.hm>  Mon, 14 Sep 2015 01:08:10 +0900
