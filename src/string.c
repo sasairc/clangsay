@@ -117,7 +117,10 @@ int mbstrlen(char* src)
     setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
 
     while (src[i] != '\0') {
-        ch = mblen(&src[i], MB_CUR_MAX);    /* get string length */
+        /* get string length */
+        if ((ch = mblen(&src[i], MB_CUR_MAX)) < 0)
+            return 0;
+
         if (ch > 1) {
             cpoints = g_utf8_to_ucs4_fast(&src[i], sizeof(src[i]), NULL);   /* get unicode code point */
 
