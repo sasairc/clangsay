@@ -1,0 +1,28 @@
+#
+# The universal operating system
+#
+# Original: Debian Mailing List
+# https://lists.debian.org/debian-devel/2001/07/msg00686.html
+#
+
+$the_cow = <<EOC;
+  $thoughts
+   $thoughts
+[38;05;1m          _,met$$$$$gg.
+       ,g$$$$$$$$$$$$$$$P.
+     ,g$$P""       """Y$$.".
+    ,$$P'              `$$$. 
+  ',$$P       ,ggs.     `$$b:
+  `d$$'     ,$P"'   .    $$$
+   $$P      d$'     ,    $$P
+   $$:      $$.   -    ,d$$'
+   $$;      Y$b._   _,d$P'
+   Y$$.    `.`"Y$$$$P"' 
+   `$$b      "-.__
+    `Y$$b
+     `Y$$.
+       `$$b.
+         `Y$$b.
+           `"Y$b._
+               `""""[0m
+EOC
