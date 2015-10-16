@@ -30,7 +30,7 @@ install-man:
 install-zsh-compdef:
 	@$(MAKE) -C ./compdef	$@
 
-install-cows:
+install-cows install-cows-asciiart install-cows-pixelart:
 	@$(MAKE) -C ./cows	$@
 
 install: install-bin		\
@@ -43,5 +43,7 @@ install: install-bin		\
 	install-bin		\
 	install-man		\
 	install-cows		\
+	install-cows-asciiart	\
+	install-cows-pixelart	\
 	install-zsh-compdef	\
 	clean
