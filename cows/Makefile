@@ -2,8 +2,16 @@
 #    Makefile for clangsay
 #
 
-install-cows:
-	install -pd $(COWPATH)
-	install -pm 644 *.cow $(COWPATH)/
+install-cows-asciiart:
+	@$(MAKE) -C ./asciiart	$@
 
-.PHONY: install-cows
+install-cows-pixelart:
+	@$(MAKE) -C ./pixelart	$@
+
+install-cows:			\
+	install-cows-asciiart	\
+	install-cows-pixelart
+
+.PHONY: install-cows		\
+	install-cows-asciiart	\
+	install-cows-pixelart
