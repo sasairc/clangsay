@@ -27,4 +27,3 @@ script:
     - ${TEST_PREFIX}/bin/clangsay --help
     - cleanup "$TEST_PREFIX"
     - unset TEST_PREFIX
-    - unfunction cleanup install_all install_bin install_cows install_cows_asciiart install_cows_pixelart install_man install_zsh_compdef
