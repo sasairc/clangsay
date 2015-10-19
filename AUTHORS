@@ -4,13 +4,13 @@
 * Masaya Tk (https://github.com/844196)
   His contributed some amazing cow-file.
 
-  cows/charlie.cow
-  cows/renge.cow
-  cows/zen-noh-milk.cow
-  cows/threader.cow
-  cows/respawn.cow
-  cows/vim.cow
-  cows/darvish.cow
-  cows/sachiko.cow
-  cows/doseisan.cow
-  cows/yurushite.cow
+  cows/asciiart/charlie.cow
+  cows/asciiart/renge.cow
+  cows/asciiart/zen-noh-milk.cow
+  cows/asciiart/threader.cow
+  cows/asciiart/sachiko.cow
+
+  cows/pixelart/vim.cow
+  cows/pixelart/darvish.cow
+  cows/pixelart/doseisan.cow
+  cows/pixelart/yurushite.cow
