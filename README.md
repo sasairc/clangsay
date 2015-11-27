@@ -135,18 +135,34 @@ cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.j
 詳しくは`clangsay --help`をご覧下さい。
 
 ## Environment variable
+
+### COWPATH
+
 環境変数`$COWPATH`は、シェルの様々な検索パスと同様に`:`区切りで、複数ディレクトリの指定ができます。	
 ```shellsession
-% export COWPATH="/foo/bar/baz:/hoge/fuga/piyo:~/body_sensor"
+% export COWPATH="/foo/bar/baz:/hoge/fuga/piyo:/ramen/oudon"
 ```
 しかし「zshでの補完」で書いた通り、同補完ファイルを利用する際には優先順位の一番高いディレクトリしか補完されません。	
 補完対象外のファイルの詳細は、`-l, --list`オプションにてご確認下さい。	
 なお、環境変数`$COWPATH`に存在しないディレクトリが登録されている場合は無視されます。
 
+### DEFAULT_COWFILE
+
+環境変数`$DEFAULT_COWFILE`は、`-f, --file`オプションを使用せずに実行した場合のcowfileを置き換えます。
+```shellsession
+% echo $COWPATH
+/usr/local/share/clangsay/cows
+% clangsay -l | grep doseisan
+doseisan.cow
+% export DEFAULT_COWFILE="doseisan.cow"	# ファイル名
+% export DEFAULT_COWFILE="doseisan"		# 拡張子省略
+% export DEFAULT_COWFILE="/usr/local/share/clangsay/cows/doseisan.cow"	# パス指定
+```
+
 ## Thanks
 * [Masaya Tk](https://github.com/844196)	
 	yasunaに続き、clangsayのHomebrew用リポジトリまで提供して頂き  
-	更にはユニークな`cowfile`まで作って頂きました。本当に有難うございました。  
+	更にはユニークなcowfileまで作って頂きました。本当に有難うございました。  
 	詳細は`AUTHORS`のクレジットをご覧下さい。
 
 ## License
