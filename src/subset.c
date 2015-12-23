@@ -82,10 +82,8 @@ char* concat_file_path(int mode, char* path, char* file)
 
     switch (mode) {
         case    1:
-            if ((buf = (char*)malloc(
-                            sizeof(char) * strlen(file)
-            )) != NULL) {
-                strcpy(buf, file);
+            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL) {
+                memcpy(buf, file, strlen(file) + 1);
             }
             break;
         case    2:

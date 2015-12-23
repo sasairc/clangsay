@@ -131,11 +131,9 @@ int main(int argc, char* argv[])
     }
 
     /* check env $DEFAULT_COWFILE */
-    if (clsay.fflag == false) {
-        if ((clsay.farg = getenv("DEFAULT_COWFILE")) == NULL) {
+    if (clsay.fflag == false)
+        if ((clsay.farg = getenv("DEFAULT_COWFILE")) == NULL)
             clsay.farg = DEFAULT_COWFILE;
-        }
-    }
 
     /* check env $COWPATH */
     if ((env = getenv("COWPATH")) == NULL)
@@ -213,7 +211,7 @@ int main(int argc, char* argv[])
 
                 return 7;
             }
-            strcpy(strbuf[i], argv[optind]);
+            memcpy(strbuf[i], argv[optind], strlen(argv[optind]) + 1);
         }
         stdins = i;
     } else {
@@ -246,9 +244,8 @@ int main(int argc, char* argv[])
         strlftonull(strbuf[i]);
         strunesc(strbuf[i]);
     }
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < lines; i++)
         strlftonull(cowbuf[i]);
-    }
 
     /* print string */
     print_string(stdins, strbuf);
