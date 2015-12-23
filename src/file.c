@@ -112,12 +112,15 @@ int p_count_file_lines(char** buf)
 
 char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
 {
-    int     lines   = t_lines,
-            length  = t_length,
-            i       = 0,
+    int     i       = 0,
             x       = 0,
             y       = 0,
             c       = 0;
+
+    size_t  lines   = t_lines,
+            length  = t_length,
+            tmplen  = 0;
+
     char*   str     = (char*)malloc(sizeof(char) * t_length),   /* allocate temporary array */
         **  buf     = (char**)malloc(sizeof(char*) * t_lines);  /* allocate array of Y coordinate */
 
@@ -135,6 +138,7 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
         switch (c) {
             case    '\n':
                 str[x] = c;
+                tmplen = strlen(str);
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
                     lines += t_lines;
@@ -144,15 +148,16 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                     }
                 }
                 /* allocate array for X coordinate */
-                if ((buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1))) == NULL) {
+                if ((buf[y] = (char*)malloc(sizeof(char) * (tmplen + 1))) == NULL) {
 
                     goto ERR;
                 }
-                strcpy(buf[y], str);    /* copy, str to buffer */
+                /* copy, str to buffer */
+                memcpy(buf[y], str, tmplen + 1);
                 for (i = 0; i < length; i++) {
                     str[i] = '\0';      /* refresh temporary array */
                 }
-                x = 0;
+                x = tmplen = 0;
                 y++;
                 break;
             default:
@@ -186,11 +191,12 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 goto ERR;
             }
         }
-        if ((buf[y] = (char*)malloc(sizeof(char) * (strlen(str) + 1))) == NULL) {
+        tmplen = strlen(str);
+        if ((buf[y] = (char*)malloc(sizeof(char) * (tmplen + 1))) == NULL) {
 
             goto ERR;
         }
-        strcpy(buf[y], str);
+        memcpy(buf[y], str, tmplen + 1);
         y++;
     }
     buf[y] = NULL;
