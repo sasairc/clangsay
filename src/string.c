@@ -306,3 +306,24 @@ ERR:
 
     return NULL;
 }
+
+char* mbstrtok(char* str, char* delimiter)
+{
+    static  char*   ptr = NULL;
+            char*   bdy = NULL;
+
+    if (!str)
+        str = ptr;
+
+    if (!str)
+        return NULL;
+
+    if ((bdy = strstr(str, delimiter)) != NULL) {
+        *bdy = '\0';
+        ptr = bdy + strlen(delimiter);
+    } else {
+        ptr = NULL;
+    }
+
+    return str;
+}
