@@ -177,15 +177,11 @@ int main(int argc, char* argv[])
 
         return 3;
     }
-    if (check_file_stat(path) != 0) {
+
+    if (open_cowfile(path, &fp) > 0) {
         release(NULL, envt, path, 0, NULL, 0, NULL);
 
         return 4;
-    }
-    if ((fp = open_file(path)) == NULL) {
-        release(NULL, envt, path, 0, NULL, 0, NULL);
-
-        return 5;
     }
 
     /* 
@@ -200,7 +196,7 @@ int main(int argc, char* argv[])
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
             
-            return 6;
+            return 5;
         }
         for (i = 0; optind < argc; optind++, i++) {
             strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
@@ -209,7 +205,7 @@ int main(int argc, char* argv[])
                         PROGNAME);
                 release(fp, envt, path, stdins, strbuf, 0, NULL);
 
-                return 7;
+                return 6;
             }
             memcpy(strbuf[i], argv[optind], strlen(argv[optind]) + 1);
         }
@@ -220,7 +216,7 @@ int main(int argc, char* argv[])
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
 
-            return 8;
+            return 7;
         }
         stdins = p_count_file_lines(strbuf);    /* count file lines */
     }
@@ -231,7 +227,7 @@ int main(int argc, char* argv[])
                 PROGNAME);
         release(fp, envt, path, stdins, strbuf, 0, NULL);
 
-        return 9;
+        return 8;
     } else {
         lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
