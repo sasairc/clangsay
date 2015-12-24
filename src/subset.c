@@ -82,9 +82,8 @@ char* concat_file_path(int mode, char* path, char* file)
 
     switch (mode) {
         case    1:
-            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL) {
+            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL)
                 memcpy(buf, file, strlen(file) + 1);
-            }
             break;
         case    2:
             buf = strlion(3, path, "/", file);
@@ -104,7 +103,7 @@ int check_file_stat(char* path)
 {
     struct  stat st;
 
-    if (stat(path, &st) != 0) {
+    if (stat(path, &st) < 0) {
         fprintf(stderr, "%s: %s: stat failure\n",
                 PROGNAME, path);
 
@@ -119,7 +118,7 @@ int check_file_stat(char* path)
     }
 
     /* checking file permission */
-    if (access(path, R_OK) != 0) {
+    if (access(path, R_OK) < 0) {
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
@@ -131,51 +130,66 @@ int check_file_stat(char* path)
 
 int print_string(int lines, char** str)
 {
-    int i   = 0,
-        j   = 0,
-        len = strmax(lines, str);   /* get max length */
+    int i       = 0,
+        j       = 0,
+        len     = 0,
+        maxlen  = strmax(lines, str);   /* get max length */
 
-    /* one line */
-    fprintf(stdout, " ");
-    for (i = 0; i <= len; i++)
-        fprintf(stdout, "_");
-
+    /*
+     * single line
+     */
+    putchar(' ');
+    while (i <= maxlen) {
+        putchar('_');
+        i++;
+    }
     if (lines == 1) {
         fprintf(stdout, "\n< %s >\n ", str[0]);
-        for (i = 0; i <= len; i++)
-            fprintf(stdout, "-");
 
-        fprintf(stdout, "\n");
+        while (maxlen >= 0) {
+            putchar('-');
+            maxlen--;
+        }
+        putchar('\n');
 
         return 0;
     }
 
-    /* multi line */
-    for (i = 0; i < lines; i++) {
-        if (i == 0) {
+    /*
+     * multi line
+     */
+    i = 0;
+    while (i < lines) {
+        j = 0;
+        len = mbstrlen(str[i]);
+
+        if (i == 0)
             fprintf(stdout, "\n/ %s", str[i]);
-        } else if (i == (lines -1)) {
+        else if (i == (lines -1))
             fprintf(stdout, "\\ %s", str[i]);
-        } else {
+        else
             fprintf(stdout, "| %s", str[i]);
+
+        while (j < (maxlen - len)) {
+            putchar(' ');
+            j++;
         }
 
-        for (j = 0; j < (len - mbstrlen(str[i])); j++) {
-            fprintf(stdout, " ");
-        }
-
-        if (i == 0) {
+        if (i == 0)
             fprintf(stdout, " \\\n");
-        } else if (i == (lines - 1)) {
+        else if (i == (lines - 1))
             fprintf(stdout, " /\n ");
-        } else {
+        else
             fprintf(stdout, " |\n");
-        }
-    }
-    for (i = 0; i <= len; i++)
-        fprintf(stdout, "-");
 
-    fprintf(stdout, "\n");
+        i++;
+    }
+
+    while (maxlen >= 0) {
+        putchar('-');
+        maxlen--;
+    }
+    putchar('\n');
 
     return 0;
 }
