@@ -5,19 +5,17 @@
 override \
 CFLAGS	+= -fno-strict-aliasing
 
-PKGCFG	= `pkg-config --cflags --libs glib-2.0`
 SRCS	= $(wildcard *.c)
 OBJS	= $(SRCS:.c=.o)
 ARCH	= $(shell gcc -print-multiarch)
+LIBS	= `pkg-config --cflags --libs glib-2.0`
 
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 		-DARCH=\"$(ARCH)\"	  \
-		$(INCLUDE)		  \
-		$(LIBS)		 	  \
-		$(PKGCFG)
+		$(LIBS)
 
-DEFLDFLAGS = $(PKGCFG)
+DEFLDFLAGS = $(LIBS)
 
 all: $(TARGET) $(OBJS)
 
@@ -32,9 +30,9 @@ endif
 %.o: %.c %.h
 ifeq ($(CMDLINE), 0)
 	@echo "  CC      $@"
-	@$(CC) $(DEFCFLAGS) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@ $(DEFCFLAGS)
 else
-	$(CC) $(DEFCFLAGS) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@ $(DEFCFLAGS)
 endif
 
 install-bin: $(TARGET)
