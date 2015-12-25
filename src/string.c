@@ -68,42 +68,52 @@ int strrep(char* src, char* haystack, char* needle)
 
 char* strlion(int argnum, ...)
 {
-    char*   buf     = NULL,
-        **  argmnt  = NULL;
     int     i       = 0;
-    size_t  size    = 0;    /* string size */
-    va_list list;           /* list of variable arguments */
 
-    if ((argmnt = (char**)malloc(sizeof(char*) * argnum)) == NULL) {
+    size_t  destlen = 0,
+            blklen  = 0,
+            arglen  = 0;
 
+    char*   dest    = NULL,
+        **  argmnt  = NULL;
+
+    va_list list;       /* list of variable arguments */
+
+    if ((argmnt = (char**)malloc(sizeof(char*) * argnum)) == NULL)
         return NULL;
-    }
 
     /* processing of variable arguments */
     va_start(list, argnum);
-    for (i = 0; i < argnum; i++) {
+    while (i < argnum) {
         argmnt[i] = va_arg(list, char*);
+        arglen += strlen(argmnt[i]);
+        i++;
     }
     va_end(list);
 
-    /* count of string size */
-    for (i = 0; i < argnum; i++) {
-        size = size + strlen(argmnt[i]);
-    }
-    if ((buf = (char*)malloc(sizeof(char) * (size + 1))) == NULL) { /* memory allocation */
-
+    /* memory allocation */
+    if ((dest = (char*)malloc(sizeof(char) * (arglen + 1))) == NULL)
         return NULL;
+
+    /* concat strings */
+    i = destlen = blklen = 0;
+
+    blklen = strlen(argmnt[i]);
+    memcpy(dest, argmnt[i], blklen);
+    destlen += blklen;
+
+    i++;
+    while(i < argnum) {
+        blklen = strlen(argmnt[i]);
+        memcpy(dest + destlen, argmnt[i], blklen);
+        destlen += blklen;
+        i++;
     }
-    for (i = 0; i < argnum; i++) {
-        if (i == 0) {
-            strcpy(buf, argmnt[i]);
-        } else {
-            strcat(buf, argmnt[i]);     /* string concatenate */
-        }
-    }
+    dest[destlen] = '\0';
+
     free(argmnt);
 
-    return buf;
+    return dest;
 }
 
 #ifdef  WITH_GLIB
@@ -295,4 +305,25 @@ ERR:
     free(args);
 
     return NULL;
+}
+
+char* mbstrtok(char* str, char* delimiter)
+{
+    static  char*   ptr = NULL;
+            char*   bdy = NULL;
+
+    if (!str)
+        str = ptr;
+
+    if (!str)
+        return NULL;
+
+    if ((bdy = strstr(str, delimiter)) != NULL) {
+        *bdy = '\0';
+        ptr = bdy + strlen(delimiter);
+    } else {
+        ptr = NULL;
+    }
+
+    return str;
 }

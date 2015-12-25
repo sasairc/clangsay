@@ -18,8 +18,8 @@ env_t* split_env(char* env)
 {
     int     i       = 0,
             x       = 0,
-            y       = 0,
-            head    = 0,
+            y       = 0;
+    size_t  head    = 0,
             tail    = 0;
     env_t*  buf     = NULL;
 

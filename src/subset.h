@@ -25,10 +25,9 @@ struct  reptarg {
 };
     
 /* This functions is required subset.c */
-extern FILE* open_file(char* path);
+extern int open_cowfile(char* path, FILE** fp);
 extern int check_file_exists(char* path, char* file);
 extern char* concat_file_path(int mode, char* path, char* file);
-extern int check_file_stat(char* path);
 extern int print_string(int lines, char** str);
 extern int print_cow(int lines, char** str, clangsay_t* clsay);
 extern int selects_cowfiles(const struct dirent* dir);

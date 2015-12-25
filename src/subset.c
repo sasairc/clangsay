@@ -23,18 +23,39 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-FILE* open_file(char* path)
+int open_cowfile(char* path, FILE** fp)
 {
-    FILE*   fp;
+    struct  stat st;
 
-    if ((fp = fopen(path, "r")) == NULL) {
+    if (stat(path, &st) < 0) {
+        fprintf(stderr, "%s: %s: stat failure\n",
+                PROGNAME, path);
+
+        return 1;
+    }
+
+    if (S_ISDIR(st.st_mode & S_IFMT)) {
+        fprintf(stderr, "%s: %s: is a directory\n",
+                PROGNAME, path);
+        
+        return 2;
+    }
+
+    if (access(path, R_OK) < 0) {
+        fprintf(stderr, "%s: %s: permission denied\n",
+                PROGNAME, path);
+
+        return 3;
+    }
+
+    if ((*fp = fopen(path, "r")) == NULL) {
         fprintf(stderr, "%s: fp is NULL\n",
                 PROGNAME);
 
-        return NULL;
+        return 4;
     }
 
-    return fp;
+    return 0;
 }
 
 int check_file_exists(char* path, char* file)
@@ -82,11 +103,8 @@ char* concat_file_path(int mode, char* path, char* file)
 
     switch (mode) {
         case    1:
-            if ((buf = (char*)malloc(
-                            sizeof(char) * strlen(file)
-            )) != NULL) {
-                strcpy(buf, file);
-            }
+            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL)
+                memcpy(buf, file, strlen(file) + 1);
             break;
         case    2:
             buf = strlion(3, path, "/", file);
@@ -102,82 +120,68 @@ char* concat_file_path(int mode, char* path, char* file)
     return buf;
 }
 
-int check_file_stat(char* path)
-{
-    struct  stat st;
-
-    if (stat(path, &st) != 0) {
-        fprintf(stderr, "%s: %s: stat failure\n",
-                PROGNAME, path);
-
-        return 1;
-    }
-
-    if (S_ISDIR(st.st_mode & S_IFMT)) {
-        fprintf(stderr, "%s: %s: is a directory\n",
-                PROGNAME, path);
-        
-        return 2;
-    }
-
-    /* checking file permission */
-    if (access(path, R_OK) != 0) {
-        fprintf(stderr, "%s: %s: permission denied\n",
-                PROGNAME, path);
-
-        return 3;
-    }
-
-    return 0;
-}
-
 int print_string(int lines, char** str)
 {
-    int i   = 0,
-        j   = 0,
-        len = strmax(lines, str);   /* get max length */
+    int i       = 0,
+        j       = 0,
+        len     = 0,
+        maxlen  = strmax(lines, str);   /* get max length */
 
-    /* one line */
-    fprintf(stdout, " ");
-    for (i = 0; i <= len; i++)
-        fprintf(stdout, "_");
-
+    /*
+     * single line
+     */
+    putchar(' ');
+    while (i <= maxlen) {
+        putchar('_');
+        i++;
+    }
     if (lines == 1) {
         fprintf(stdout, "\n< %s >\n ", str[0]);
-        for (i = 0; i <= len; i++)
-            fprintf(stdout, "-");
 
-        fprintf(stdout, "\n");
+        while (maxlen >= 0) {
+            putchar('-');
+            maxlen--;
+        }
+        putchar('\n');
 
         return 0;
     }
 
-    /* multi line */
-    for (i = 0; i < lines; i++) {
-        if (i == 0) {
+    /*
+     * multi line
+     */
+    i = 0;
+    while (i < lines) {
+        j = 0;
+        len = mbstrlen(str[i]);
+
+        if (i == 0)
             fprintf(stdout, "\n/ %s", str[i]);
-        } else if (i == (lines -1)) {
+        else if (i == (lines -1))
             fprintf(stdout, "\\ %s", str[i]);
-        } else {
+        else
             fprintf(stdout, "| %s", str[i]);
+
+        while (j < (maxlen - len)) {
+            putchar(' ');
+            j++;
         }
 
-        for (j = 0; j < (len - mbstrlen(str[i])); j++) {
-            fprintf(stdout, " ");
-        }
-
-        if (i == 0) {
+        if (i == 0)
             fprintf(stdout, " \\\n");
-        } else if (i == (lines - 1)) {
+        else if (i == (lines - 1))
             fprintf(stdout, " /\n ");
-        } else {
+        else
             fprintf(stdout, " |\n");
-        }
-    }
-    for (i = 0; i <= len; i++)
-        fprintf(stdout, "-");
 
-    fprintf(stdout, "\n");
+        i++;
+    }
+
+    while (maxlen >= 0) {
+        putchar('-');
+        maxlen--;
+    }
+    putchar('\n');
 
     return 0;
 }
@@ -263,10 +267,9 @@ int selects_cowfiles(const struct dirent* dir)
         *   lp;
     char    dotcow[] = {".cow"};
 
-    if ((namlen = strlen(dir->d_name)) < 4) {
-
+    if ((namlen = strlen(dir->d_name)) < 4)
         return 0;
-    }
+
     namlen -= 4;    /* offset 4 bytes from end (.cow) */
 
     lp = (int*)&(dir->d_name[namlen]);
@@ -276,10 +279,8 @@ int selects_cowfiles(const struct dirent* dir)
      * true: .cow
      * false: other
      */
-    if (*lp == *(int*)&dotcow) {
-
+    if (*lp == *(int*)&dotcow)
         return 1;
-    }
 
     return 0;
 }
@@ -294,14 +295,14 @@ int list_cowfiles(void)
     struct  dirent**  list;
 
     /* catenate file path */
-    if ((env = getenv("COWPATH")) == NULL) {
+    if ((env = getenv("COWPATH")) == NULL)
         env = COWPATH;
-    }
+
     if ((envt = split_env(env)) == NULL) {
         fprintf(stderr, "%s: split_env() failure\n",
                 PROGNAME);
 
-        exit(10);
+        exit(9);
     }
 
     /* get file entry and sort */
