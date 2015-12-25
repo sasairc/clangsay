@@ -20,6 +20,7 @@
 #define false       0
 
 typedef int bool;
+
 typedef struct  CLANGSAY_T {
     bool    bflag;
     bool    dflag;
