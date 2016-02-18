@@ -61,7 +61,9 @@ int open_cowfile(char* path, FILE** fp)
 int check_file_exists(char* path, char* file)
 {
     int     ret     = 0;
+
     char*   tmp     = NULL;
+
     DIR*    dp      = NULL;
 
     struct  stat    st;
@@ -103,7 +105,8 @@ char* concat_file_path(int mode, char* path, char* file)
 
     switch (mode) {
         case    1:
-            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL)
+            if ((buf = (char*)
+                        malloc(sizeof(char) * strlen(file))) != NULL)
                 memcpy(buf, file, strlen(file) + 1);
             break;
         case    2:
@@ -190,7 +193,9 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 {
     int     i       = 0,
             j       = 0;
+
     char*   though  = NULL;
+
     bool    block   = false;
 
     /* eyes table */
@@ -215,13 +220,12 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
     };
 
     /* setting thoughts */
-    if (clsay->syflag == false && clsay->thflag == false) {
+    if (clsay->syflag == false && clsay->thflag == false)
         though = SAY_THOUGHTS;      /* default */
-    } else if (clsay->syflag == true){
+    else if (clsay->syflag == true)
         though = SAY_THOUGHTS;      /* --say switch */
-    } else if (clsay->thflag == true) {
+    else if (clsay->thflag == true)
         though = THINK_THOUGHTS;    /* --think switch */
-    }
 
     /* print cow */
     for (i = 0; i < lines; i++) {
@@ -232,17 +236,15 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
         /* replace eyes*/
         for (j = 0; eyes[j].haystack != NULL || eyes[j].needle != NULL; j++) {
-            if (eyes[j].flag == true) {
+            if (eyes[j].flag == true)
                 strrep(str[i], eyes[j].haystack, eyes[j].needle);
-            }
         }
         strrep(str[i], EYES, DEFAULT_EYES);     /* default eyes*/
 
         /* replace tongue */
         for (j = 0; tongue[j].haystack != NULL || tongue[j].needle != NULL; j++) {
-            if (tongue[j].flag == true) {
+            if (tongue[j].flag == true)
                 strrep(str[i], tongue[j].haystack, tongue[j].needle);
-            }
         }
         strrep(str[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
 
@@ -253,9 +255,9 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         } else if (strstr(str[i], "EOC") && block == true) {
             block = false;
         }
-        if (block == true) {
+
+        if (block == true)
             fprintf(stdout, "%s\n", str[i]);
-        }
     }
 
     return 0;
@@ -263,8 +265,9 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
 int selects_cowfiles(const struct dirent* dir)
 {
-    int     namlen,
-        *   lp;
+    int     namlen  = 0,
+        *   lp      = NULL;
+
     char    dotcow[] = {".cow"};
 
     if ((namlen = strlen(dir->d_name)) < 4)
@@ -290,8 +293,11 @@ int list_cowfiles(void)
     int     i       = 0,
             j       = 0,
             entry   = 0;
+
     char*   env     = NULL;
+
     env_t*  envt    = NULL;
+
     struct  dirent**  list;
 
     /* catenate file path */

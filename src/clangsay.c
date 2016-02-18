@@ -31,12 +31,15 @@ int main(int argc, char* argv[])
             index   = 0,    
             lines   = 0,    /* lines of cowfile*/
             stdins  = 0;    /* lines of string */
+
     FILE*   fp      = NULL; /* cow-file */
+
     char*   path    = NULL, /* .cow file */
         *   env     = NULL, /* string of $COWPATH */
         *   envp    = NULL,
         **  cowbuf  = NULL, /* string buffer (cow) */
         **  strbuf  = NULL; /* string buffer (string) */
+
     env_t*  envt    = NULL; /* environment variable */
 
     /* flag and args */
@@ -190,7 +193,10 @@ int main(int argc, char* argv[])
      * false: pipe
      */ 
     if (optind < argc) {    
-        strbuf = (char**)malloc(sizeof(char*) * (argc - optind));   /* allocate array for y coordinate (strings) */
+        /* allocate array for y coordinate (strings) */
+        strbuf = (char**)
+            malloc(sizeof(char*) * (argc - optind));
+
         if (strbuf == NULL) {
             fprintf(stderr, "%s: malloc() failure\n",
                     PROGNAME);
@@ -199,7 +205,8 @@ int main(int argc, char* argv[])
             return 5;
         }
         for (i = 0; optind < argc; optind++, i++) {
-            strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
+            strbuf[i] = (char*)
+                malloc(sizeof(char) * (strlen(argv[optind]) + 1));
             if (strbuf[i] == NULL) {
                 fprintf(stderr, "%s: malloc() failure\n",
                         PROGNAME);
@@ -232,16 +239,12 @@ int main(int argc, char* argv[])
         lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
 
-    /* 
-     * strunesc():    remove escape sequence
-     * strlftonull(): rf to null
-     */
-    for (i = 0; i < stdins; i++) {
-        strlftonull(strbuf[i]);
+    /* remove escape sequence */
+    i = 0;
+    while (i < stdins) {
         strunesc(strbuf[i]);
+        i++;
     }
-    for (i = 0; i < lines; i++)
-        strlftonull(cowbuf[i]);
 
     /* print string */
     print_string(stdins, strbuf);
