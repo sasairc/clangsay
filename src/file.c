@@ -137,7 +137,7 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
     while ((c = fgetc(fp)) != EOF) {
         switch (c) {
             case    '\n':
-                str[x] = c;
+                str[x] = '\0';
                 tmplen = strlen(str);
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
