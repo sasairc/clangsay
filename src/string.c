@@ -327,3 +327,27 @@ char* mbstrtok(char* str, char* delimiter)
 
     return str;
 }
+
+int strcmp_lite(const char* str1, const char* str2)
+{
+    if (str1 == NULL || str2 == NULL)
+        return -1;
+
+    int     cnt     = 0;
+
+    size_t  len1    = 0,
+            len2    = 0;
+
+    len1 = strlen(str1);
+    len2 = strlen(str2);
+
+    while (*str1 == *str2 && *str1 != '\0' && *str2 != '\0') {
+        str1++;
+        str2++;
+        cnt++;
+    }
+    if (cnt == len1 && cnt == len2)
+        return 0;
+
+    return 1;
+}
