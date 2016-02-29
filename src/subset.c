@@ -265,24 +265,12 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
 int selects_cowfiles(const struct dirent* dir)
 {
-    int     namlen  = 0,
-        *   lp      = NULL;
+    char* tcow  = ".cow\0";
 
-    char    dotcow[] = {".cow"};
-
-    if ((namlen = strlen(dir->d_name)) < 4)
+    if (strlen(dir->d_name) < 5)
         return 0;
 
-    namlen -= 4;    /* offset 4 bytes from end (.cow) */
-
-    lp = (int*)&(dir->d_name[namlen]);
-
-    /*
-     * comparison on int
-     * true: .cow
-     * false: other
-     */
-    if (*lp == *(int*)&dotcow)
+    if (memcmp(dir->d_name + (strlen(dir->d_name) - 4), tcow, 5) == 0)
         return 1;
 
     return 0;

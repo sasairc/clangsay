@@ -2,9 +2,6 @@
 #    Makefile for clangsay
 #
 
-override \
-CFLAGS	+= -fno-strict-aliasing
-
 SRCS	= $(wildcard *.c)
 OBJS	= $(SRCS:.c=.o)
 ARCH	= $(shell gcc -print-multiarch)
