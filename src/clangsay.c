@@ -27,20 +27,20 @@
 int main(int argc, char* argv[])
 {
     int     i       = 0,
-            res     = 0,    /* use getopt_long() */
+            res     = 0,
             index   = 0,    
-            lines   = 0,    /* lines of cowfile*/
-            stdins  = 0;    /* lines of string */
+            cows    = 0,    /* lines of cow-file */
+            msgs    = 0;    /* lines of string */
 
-    FILE*   fp      = NULL; /* cow-file */
+    FILE*   fp      = NULL;
 
-    char*   path    = NULL, /* .cow file */
-        *   env     = NULL, /* string of $COWPATH */
+    char*   path    = NULL,
+        *   env     = NULL,
         *   envp    = NULL,
-        **  cowbuf  = NULL, /* string buffer (cow) */
-        **  strbuf  = NULL; /* string buffer (string) */
+        **  cow     = NULL, /* cowfile */
+        **  msg     = NULL; /* message */
 
-    env_t*  envt    = NULL; /* environment variable */
+    env_t*  envt    = NULL;
 
     /* flag and args */
     clangsay_t  clsay = {
@@ -194,7 +194,7 @@ int main(int argc, char* argv[])
      */ 
     if (optind < argc) {    
         /* allocate array for y coordinate (strings) */
-        if ((strbuf = (char**)
+        if ((msg = (char**)
                     malloc(sizeof(char*) * (argc - optind))) == NULL) {
             fprintf(stderr, "%s: malloc() failure\n",
                     PROGNAME);
@@ -205,21 +205,21 @@ int main(int argc, char* argv[])
 
         i = 0;
         while (optind < argc) {
-            if ((strbuf[i] = (char*)
+            if ((msg[i] = (char*)
                         malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
                 fprintf(stderr, "%s: malloc() failure\n",
                         PROGNAME);
-                release(fp, envt, path, stdins, strbuf, 0, NULL);
+                release(fp, envt, path, msgs, msg, 0, NULL);
 
                 return 6;
             }
-            memcpy(strbuf[i], argv[optind], strlen(argv[optind]) + 1);
+            memcpy(msg[i], argv[optind], strlen(argv[optind]) + 1);
             i++;
             optind++;
         }
-        stdins = i;
+        msgs = i;
     } else {
-        if ((stdins = p_read_file_char(&strbuf, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
+        if ((msgs = p_read_file_char(&msg, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
             fprintf(stderr, "%s: p_read_file_char() failure\n",
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
@@ -228,28 +228,28 @@ int main(int argc, char* argv[])
         }
     }
 
+    /* remove escape sequence */
+    i = 0;
+    while (i < msgs) {
+        strunesc(msg[i]);
+        i++;
+    }
+
     /* reading cow file to array */
-    if ((lines = p_read_file_char(&cowbuf, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
+    if ((cows = p_read_file_char(&cow, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
         fprintf(stderr, "%s: p_read_file_char() failure\n",
                 PROGNAME);
-        release(fp, envt, path, stdins, strbuf, 0, NULL);
+        release(fp, envt, path, msgs, msg, 0, NULL);
 
         return 8;
     }
 
-    /* remove escape sequence */
-    i = 0;
-    while (i < stdins) {
-        strunesc(strbuf[i]);
-        i++;
-    }
-
     /* print string */
-    print_string(stdins, strbuf);
+    print_string(msgs, msg);
     /* print cow */
-    print_cow(lines, cowbuf, &clsay);
+    print_cow(cows, cow, &clsay);
     /* memory release */
-    release(fp, envt, path, stdins, strbuf, lines, cowbuf);
+    release(fp, envt, path, msgs, msg, cows, cow);
 
     return 0;
 }

@@ -123,12 +123,12 @@ char* concat_file_path(int mode, char* path, char* file)
     return buf;
 }
 
-int print_string(int lines, char** str)
+int print_string(int msgs, char** msg)
 {
     int i       = 0,
         j       = 0,
         len     = 0,
-        maxlen  = strmax(lines, str);   /* get max length */
+        maxlen  = strmax(msgs, msg);    /* get max length */
 
     /*
      * single line
@@ -138,8 +138,8 @@ int print_string(int lines, char** str)
         putchar('_');
         i++;
     }
-    if (lines == 1) {
-        fprintf(stdout, "\n< %s >\n ", str[0]);
+    if (msgs == 1) {
+        fprintf(stdout, "\n< %s >\n ", msg[0]);
 
         while (maxlen >= 0) {
             putchar('-');
@@ -154,16 +154,16 @@ int print_string(int lines, char** str)
      * multi line
      */
     i = 0;
-    while (i < lines) {
+    while (i < msgs) {
         j = 0;
-        len = mbstrlen(str[i]);
+        len = mbstrlen(msg[i]);
 
         if (i == 0)
-            fprintf(stdout, "\n/ %s", str[i]);
-        else if (i == (lines -1))
-            fprintf(stdout, "\\ %s", str[i]);
+            fprintf(stdout, "\n/ %s", msg[i]);
+        else if (i == (msgs -1))
+            fprintf(stdout, "\\ %s", msg[i]);
         else
-            fprintf(stdout, "| %s", str[i]);
+            fprintf(stdout, "| %s", msg[i]);
 
         while (j < (maxlen - len)) {
             putchar(' ');
@@ -172,7 +172,7 @@ int print_string(int lines, char** str)
 
         if (i == 0)
             fprintf(stdout, " \\\n");
-        else if (i == (lines - 1))
+        else if (i == (msgs - 1))
             fprintf(stdout, " /\n ");
         else
             fprintf(stdout, " |\n");
@@ -189,7 +189,7 @@ int print_string(int lines, char** str)
     return 0;
 }
 
-int print_cow(int lines, char** str, clangsay_t* clsay)
+int print_cow(int cows, char** cow, clangsay_t* clsay)
 {
     int     i       = 0,
             j       = 0;
@@ -228,36 +228,36 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
         though = THINK_THOUGHTS;    /* --think switch */
 
     /* print cow */
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < cows; i++) {
         /* replace thoughts */
-        strrep(str[i], THOUGHTS, though);
+        strrep(cow[i], THOUGHTS, though);
 
-        while (strrep(str[i], "\\\\", "\\") == 0);
+        while (strrep(cow[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/
         for (j = 0; eyes[j].haystack != NULL || eyes[j].needle != NULL; j++) {
             if (eyes[j].flag == true)
-                strrep(str[i], eyes[j].haystack, eyes[j].needle);
+                strrep(cow[i], eyes[j].haystack, eyes[j].needle);
         }
-        strrep(str[i], EYES, DEFAULT_EYES);     /* default eyes*/
+        strrep(cow[i], EYES, DEFAULT_EYES);     /* default eyes*/
 
         /* replace tongue */
         for (j = 0; tongue[j].haystack != NULL || tongue[j].needle != NULL; j++) {
             if (tongue[j].flag == true)
-                strrep(str[i], tongue[j].haystack, tongue[j].needle);
+                strrep(cow[i], tongue[j].haystack, tongue[j].needle);
         }
-        strrep(str[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
+        strrep(cow[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
 
         /* EOC to EOC */
-        if (strstr(str[i], "EOC")) {
+        if (strstr(cow[i], "EOC")) {
             block = true;
             continue;
-        } else if (strstr(str[i], "EOC") && block == true) {
+        } else if (strstr(cow[i], "EOC") && block == true) {
             block = false;
         }
 
         if (block == true)
-            fprintf(stdout, "%s\n", str[i]);
+            fprintf(stdout, "%s\n", cow[i]);
     }
 
     return 0;
