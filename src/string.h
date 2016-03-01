@@ -15,7 +15,7 @@
 #define YSTRING_H
 
 #undef  DEBUG
-#undef  WITH_GLIB   /* use glib */
+#define WITH_GLIB   /* use glib */
 #define LOCALE      ""
 
 /* This functions is required string.c */
