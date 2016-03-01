@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
         return 3;
     }
 
-    if (open_cowfile(path, &fp) > 0) {
+    if (open_cowfile(path, &fp) < 0) {
         release(NULL, envt, path, 0, NULL, 0, NULL);
 
         return 4;
@@ -194,20 +194,19 @@ int main(int argc, char* argv[])
      */ 
     if (optind < argc) {    
         /* allocate array for y coordinate (strings) */
-        strbuf = (char**)
-            malloc(sizeof(char*) * (argc - optind));
-
-        if (strbuf == NULL) {
+        if ((strbuf = (char**)
+                    malloc(sizeof(char*) * (argc - optind))) == NULL) {
             fprintf(stderr, "%s: malloc() failure\n",
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
             
             return 5;
         }
-        for (i = 0; optind < argc; optind++, i++) {
-            strbuf[i] = (char*)
-                malloc(sizeof(char) * (strlen(argv[optind]) + 1));
-            if (strbuf[i] == NULL) {
+
+        i = 0;
+        while (optind < argc) {
+            if ((strbuf[i] = (char*)
+                        malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
                 fprintf(stderr, "%s: malloc() failure\n",
                         PROGNAME);
                 release(fp, envt, path, stdins, strbuf, 0, NULL);
@@ -215,28 +214,27 @@ int main(int argc, char* argv[])
                 return 6;
             }
             memcpy(strbuf[i], argv[optind], strlen(argv[optind]) + 1);
+            i++;
+            optind++;
         }
         stdins = i;
     } else {
-        if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
+        if ((stdins = p_read_file_char(&strbuf, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
             fprintf(stderr, "%s: p_read_file_char() failure\n",
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
 
             return 7;
         }
-        stdins = p_count_file_lines(strbuf);    /* count file lines */
     }
 
     /* reading cow file to array */
-    if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
+    if ((lines = p_read_file_char(&cowbuf, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
         fprintf(stderr, "%s: p_read_file_char() failure\n",
                 PROGNAME);
         release(fp, envt, path, stdins, strbuf, 0, NULL);
 
         return 8;
-    } else {
-        lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
 
     /* remove escape sequence */

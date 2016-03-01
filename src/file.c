@@ -22,6 +22,7 @@ int check_file_type(char* filename)
 {
     int     i,
             c;
+
     FILE*   fp  = NULL;
 
     int     rtf[5] = {0x7B, 0x5C, 0x72, 0x74, 0x66};    /* {\rtf is Ritch-test format's header */
@@ -78,9 +79,11 @@ int count_file_lines(FILE* fp)
 int read_file(int lines, size_t length, char** buf, FILE* fp)
 {
     int     i   = 0;
+
     char*   str = NULL;
 
-    if ((str = (char*)malloc(sizeof(char) * length)) == NULL) { /* allocate buffer */
+    if ((str = (char*)
+                malloc(sizeof(char) * length)) == NULL) {   /* allocate buffer */
 
         return 0;
     }
@@ -103,17 +106,20 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
 
 int p_count_file_lines(char** buf)
 {
-    int i;
+    int i   = 0;
 
-    for (i = 0; buf[i] != NULL; i++);
+    while (buf[i] != NULL)
+        i++;
 
     return i;
 }
 
-char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
+int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int chomp)
 {
-    int     i       = 0,
-            x       = 0,
+    if (t_lines <= 0 || t_length <= 0 || fp == NULL)
+        return -1;
+
+    int     x       = 0,
             y       = 0,
             c       = 0;
 
@@ -121,42 +127,44 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
             length  = t_length,
             tmplen  = 0;
 
-    char*   str     = (char*)malloc(sizeof(char) * t_length),   /* allocate temporary array */
-        **  buf     = (char**)malloc(sizeof(char*) * t_lines);  /* allocate array of Y coordinate */
+    char    end     = '\0',
+        *   str     = NULL,
+        **  buf     = NULL;
 
-    if (str == NULL || buf == NULL) {
+    if ((str = (char*)
+                malloc(sizeof(char) * t_length)) == NULL)
+        return -2;
 
-        return NULL;
-    } else if (t_lines == 0 || t_length == 0 || fp == NULL) {
-        free(str);
-        free(buf);
+    if ((buf = (char**)
+                malloc(sizeof(char*) * t_lines)) == NULL)
+        goto ERR;
 
-        return NULL;
-    }
+    /* lf to ? */
+    if (chomp > 0)
+        end = '\0';
+    else
+        end = '\n';
 
     while ((c = fgetc(fp)) != EOF) {
         switch (c) {
             case    '\n':
-                str[x] = '\0';
+                str[x] = end;
                 tmplen = strlen(str);
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
                     lines += t_lines;
-                    if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL) {
-
+                    if ((buf = (char**)
+                                realloc(buf, sizeof(char*) * lines)) == NULL)
                         goto ERR;
-                    }
                 }
                 /* allocate array for X coordinate */
-                if ((buf[y] = (char*)malloc(sizeof(char) * (tmplen + 1))) == NULL) {
-
+                if ((buf[y] = (char*)
+                            malloc(sizeof(char) * (tmplen + 1))) == NULL)
                     goto ERR;
-                }
+
                 /* copy, str to buffer */
                 memcpy(buf[y], str, tmplen + 1);
-                for (i = 0; i < length; i++) {
-                    str[i] = '\0';      /* refresh temporary array */
-                }
+                memset(str, '\0', length);
                 x = tmplen = 0;
                 y++;
                 break;
@@ -164,10 +172,9 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
                 /* reallocate temporary array */
                 if (x == (length - 1)) {
                     length += t_length;
-                    if ((str = (char*)realloc(str, length)) == NULL) {
-
+                    if ((str = (char*)
+                                realloc(str, length)) == NULL)
                         goto ERR;
-                    }
                 }
                 str[x] = c;
                 x++;
@@ -179,54 +186,38 @@ char** p_read_file_char(int t_lines, size_t t_length, FILE* fp)
         buf[y] = NULL;
         free(str);
 
-        return buf;
-    }
-
-    if (str[0] != '\0') {
-        if (y == (lines - 1)) {
-            str[x] = c;
-            lines += t_lines;
-            if ((buf = (char**)realloc(buf, sizeof(char*) * lines)) == NULL) {
-
-                goto ERR;
-            }
-        }
-        tmplen = strlen(str);
-        if ((buf[y] = (char*)malloc(sizeof(char) * (tmplen + 1))) == NULL) {
-
-            goto ERR;
-        }
-        memcpy(buf[y], str, tmplen + 1);
-        y++;
+        return 0;
     }
     buf[y] = NULL;
     free(str);
 
-    return buf;
+    *dest = buf;
 
+    return y;
 
 ERR:
     lines   -= t_lines;
     length  -= t_length;
 
     if (buf != NULL) {
-        for (i = 0; i < lines; i++) {
-            if (buf[i] != NULL) {
-                free(buf[i]);
-                buf[i] = NULL;
-            }
+        while (lines >= 0) {
+            if (buf[lines] != NULL)
+                free(buf[lines]);
+
+            lines--;
         }
         free(buf);
     }
     if (str != NULL)
         free(str);
 
-    return NULL;
+    return -3;
 }
 
 int watch_fd(int fd, long timeout)
 {
     fd_set  fdset;
+
     struct  timeval tm;
 
     FD_ZERO(&fdset);
