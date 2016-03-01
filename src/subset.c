@@ -31,28 +31,28 @@ int open_cowfile(char* path, FILE** fp)
         fprintf(stderr, "%s: %s: stat failure\n",
                 PROGNAME, path);
 
-        return 1;
+        return -1;
     }
 
     if (S_ISDIR(st.st_mode & S_IFMT)) {
         fprintf(stderr, "%s: %s: is a directory\n",
                 PROGNAME, path);
         
-        return 2;
+        return -2;
     }
 
     if (access(path, R_OK) < 0) {
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
-        return 3;
+        return -3;
     }
 
     if ((*fp = fopen(path, "r")) == NULL) {
         fprintf(stderr, "%s: fp is NULL\n",
                 PROGNAME);
 
-        return 4;
+        return -4;
     }
 
     return 0;
@@ -310,9 +310,11 @@ int list_cowfiles(void)
 
             fprintf(stdout, "%s:\n", envt->envs[i]);
         }
-        for (j = 0; j < entry; j++) {
+        j = 0;
+        while (j < entry) {
             fprintf(stdout, "%s\n", list[j]->d_name);
             free(list[j]);
+            j++;
         }
         free(list);
         i++;

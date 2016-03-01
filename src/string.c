@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <ctype.h>
 #include <string.h>
 #include <locale.h>
 
@@ -25,25 +26,19 @@ int strrep(char* src, char* haystack, char* needle)
 {
     char*   find = NULL;
 
-    if (src == NULL || haystack == NULL || needle == NULL) {
-
-        return 1;
-    }
+    if (src == NULL || haystack == NULL || needle == NULL)
+        return -1;
 
     /* seach strings */
-    if ((find = strstr(src, haystack)) == NULL) {
+    if ((find = strstr(src, haystack)) == NULL)
+        return -2;
 
-        return 2;       /* word not found */
-    }
     if (strlen(haystack) < strlen(needle)) {
         /* reallocate memory */
-        if ((src = (char*)realloc(
-                        src,
-                        strlen(src) + strlen(needle) + 1 - strlen(haystack))
-            ) == NULL) {
+        if ((src = (char*)
+                    realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack))) == NULL)
+            return -3;
 
-            return 3;
-        }
         /* move match word to specified location in memory */
         memmove(
             find + strlen(needle),
@@ -79,7 +74,8 @@ char* strlion(int argnum, ...)
 
     va_list list;       /* list of variable arguments */
 
-    if ((argmnt = (char**)malloc(sizeof(char*) * argnum)) == NULL)
+    if ((argmnt = (char**)
+                malloc(sizeof(char*) * argnum)) == NULL)
         return NULL;
 
     /* processing of variable arguments */
@@ -92,7 +88,8 @@ char* strlion(int argnum, ...)
     va_end(list);
 
     /* memory allocation */
-    if ((dest = (char*)malloc(sizeof(char) * (arglen + 1))) == NULL)
+    if ((dest = (char*)
+                malloc(sizeof(char) * (arglen + 1))) == NULL)
         return NULL;
 
     /* concat strings */
@@ -122,9 +119,10 @@ int mbstrlen(char* src)
     int         i   = 0,
                 ch  = 0,
                 len = 0;
+
     gunichar*   cpoints;
 
-    setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
+    setlocale(LC_CTYPE, LOCALE);
 
     while (src[i] != '\0') {
         /* get string length */
@@ -199,10 +197,11 @@ int strmax(int val, char** src)
         len = 0,
         max = 0;
 
-    for (i = 0; i < val; i++) {
+    while (i < val) {
         len = mbstrlen(src[i]);
         if (max < len)
             max = len;
+        i++;
     }
 
     return max;
@@ -213,9 +212,9 @@ int strlftonull(char* str)
     int i   = 0,
         ret = 0;
 
-    for (i = 0; i <= strlen(str); i++) {
+    while (i < strlen(str)) {
         if (str[i] == '\n') {
-            str[i] = '\0';
+            str[i] = '\n';
             ret++;
         }
     }
@@ -234,47 +233,84 @@ char** str_to_args(char* str)
      *  ay   : args array pointer (Y)
      *  elmc : elements counter
      *  dspf : double space flag
+     *  sqtf : single quote flag
+     *  dqtf : double quote flag
      */
     int     i,
             sx, xt, ax, ay,
             elmc,
-            dspf;
-    char**  args;
+            dspf,
+            sqtf,
+            dqtf;
+
+    char**  args    = NULL;
     
     /* count elements */
-    for (i = dspf = 0, elmc = 1; str[i] != '\0'; i++) {
+    for (i = dspf = sqtf = dqtf = 0, elmc = 1; str[i] != '\0'; i++) {
+        if (str[i] == '\'') {
+            if (sqtf == 0)
+                sqtf = 1;
+            else
+                sqtf = 0;
+        }
+        if (str[i] == '\"') {
+            if (dqtf == 0)
+                dqtf = 1;
+            else
+                dqtf = 0;
+        }
+        if (sqtf == 1 || dqtf == 1)
+            continue;
+
         if (str[i] == ' ' || str[i] == '\t') {
             if (dspf == 1)
                 continue;
-
             elmc++;
-            dspf = 1;
         } else {
             dspf = 0;
         }
     }
-
-    if (elmc >= 1) {
-        args = (char**)malloc(sizeof(char*) * (elmc + 1));
-        if (args == NULL)
+    if (elmc > 0) {
+        if ((args = (char**)
+                    malloc(sizeof(char*) * (elmc + 1))) == NULL)
             return NULL;
     } else {
         return NULL;
     }
 
     /* string to args */
-    for (dspf = sx = ay = ax = xt = 0; sx <= strlen(str); sx++) {
-        if (str[sx] == ' ' || str[sx] == '\t' || str[sx] == '\0') {
+    for (dspf = sqtf = dqtf = sx = ay = ax = xt = 0; sx <= strlen(str); sx++) {
+        if (str[sx] == ' ' || str[sx] == '\t' || str[sx] == '\0' || str[sx] == '\'' || str[sx] == '\"') {
+            if (str[sx] == '\'') {
+                if (sqtf == 0) {
+                    xt++;
+                    sqtf = 1;
+                } else {
+                    sqtf = 0;
+                }
+            }
+            if (str[sx] == '\"') {
+                if (dqtf == 0) {
+                    xt++;
+                    dqtf = 1;
+                } else {
+                    dqtf = 0;
+                }
+            }
+            if (sqtf == 1 || dqtf == 1)
+                continue;
+
             if (dspf == 1) {
                 xt++;
                 continue;
             }
-            if ((args[ay] = (char*)malloc(sizeof(char) * (sx - xt + 1))) == NULL)
+            if ((args[ay] = (char*)
+                        malloc(sizeof(char) * (sx - xt + 1))) == NULL)
                 goto ERR;
 
-            for (ax = 0; xt < sx; xt++, ax++) {
+            for (ax = 0; xt < sx; xt++, ax++)
                     args[ay][ax] = str[xt];
-            }
+
             args[ay][ax] = '\0';
             xt++;
             ay++;
@@ -326,6 +362,30 @@ char* mbstrtok(char* str, char* delimiter)
     }
 
     return str;
+}
+
+int trim(char* str)
+{
+    int i   = 0,
+        j   = 0;
+
+    i = strlen(str) - 1;
+    while (i >= 0 && isspace(*(str + i))) {
+        i--;
+    }
+    *(str + i + 1) = '\0';
+    i = 0;
+    while (isspace(*(str + i)))
+        i++;
+
+    if (i > 0) {
+        j = 0;
+        while (*(str + i))
+            *(str + j++) = *(str + i++);
+        *(str + j) = '\0';
+    }
+
+    return 0;
 }
 
 int strcmp_lite(const char* str1, const char* str2)
