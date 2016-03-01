@@ -44,8 +44,7 @@ int main(int argc, char* argv[])
 
     /* flag and args */
     clangsay_t  clsay = {
-        false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-        NULL, NULL, NULL,
+        CLANGSAY_ALLNO_FLAG,
     };
 
     /* option for getopt_long() */
@@ -76,9 +75,7 @@ int main(int argc, char* argv[])
                     argv,
                     "nW;bdgpstwye:T:f:l",
                     opts,
-                    &index
-                    )
-           ) != -1) {
+                    &index)) != -1) {
         switch (res) {
             case    'e':
                 clsay.earg = optarg;
