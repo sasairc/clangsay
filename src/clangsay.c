@@ -27,22 +27,24 @@
 int main(int argc, char* argv[])
 {
     int     i       = 0,
-            res     = 0,    /* use getopt_long() */
+            res     = 0,
             index   = 0,    
-            lines   = 0,    /* lines of cowfile*/
-            stdins  = 0;    /* lines of string */
-    FILE*   fp      = NULL; /* cow-file */
-    char*   path    = NULL, /* .cow file */
-        *   env     = NULL, /* string of $COWPATH */
+            cows    = 0,    /* lines of cow-file */
+            msgs    = 0;    /* lines of string */
+
+    FILE*   fp      = NULL;
+
+    char*   path    = NULL,
+        *   env     = NULL,
         *   envp    = NULL,
-        **  cowbuf  = NULL, /* string buffer (cow) */
-        **  strbuf  = NULL; /* string buffer (string) */
-    env_t*  envt    = NULL; /* environment variable */
+        **  cow     = NULL, /* cowfile */
+        **  msg     = NULL; /* message */
+
+    env_t*  envt    = NULL;
 
     /* flag and args */
     clangsay_t  clsay = {
-        false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-        NULL, NULL, NULL,
+        CLANGSAY_ALLNO_FLAG,
     };
 
     /* option for getopt_long() */
@@ -73,9 +75,7 @@ int main(int argc, char* argv[])
                     argv,
                     "nW;bdgpstwye:T:f:l",
                     opts,
-                    &index
-                    )
-           ) != -1) {
+                    &index)) != -1) {
         switch (res) {
             case    'e':
                 clsay.earg = optarg;
@@ -131,9 +131,10 @@ int main(int argc, char* argv[])
     }
 
     /* check env $DEFAULT_COWFILE */
-    if (clsay.fflag == false)
+    if (clsay.fflag == false) {
         if ((clsay.farg = getenv("DEFAULT_COWFILE")) == NULL)
             clsay.farg = DEFAULT_COWFILE;
+    }
 
     /* check env $COWPATH */
     if ((env = getenv("COWPATH")) == NULL)
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
         return 3;
     }
 
-    if (open_cowfile(path, &fp) > 0) {
+    if (open_cowfile(path, &fp) < 0) {
         release(NULL, envt, path, 0, NULL, 0, NULL);
 
         return 4;
@@ -190,65 +191,63 @@ int main(int argc, char* argv[])
      * false: pipe
      */ 
     if (optind < argc) {    
-        strbuf = (char**)malloc(sizeof(char*) * (argc - optind));   /* allocate array for y coordinate (strings) */
-        if (strbuf == NULL) {
+        /* allocate array for y coordinate (strings) */
+        if ((msg = (char**)
+                    malloc(sizeof(char*) * (argc - optind))) == NULL) {
             fprintf(stderr, "%s: malloc() failure\n",
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
             
             return 5;
         }
-        for (i = 0; optind < argc; optind++, i++) {
-            strbuf[i] = (char*)malloc(sizeof(char) * (strlen(argv[optind]) + 1));
-            if (strbuf[i] == NULL) {
+
+        i = 0;
+        while (optind < argc) {
+            if ((msg[i] = (char*)
+                        malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
                 fprintf(stderr, "%s: malloc() failure\n",
                         PROGNAME);
-                release(fp, envt, path, stdins, strbuf, 0, NULL);
+                release(fp, envt, path, msgs, msg, 0, NULL);
 
                 return 6;
             }
-            memcpy(strbuf[i], argv[optind], strlen(argv[optind]) + 1);
+            memcpy(msg[i], argv[optind], strlen(argv[optind]) + 1);
+            i++;
+            optind++;
         }
-        stdins = i;
+        msgs = i;
     } else {
-        if ((strbuf = p_read_file_char(TH_LINES, TH_LENGTH, stdin)) == NULL) {
+        if ((msgs = p_read_file_char(&msg, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
             fprintf(stderr, "%s: p_read_file_char() failure\n",
                     PROGNAME);
             release(fp, envt, path, 0, NULL, 0, NULL);
 
             return 7;
         }
-        stdins = p_count_file_lines(strbuf);    /* count file lines */
+    }
+
+    /* remove escape sequence */
+    i = 0;
+    while (i < msgs) {
+        strunesc(msg[i]);
+        i++;
     }
 
     /* reading cow file to array */
-    if ((cowbuf = p_read_file_char(TH_LINES, TH_LENGTH, fp)) == NULL) {
+    if ((cows = p_read_file_char(&cow, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
         fprintf(stderr, "%s: p_read_file_char() failure\n",
                 PROGNAME);
-        release(fp, envt, path, stdins, strbuf, 0, NULL);
+        release(fp, envt, path, msgs, msg, 0, NULL);
 
         return 8;
-    } else {
-        lines = p_count_file_lines(cowbuf);     /* count file lines */
     }
-
-    /* 
-     * strunesc():    remove escape sequence
-     * strlftonull(): rf to null
-     */
-    for (i = 0; i < stdins; i++) {
-        strlftonull(strbuf[i]);
-        strunesc(strbuf[i]);
-    }
-    for (i = 0; i < lines; i++)
-        strlftonull(cowbuf[i]);
 
     /* print string */
-    print_string(stdins, strbuf);
+    print_string(msgs, msg);
     /* print cow */
-    print_cow(lines, cowbuf, &clsay);
+    print_cow(cows, cow, &clsay);
     /* memory release */
-    release(fp, envt, path, stdins, strbuf, lines, cowbuf);
+    release(fp, envt, path, msgs, msg, cows, cow);
 
     return 0;
 }

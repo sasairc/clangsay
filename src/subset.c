@@ -31,28 +31,28 @@ int open_cowfile(char* path, FILE** fp)
         fprintf(stderr, "%s: %s: stat failure\n",
                 PROGNAME, path);
 
-        return 1;
+        return -1;
     }
 
     if (S_ISDIR(st.st_mode & S_IFMT)) {
         fprintf(stderr, "%s: %s: is a directory\n",
                 PROGNAME, path);
         
-        return 2;
+        return -2;
     }
 
     if (access(path, R_OK) < 0) {
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
-        return 3;
+        return -3;
     }
 
     if ((*fp = fopen(path, "r")) == NULL) {
         fprintf(stderr, "%s: fp is NULL\n",
                 PROGNAME);
 
-        return 4;
+        return -4;
     }
 
     return 0;
@@ -61,10 +61,13 @@ int open_cowfile(char* path, FILE** fp)
 int check_file_exists(char* path, char* file)
 {
     int     ret     = 0;
+
     char*   tmp     = NULL;
+
     DIR*    dp      = NULL;
 
     struct  stat    st;
+
     struct  dirent* list;
 
     /* open directory */
@@ -72,8 +75,11 @@ int check_file_exists(char* path, char* file)
         return 0;
 
     /* concat filename + .cow */
-    if ((tmp = strlion(2, file, ".cow")) == NULL)
+    if ((tmp = strlion(2, file, ".cow")) == NULL) {
+        closedir(dp);
+
         return 0;
+    }
 
     /* search cowfile from directory */
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {
@@ -103,7 +109,8 @@ char* concat_file_path(int mode, char* path, char* file)
 
     switch (mode) {
         case    1:
-            if ((buf = (char*)malloc(sizeof(char) * strlen(file))) != NULL)
+            if ((buf = (char*)
+                        malloc(sizeof(char) * strlen(file))) != NULL)
                 memcpy(buf, file, strlen(file) + 1);
             break;
         case    2:
@@ -120,12 +127,12 @@ char* concat_file_path(int mode, char* path, char* file)
     return buf;
 }
 
-int print_string(int lines, char** str)
+int print_string(int msgs, char** msg)
 {
     int i       = 0,
         j       = 0,
         len     = 0,
-        maxlen  = strmax(lines, str);   /* get max length */
+        maxlen  = strmax(msgs, msg);    /* get max length */
 
     /*
      * single line
@@ -135,8 +142,8 @@ int print_string(int lines, char** str)
         putchar('_');
         i++;
     }
-    if (lines == 1) {
-        fprintf(stdout, "\n< %s >\n ", str[0]);
+    if (msgs == 1) {
+        fprintf(stdout, "\n< %s >\n ", msg[0]);
 
         while (maxlen >= 0) {
             putchar('-');
@@ -151,16 +158,16 @@ int print_string(int lines, char** str)
      * multi line
      */
     i = 0;
-    while (i < lines) {
+    while (i < msgs) {
         j = 0;
-        len = mbstrlen(str[i]);
+        len = mbstrlen(msg[i]);
 
         if (i == 0)
-            fprintf(stdout, "\n/ %s", str[i]);
-        else if (i == (lines -1))
-            fprintf(stdout, "\\ %s", str[i]);
+            fprintf(stdout, "\n/ %s", msg[i]);
+        else if (i == (msgs -1))
+            fprintf(stdout, "\\ %s", msg[i]);
         else
-            fprintf(stdout, "| %s", str[i]);
+            fprintf(stdout, "| %s", msg[i]);
 
         while (j < (maxlen - len)) {
             putchar(' ');
@@ -169,7 +176,7 @@ int print_string(int lines, char** str)
 
         if (i == 0)
             fprintf(stdout, " \\\n");
-        else if (i == (lines - 1))
+        else if (i == (msgs - 1))
             fprintf(stdout, " /\n ");
         else
             fprintf(stdout, " |\n");
@@ -186,11 +193,13 @@ int print_string(int lines, char** str)
     return 0;
 }
 
-int print_cow(int lines, char** str, clangsay_t* clsay)
+int print_cow(int cows, char** cow, clangsay_t* clsay)
 {
     int     i       = 0,
             j       = 0;
+
     char*   though  = NULL;
+
     bool    block   = false;
 
     /* eyes table */
@@ -215,47 +224,44 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
     };
 
     /* setting thoughts */
-    if (clsay->syflag == false && clsay->thflag == false) {
+    if (clsay->syflag == false && clsay->thflag == false)
         though = SAY_THOUGHTS;      /* default */
-    } else if (clsay->syflag == true){
+    else if (clsay->syflag == true)
         though = SAY_THOUGHTS;      /* --say switch */
-    } else if (clsay->thflag == true) {
+    else if (clsay->thflag == true)
         though = THINK_THOUGHTS;    /* --think switch */
-    }
 
     /* print cow */
-    for (i = 0; i < lines; i++) {
+    for (i = 0; i < cows; i++) {
         /* replace thoughts */
-        strrep(str[i], THOUGHTS, though);
+        strrep(cow[i], THOUGHTS, though);
 
-        while (strrep(str[i], "\\\\", "\\") == 0);
+        while (strrep(cow[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/
         for (j = 0; eyes[j].haystack != NULL || eyes[j].needle != NULL; j++) {
-            if (eyes[j].flag == true) {
-                strrep(str[i], eyes[j].haystack, eyes[j].needle);
-            }
+            if (eyes[j].flag == true)
+                strrep(cow[i], eyes[j].haystack, eyes[j].needle);
         }
-        strrep(str[i], EYES, DEFAULT_EYES);     /* default eyes*/
+        strrep(cow[i], EYES, DEFAULT_EYES);     /* default eyes*/
 
         /* replace tongue */
         for (j = 0; tongue[j].haystack != NULL || tongue[j].needle != NULL; j++) {
-            if (tongue[j].flag == true) {
-                strrep(str[i], tongue[j].haystack, tongue[j].needle);
-            }
+            if (tongue[j].flag == true)
+                strrep(cow[i], tongue[j].haystack, tongue[j].needle);
         }
-        strrep(str[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
+        strrep(cow[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
 
         /* EOC to EOC */
-        if (strstr(str[i], "EOC")) {
+        if (strstr(cow[i], "EOC")) {
             block = true;
             continue;
-        } else if (strstr(str[i], "EOC") && block == true) {
+        } else if (strstr(cow[i], "EOC") && block == true) {
             block = false;
         }
-        if (block == true) {
-            fprintf(stdout, "%s\n", str[i]);
-        }
+
+        if (block == true)
+            fprintf(stdout, "%s\n", cow[i]);
     }
 
     return 0;
@@ -263,23 +269,12 @@ int print_cow(int lines, char** str, clangsay_t* clsay)
 
 int selects_cowfiles(const struct dirent* dir)
 {
-    int     namlen,
-        *   lp;
-    char    dotcow[] = {".cow"};
+    char* tcow  = ".cow\0";
 
-    if ((namlen = strlen(dir->d_name)) < 4)
+    if (strlen(dir->d_name) < 5)
         return 0;
 
-    namlen -= 4;    /* offset 4 bytes from end (.cow) */
-
-    lp = (int*)&(dir->d_name[namlen]);
-
-    /*
-     * comparison on int
-     * true: .cow
-     * false: other
-     */
-    if (*lp == *(int*)&dotcow)
+    if (memcmp(dir->d_name + (strlen(dir->d_name) - 4), tcow, 5) == 0)
         return 1;
 
     return 0;
@@ -290,8 +285,11 @@ int list_cowfiles(void)
     int     i       = 0,
             j       = 0,
             entry   = 0;
+
     char*   env     = NULL;
+
     env_t*  envt    = NULL;
+
     struct  dirent**  list;
 
     /* catenate file path */
@@ -316,9 +314,11 @@ int list_cowfiles(void)
 
             fprintf(stdout, "%s:\n", envt->envs[i]);
         }
-        for (j = 0; j < entry; j++) {
+        j = 0;
+        while (j < entry) {
             fprintf(stdout, "%s\n", list[j]->d_name);
             free(list[j]);
+            j++;
         }
         free(list);
         i++;

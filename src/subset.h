@@ -28,8 +28,8 @@ struct  reptarg {
 extern int open_cowfile(char* path, FILE** fp);
 extern int check_file_exists(char* path, char* file);
 extern char* concat_file_path(int mode, char* path, char* file);
-extern int print_string(int lines, char** str);
-extern int print_cow(int lines, char** str, clangsay_t* clsay);
+extern int print_string(int msgs, char** msg);
+extern int print_cow(int cows, char** cow, clangsay_t* clsay);
 extern int selects_cowfiles(const struct dirent* dir);
 extern int list_cowfiles(void);
 

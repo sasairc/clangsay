@@ -19,6 +19,10 @@
 #define true        1
 #define false       0
 
+#define CLANGSAY_ALLNO_FLAG \
+    false, false, false, false, false, false, false, false, false, false, false, false, false, false,   \
+    NULL, NULL, NULL
+
 typedef int bool;
 
 typedef struct  CLANGSAY_T {
