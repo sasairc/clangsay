@@ -67,6 +67,7 @@ int check_file_exists(char* path, char* file)
     DIR*    dp      = NULL;
 
     struct  stat    st;
+
     struct  dirent* list;
 
     /* open directory */
@@ -74,8 +75,11 @@ int check_file_exists(char* path, char* file)
         return 0;
 
     /* concat filename + .cow */
-    if ((tmp = strlion(2, file, ".cow")) == NULL)
+    if ((tmp = strlion(2, file, ".cow")) == NULL) {
+        closedir(dp);
+
         return 0;
+    }
 
     /* search cowfile from directory */
     for (list = readdir(dp); list != NULL; list = readdir(dp)) {

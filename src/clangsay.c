@@ -131,9 +131,10 @@ int main(int argc, char* argv[])
     }
 
     /* check env $DEFAULT_COWFILE */
-    if (clsay.fflag == false)
+    if (clsay.fflag == false) {
         if ((clsay.farg = getenv("DEFAULT_COWFILE")) == NULL)
             clsay.farg = DEFAULT_COWFILE;
+    }
 
     /* check env $COWPATH */
     if ((env = getenv("COWPATH")) == NULL)
