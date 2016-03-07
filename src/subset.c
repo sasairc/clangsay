@@ -18,7 +18,6 @@
 #include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -41,7 +40,7 @@ int open_cowfile(char* path, FILE** fp)
         return -2;
     }
 
-    if (access(path, R_OK) < 0) {
+    if ((st.st_mode & S_IREAD) == 0) {
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
