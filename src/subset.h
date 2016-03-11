@@ -27,7 +27,7 @@ struct  reptarg {
 /* This functions is required subset.c */
 extern int open_cowfile(char* path, FILE** fp);
 extern int check_file_exists(char* path, char* file);
-extern char* concat_file_path(int mode, char* path, char* file);
+extern int concat_file_path(int mode, char** dest, char* path, char* file);
 extern int print_string(int msgs, char** msg);
 extern int print_cow(int cows, char** cow, clangsay_t* clsay);
 extern int selects_cowfiles(const struct dirent* dir);

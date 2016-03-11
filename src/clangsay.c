@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
         return 2;
     }
 
-    if ((path = concat_file_path(res, envp, clsay.farg)) == NULL) {
+    if (concat_file_path(res, &path, envp, clsay.farg) < 0) {
         release(NULL, envt, NULL, 0, NULL, 0, NULL);
 
         return 3;
