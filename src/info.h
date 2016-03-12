@@ -13,8 +13,8 @@
 #ifndef INFO_H
 #define INFO_H
 
-/* This functions is required info.c */
 extern int print_version(void);
 extern int print_usage(void);
 
+/* INFO_H */
 #endif
