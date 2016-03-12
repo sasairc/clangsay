@@ -18,7 +18,6 @@
 #include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -41,7 +40,7 @@ int open_cowfile(char* path, FILE** fp)
         return -2;
     }
 
-    if (access(path, R_OK) < 0) {
+    if ((st.st_mode & S_IREAD) == 0) {
         fprintf(stderr, "%s: %s: permission denied\n",
                 PROGNAME, path);
 
@@ -103,28 +102,29 @@ int check_file_exists(char* path, char* file)
     return ret;
 }
 
-char* concat_file_path(int mode, char* path, char* file)
+int concat_file_path(int mode, char** dest, char* path, char* file)
 {
-    char*   buf = NULL;
-
     switch (mode) {
         case    1:
-            if ((buf = (char*)
+            if ((*dest = (char*)
                         malloc(sizeof(char) * strlen(file))) != NULL)
-                memcpy(buf, file, strlen(file) + 1);
+            memcpy(*dest, file, strlen(file) + 1);
             break;
         case    2:
-            buf = strlion(3, path, "/", file);
+            *dest = strlion(3, path, "/", file);
             break;
         case    3:
-            buf = strlion(4, path, "/", file, ".cow");
+            *dest = strlion(4, path, "/", file, ".cow");
             break;
     }
-    if (buf == NULL)
+    if (*dest == NULL) {
         fprintf(stderr, "%s: concat_file_path() failure\n",
                 PROGNAME);
+    
+        return -1;
+    }
 
-    return buf;
+    return 0;
 }
 
 int print_string(int msgs, char** msg)
