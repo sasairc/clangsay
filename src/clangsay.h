@@ -45,7 +45,7 @@ typedef struct  CLANGSAY_T {
     char*   farg;
 } clangsay_t;
 
-/* This functions is required clangsay.c */
 extern void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lines2, char** buf2);
 
+/* CLANGSAY_H */
 #endif
