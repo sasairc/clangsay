@@ -52,7 +52,7 @@ function install_cows_pixelart() {
 
 function install_man() {
     echo "*** target install-man ***"
-    make CC="$1" PREFIX="$2" install-man && \
+    LANG="ja_JP.UTF-8" make CC="$1" PREFIX="$2" install-man && \
         tree "$2"
 
     return $?
