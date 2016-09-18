@@ -51,5 +51,7 @@
 
 #define DEAD_TONGUE     "U "
 
+#define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
+
 /* CONFIG_H */
 #endif
