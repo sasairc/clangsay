@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
+#include <regex.h>
 #include <sys/stat.h>
 
 int open_cowfile(char* path, FILE** fp)
@@ -129,10 +130,15 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
 
 int print_string(int msgs, char** msg)
 {
-    int i       = 0,
-        j       = 0,
-        len     = 0,
-        maxlen  = strmax(msgs, msg);    /* get max length */
+    int         i       = 0,
+                j       = 0,
+                len     = 0,
+                maxlen  = 0;    /* get max length */
+
+    regex_t     reg;
+
+    regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
+    maxlen = strmax_with_regex(msgs, msg, &reg);
 
     /*
      * single line
@@ -160,7 +166,7 @@ int print_string(int msgs, char** msg)
     i = 0;
     while (i < msgs) {
         j = 0;
-        len = mbstrlen(msg[i]);
+        len = mbstrlen_with_regex(msg[i], &reg);
 
         if (i == 0)
             fprintf(stdout, "\n/ %s", msg[i]);
@@ -189,6 +195,8 @@ int print_string(int msgs, char** msg)
         maxlen--;
     }
     putchar('\n');
+
+    regfree(&reg);
 
     return 0;
 }

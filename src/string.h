@@ -18,11 +18,15 @@
 #define WITH_GLIB   /* use glib */
 #define LOCALE      ""
 
+#include <regex.h>
+
 extern int strrep(char* src, char* haystack, char* needle);
 extern char* strlion(int argnum, ...);
 extern int mbstrlen(char* src);
+extern int mbstrlen_with_regex(char* src, regex_t* reg);
 extern int strunesc(char* src);
 extern int strmax(int val, char** src);
+extern int strmax_with_regex(int val, char** src, regex_t* reg);
 extern int strlftonull(char* str);
 extern char** str_to_args(char* str);
 extern char* mbstrtok(char* str, char* delimiter);
