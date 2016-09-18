@@ -35,33 +35,18 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 
 依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
 
-* 全てインストールする場合（cowファイルを共有）	
-	cowsay側のパスに対して、cowファイルのインストールが行われます。
+```shellsession
+% brew install 844196/Renge/clangsay
+```
 
-	```shellsession
-	% brew install 844196/Renge/clangsay
-	```
-	
-* zsh補完関数もインストールする場合		
-	```shellsession
-	% brew install --zsh-completion 844196/Renge/clangsay
-	```
+上記のコマンドを実行した際に、補完関数をインストールしたディレクトリを示す下記のようなメッセージが出ます。
 
-	上記のコマンドを実行した際に、補完関数をインストールしたディレクトリを示す下記のようなメッセージが出ます。
+```shellsession
+zsh completion has been installed to:
+/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります
+```
 
-	```shellsession
-	zsh completion has been installed to:
-	/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります
-	```
-
-	このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。
-
-* cowsayとcowファイルを共有せずにインストールする場合	
-	cowsay側のパスではなく、`$(brew --prefix)/cellar/clangsay/<version>/share/clangsay/cows`に対して、cowファイルがインストールされます。
-
-	```shellsession
-	% brew install --without-cows 844196/Renge/clangsay
-	```
+このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。
 
 #### Other systems.
 
