@@ -13,9 +13,9 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-/* This functions is required memory.c */
 extern char** malloc2d(int x, int y);
 extern int init2d(char** buf, int x, int y);
 extern void free2d(char** buf, int y);
 
+/* MEMORY_H */
 #endif

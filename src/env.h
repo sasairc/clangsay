@@ -21,4 +21,5 @@ typedef struct ENV_T {
 extern env_t* split_env(char* env);
 extern void release_env_t(env_t* env);
 
+/* ENV_H */
 #endif

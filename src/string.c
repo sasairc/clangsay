@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <locale.h>
+#include <regex.h>
 
 #ifdef  WITH_GLIB
 #include <glib.h>
@@ -152,6 +153,54 @@ int mbstrlen(char* src)
 
     return len;
 }
+
+int mbstrlen_with_regex(char* src, regex_t* reg)
+{
+    int         i   = 0,
+                ch  = 0,
+                len = 0;
+
+    gunichar*   cpoints;
+
+    regmatch_t  match;
+
+    setlocale(LC_CTYPE, LOCALE);
+
+    while (src[i] != '\0') {
+        /* get string length */
+        if ((ch = mblen(&src[i], MB_CUR_MAX)) < 0)
+            return 0;
+
+        if (ch > 1) {
+            cpoints = g_utf8_to_ucs4_fast(&src[i], sizeof(src[i]), NULL);   /* get unicode code point */
+
+            /*
+             * multi byte
+             * true : hankaku kana
+             * false: other
+             */
+            if ((cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) || cpoints[0] == 0x001b) {
+                len++;
+            } else {
+                len += 2;
+            }
+
+            g_free(cpoints);
+        } else {
+            len++;                          /* ascii */
+        }
+        i += ch;                            /* seek offset */
+    }
+
+    /* regex match */
+    while (regexec(reg, src, 1, &match, 0) != REG_NOMATCH) {
+        src += match.rm_eo;
+        len -= match.rm_eo - match.rm_so;
+    }
+
+    return len;
+}
+
 #else
 int mbstrlen(char* src)
 {
@@ -199,6 +248,22 @@ int strmax(int val, char** src)
 
     while (i < val) {
         len = mbstrlen(src[i]);
+        if (max < len)
+            max = len;
+        i++;
+    }
+
+    return max;
+}
+
+int strmax_with_regex(int val, char** src, regex_t* reg)
+{
+    int     i   = 0,
+            len = 0,
+            max = 0;
+
+    while (i < val) {
+        len = mbstrlen_with_regex(src[i], reg);
         if (max < len)
             max = len;
         i++;

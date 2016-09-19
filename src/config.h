@@ -16,8 +16,8 @@
 #define PROGNAME        "clangsay"
 #define VERSION         1
 #define PATCHLEVEL      6
-#define SUBLEVEL        2
-#define EXTRAVERSION    ""
+#define SUBLEVEL        3
+#define EXTRAVERSION    "-devel"
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
 
@@ -51,4 +51,7 @@
 
 #define DEAD_TONGUE     "U "
 
+#define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
+
+/* CONFIG_H */
 #endif
