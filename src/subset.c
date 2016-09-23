@@ -137,7 +137,10 @@ int print_string(int msgs, char** msg)
 
     regex_t     reg;
 
+    /* compile regex */
     regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
+
+    /* get max length */
     maxlen = strmax_with_regex(msgs, msg, &reg);
 
     /*
