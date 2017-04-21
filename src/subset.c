@@ -49,7 +49,7 @@ int open_cowfile(char* path, FILE** fp)
     }
 
     if ((*fp = fopen(path, "r")) == NULL) {
-        fprintf(stderr, "%s: fp is NULL\n",
+        fprintf(stderr, "%s: open_cowfile(): fp is NULL\n",
                 PROGNAME);
 
         return -4;
@@ -128,7 +128,80 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
     return 0;
 }
 
-int print_string(int msgs, char** msg)
+void strunsecs(struct CLANGSAY_MSG_T* msg)
+{
+    int i   = 0,
+        j   = msg->lines - 1;
+
+    while (i <= j && i < msg->lines) {
+        strunesc(*(msg->msg + i));
+        strunesc(*(msg->msg + j));
+        i++;
+        j--;
+    }
+
+    return;
+}
+
+int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
+{
+    if (optind < argc) {    
+        if ((clsay->msg.msg = (char**)
+                    malloc(sizeof(char*) * (argc - optind))) == NULL) {
+            fprintf(stderr, "%s: read_string(): malloc() failure\n",
+                    PROGNAME);
+            
+            return -1;
+        }
+        while (optind < argc) {
+            if ((clsay->msg.msg[clsay->msg.lines] = (char*)
+                        malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
+                fprintf(stderr, "%s: read_string(): malloc() failure\n",
+                        PROGNAME);
+
+                return -2;
+            }
+            memcpy(clsay->msg.msg[clsay->msg.lines],
+                    argv[optind], strlen(argv[optind]) + 1);
+            clsay->msg.lines++;
+            optind++;
+        }
+    } else {
+        if ((clsay->msg.lines =
+                    p_read_file_char(&clsay->msg.msg, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
+            fprintf(stderr, "%s: read_string(): p_read_file_char() failure\n",
+                    PROGNAME);
+
+            return -3;
+        }
+    }
+    /* remove escape sequence */
+    strunsecs(&clsay->msg);
+
+    return 0;
+}
+
+int read_cowfile(clangsay_t* clsay, FILE* fp)
+{
+    if (fp == NULL) {
+        fprintf(stdout, "%s: read_cowfile(): fp is NULL\n",
+                PROGNAME);
+
+        return -1;
+    }
+    if ((clsay->cow.lines =
+                p_read_file_char(&clsay->cow.cow, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
+        fprintf(stderr, "%s: read_cowfile(): p_read_file_char() failure\n",
+                PROGNAME);
+
+        return -2;
+    }
+    fclose(fp);
+
+    return 0;
+}
+
+int print_string(clangsay_t* clsay)
 {
     int         i       = 0,
                 j       = 0,
@@ -137,25 +210,30 @@ int print_string(int msgs, char** msg)
 
     regex_t     reg;
 
+    /* compile regex */
     regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
-    maxlen = strmax_with_regex(msgs, msg, &reg);
+
+    /* get max length */
+    maxlen = strmax_with_regex(clsay->msg.lines, clsay->msg.msg, &reg);
 
     /*
      * single line
      */
     putchar(' ');
-    while (i <= maxlen) {
+    i = maxlen;
+    while (i >= 0) {
         putchar('_');
-        i++;
+        i--;
     }
-    if (msgs == 1) {
-        fprintf(stdout, "\n< %s >\n ", msg[0]);
+    if (clsay->msg.lines == 1) {
+        fprintf(stdout, "\n< %s >\n ",
+                clsay->msg.msg[0]);
 
         while (maxlen >= 0) {
             putchar('-');
             maxlen--;
         }
-        putchar('\n');
+        puts("");
 
         return 0;
     }
@@ -164,44 +242,45 @@ int print_string(int msgs, char** msg)
      * multi line
      */
     i = 0;
-    while (i < msgs) {
-        j = 0;
-        len = mbstrlen_with_regex(msg[i], &reg);
-
+    while (i < clsay->msg.lines) {
+        len = mbstrlen_with_regex(clsay->msg.msg[i], &reg);
         if (i == 0)
-            fprintf(stdout, "\n/ %s", msg[i]);
-        else if (i == (msgs -1))
-            fprintf(stdout, "\\ %s", msg[i]);
+            fprintf(stdout, "\n/ %s",
+                    clsay->msg.msg[i]);
+        else if (i == (clsay->msg.lines - 1))
+            fprintf(stdout, "\\ %s",
+                    clsay->msg.msg[i]);
         else
-            fprintf(stdout, "| %s", msg[i]);
+            fprintf(stdout, "| %s",
+                    clsay->msg.msg[i]);
 
-        while (j < (maxlen - len)) {
+        j = maxlen - len;
+        while (j > 0) {
             putchar(' ');
-            j++;
+            j--;
         }
 
         if (i == 0)
-            fprintf(stdout, " \\\n");
-        else if (i == (msgs - 1))
+            puts(" \\");
+        else if (i == (clsay->msg.lines - 1))
             fprintf(stdout, " /\n ");
         else
-            fprintf(stdout, " |\n");
+            puts(" |");
 
         i++;
     }
-
     while (maxlen >= 0) {
         putchar('-');
         maxlen--;
     }
-    putchar('\n');
+    puts("");
 
     regfree(&reg);
 
     return 0;
 }
 
-int print_cow(int cows, char** cow, clangsay_t* clsay)
+int print_cow(clangsay_t* clsay)
 {
     int     i       = 0,
             j       = 0;
@@ -240,36 +319,45 @@ int print_cow(int cows, char** cow, clangsay_t* clsay)
         though = THINK_THOUGHTS;    /* --think switch */
 
     /* print cow */
-    for (i = 0; i < cows; i++) {
+    i = 0;
+    while (i < clsay->cow.lines) {
         /* replace thoughts */
-        strrep(cow[i], THOUGHTS, though);
+        strrep(clsay->cow.cow[i], THOUGHTS, though);
 
-        while (strrep(cow[i], "\\\\", "\\") == 0);
+        while (strrep(clsay->cow.cow[i], "\\\\", "\\") == 0);
 
         /* replace eyes*/
-        for (j = 0; eyes[j].haystack != NULL || eyes[j].needle != NULL; j++) {
+        j = 0;
+        while (eyes[j].haystack != NULL || eyes[j].needle != NULL) {
             if (eyes[j].flag == true)
-                strrep(cow[i], eyes[j].haystack, eyes[j].needle);
+                strrep(clsay->cow.cow[i], eyes[j].haystack, eyes[j].needle);
+            j++;
         }
-        strrep(cow[i], EYES, DEFAULT_EYES);     /* default eyes*/
+        /* default_eyes */
+        strrep(clsay->cow.cow[i], EYES, DEFAULT_EYES);
 
         /* replace tongue */
-        for (j = 0; tongue[j].haystack != NULL || tongue[j].needle != NULL; j++) {
+        j = 0;
+        while (tongue[j].haystack != NULL || tongue[j].needle != NULL) {
             if (tongue[j].flag == true)
-                strrep(cow[i], tongue[j].haystack, tongue[j].needle);
+                strrep(clsay->cow.cow[i], tongue[j].haystack, tongue[j].needle);
+            j++;
         }
-        strrep(cow[i], TONGUE, DEFAULT_TONGUE); /* default tongue */
+        /* default tongue */
+        strrep(clsay->cow.cow[i], TONGUE, DEFAULT_TONGUE);
 
         /* EOC to EOC */
-        if (strstr(cow[i], "EOC")) {
+        if (strstr(clsay->cow.cow[i], "EOC")) {
             block = true;
+            i++;
             continue;
-        } else if (strstr(cow[i], "EOC") && block == true) {
+        } else if (strstr(clsay->cow.cow[i], "EOC") && block == true) {
             block = false;
         }
-
         if (block == true)
-            fprintf(stdout, "%s\n", cow[i]);
+            fprintf(stdout, "%s\n",
+                    clsay->cow.cow[i]);
+        i++;
     }
 
     return 0;
@@ -305,10 +393,10 @@ int list_cowfiles(void)
         env = COWPATH;
 
     if ((envt = split_env(env)) == NULL) {
-        fprintf(stderr, "%s: split_env() failure\n",
+        fprintf(stderr, "%s: list_cowfiles(): split_env() failure\n",
                 PROGNAME);
 
-        exit(9);
+        exit(7);
     }
 
     /* get file entry and sort */
@@ -318,13 +406,15 @@ int list_cowfiles(void)
             continue;
         } else {
             if (i != 0)
-                putchar('\n');
+                puts("");
 
-            fprintf(stdout, "%s:\n", envt->envs[i]);
+            fprintf(stdout, "%s:\n",
+                    envt->envs[i]);
         }
         j = 0;
         while (j < entry) {
-            fprintf(stdout, "%s\n", list[j]->d_name);
+            fprintf(stdout, "%s\n",
+                    list[j]->d_name);
             free(list[j]);
             j++;
         }

@@ -73,7 +73,8 @@ zsh completion has been installed to:
 
 ## Usage
 
-基本的にcowsayのオプションと同様です。
+基本的にcowsayのオプションと同様です。		
+例外として、ANSIエスケープシーケンスによる色付け等に対応しました。
 
 ```shellsession
 % export COWPATH="~/.cows"	# COWPATHを指定したい場合
