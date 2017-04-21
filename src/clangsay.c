@@ -28,17 +28,13 @@ int main(int argc, char* argv[])
 {
     int     i       = 0,
             res     = 0,
-            index   = 0,    
-            cows    = 0,    /* lines of cow-file */
-            msgs    = 0;    /* lines of string */
+            index   = 0;
 
     FILE*   fp      = NULL;
 
     char*   path    = NULL,
         *   env     = NULL,
-        *   envp    = NULL,
-        **  cow     = NULL, /* cowfile */
-        **  msg     = NULL; /* message */
+        *   envp    = NULL;
 
     env_t*  envt    = NULL;
 
@@ -142,7 +138,7 @@ int main(int argc, char* argv[])
 
     /* env string to struct */
     if ((envt = split_env(env)) == NULL) {
-        fprintf(stderr, "%s: split_env() failure\n",
+        fprintf(stderr, "%s: main(): split_env() failure\n",
                 PROGNAME);
 
         return 1;
@@ -168,95 +164,52 @@ int main(int argc, char* argv[])
     if (res == 0) {
         fprintf(stderr, "%s: %s: cowfile not found\n",
                 PROGNAME, clsay.farg);
-        release(NULL, envt, NULL, 0, NULL, 0, NULL);
+        release(envt, NULL, NULL);
 
         return 2;
     }
 
     if (concat_file_path(res, &path, envp, clsay.farg) < 0) {
-        release(NULL, envt, NULL, 0, NULL, 0, NULL);
+        release(envt, NULL, NULL);
 
         return 3;
     }
 
     if (open_cowfile(path, &fp) < 0) {
-        release(NULL, envt, path, 0, NULL, 0, NULL);
+        release(envt, path, NULL);
 
         return 4;
     }
 
-    /* 
-     * reading stdin or args to array
-     * true : arguments
-     * false: pipe
-     */ 
-    if (optind < argc) {    
-        /* allocate array for y coordinate (strings) */
-        if ((msg = (char**)
-                    malloc(sizeof(char*) * (argc - optind))) == NULL) {
-            fprintf(stderr, "%s: malloc() failure\n",
-                    PROGNAME);
-            release(fp, envt, path, 0, NULL, 0, NULL);
-            
-            return 5;
-        }
-
-        i = 0;
-        while (optind < argc) {
-            if ((msg[i] = (char*)
-                        malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
-                fprintf(stderr, "%s: malloc() failure\n",
-                        PROGNAME);
-                release(fp, envt, path, msgs, msg, 0, NULL);
-
-                return 6;
-            }
-            memcpy(msg[i], argv[optind], strlen(argv[optind]) + 1);
-            i++;
-            optind++;
-        }
-        msgs = i;
-    } else {
-        if ((msgs = p_read_file_char(&msg, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
-            fprintf(stderr, "%s: p_read_file_char() failure\n",
-                    PROGNAME);
-            release(fp, envt, path, 0, NULL, 0, NULL);
-
-            return 7;
-        }
-    }
-
-    /* remove escape sequence */
-    i = 0;
-    while (i < msgs) {
-        strunesc(msg[i]);
-        i++;
-    }
-
     /* reading cow file to array */
-    if ((cows = p_read_file_char(&cow, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
-        fprintf(stderr, "%s: p_read_file_char() failure\n",
-                PROGNAME);
-        release(fp, envt, path, msgs, msg, 0, NULL);
+    if (read_cowfile(&clsay, fp) < 0) {
+        release(envt, path, &clsay);
 
-        return 8;
+        return 5;
+    }
+
+    /* read argv or stdin */
+    if (read_string(&clsay, argc, optind, argv) < 0) {
+        release(envt, path, &clsay);
+
+        return 6;
     }
 
     /* print string */
-    print_string(msgs, msg);
+    print_string(&clsay);
     /* print cow */
-    print_cow(cows, cow, &clsay);
+    print_cow(&clsay);
     /* memory release */
-    release(fp, envt, path, msgs, msg, cows, cow);
+    release(envt, path, &clsay);
 
     return 0;
 }
 
-void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lines2, char** buf2)
+void release(env_t* envt, char* path, clangsay_t* clsay)
 {
-    if (fp != NULL) {
-        fclose(fp);
-    }
+    int     i   = 0,
+            j   = 0;
+
     if (envt != NULL) {
         release_env_t(envt);
     }
@@ -264,11 +217,41 @@ void release(FILE* fp, env_t* envt, char* path, int lines1, char** buf1, int lin
         free(path);
         path = NULL;
     }
-    if (buf1 != NULL) {
-        free2d(buf1, lines1);
+    if (clsay->cow.cow != NULL) {
+        i = 0;
+        j = clsay->cow.lines - 1;
+        while (i <= j) {
+            if (clsay->cow.cow[i] != NULL) {
+                free(clsay->cow.cow[i]);
+                clsay->cow.cow[i] = NULL;
+            }
+            if (clsay->cow.cow[j] != NULL) {
+                free(clsay->cow.cow[j]);
+                clsay->cow.cow[j] = NULL;
+            }
+            i++;
+            j--;
+        }
+        free(clsay->cow.cow);
+        clsay->cow.cow = NULL;
     }
-    if (buf2 != NULL) {
-        free2d(buf2, lines2);
+    if (clsay->msg.msg != NULL) {
+        i = 0;
+        j = clsay->msg.lines - 1;
+        while (i <= j) {
+            if (clsay->msg.msg[i] != NULL) {
+                free(clsay->msg.msg[i]);
+                clsay->msg.msg[i] = NULL;
+            }
+            if (clsay->msg.msg[j] != NULL) {
+                free(clsay->msg.msg[j]);
+                clsay->msg.msg[j] = NULL;
+            }
+            i++;
+            j--;
+        }
+        free(clsay->msg.msg);
+        clsay->msg.msg = NULL;
     }
 
     return;
