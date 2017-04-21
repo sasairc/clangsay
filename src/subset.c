@@ -396,7 +396,7 @@ int list_cowfiles(void)
         fprintf(stderr, "%s: list_cowfiles(): split_env() failure\n",
                 PROGNAME);
 
-        exit(9);
+        exit(7);
     }
 
     /* get file entry and sort */
