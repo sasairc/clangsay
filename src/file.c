@@ -181,6 +181,27 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 continue;
         }
     }
+
+    /* \n -{data}- EOF */
+    if (x > 0) {
+        tmplen = strlen(str);
+        /* reallocate array of Y coordinate */
+        if (y == (lines - 1)) {
+            lines += t_lines;
+            if ((buf = (char**)
+                        realloc(buf, sizeof(char*) * lines)) == NULL)
+                goto ERR;
+        }
+        /* allocate array for X coordinate */
+        if ((buf[y] = (char*)
+                    malloc(sizeof(char) * (tmplen + 1))) == NULL)
+            goto ERR;
+
+        /* copy, str to buffer */
+        memcpy(buf[y], str, tmplen + 1);
+        y++;
+    }
+
     /* no data */
     if (x == 0 && y == 0) {
         buf[y] = NULL;
