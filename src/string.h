@@ -18,8 +18,6 @@ extern "C" {
 #endif
 
 #undef  DEBUG
-#define WITH_GLIB   /* use glib */
-#define WITH_REGEX  /* use regex */
 #define LOCALE      ""
 
 extern int strrep(char* src, char* haystack, char* needle);

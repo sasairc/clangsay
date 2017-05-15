@@ -15,98 +15,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/time.h>
 #include <sys/select.h>
 
-int check_file_type(char* filename)
-{
-    int     i,
-            c;
-
-    FILE*   fp  = NULL;
-
-    int     rtf[5] = {0x7B, 0x5C, 0x72, 0x74, 0x66};    /* {\rtf is Ritch-test format's header */
-
-    if ((fp = fopen(filename, "rb")) == NULL) {
-
-        return -1;
-    }
-
-    while (0 == feof(fp)) {
-        c = fgetc(fp);
-        if (c == EOF) {             /* plain text */
-            break;
-        } else if (c <= 8) {        /* binary or Unknown format */
-            fclose(fp);
-
-            return 1;
-        } else if (c == 0x7B) {     /* ritch text format */
-            rewind(fp);
-            for (i = 0; i < 5; i++) {
-                c = fgetc(fp);
-                if (c == rtf[i]) {
-                    continue;
-                } else {
-                    fclose(fp);
-
-                    return 0;
-                }
-            }
-            fclose(fp);
-
-            return 2;
-        }
-    }
-    fclose(fp);
-
-    return 0;
-}   
-
-int count_file_lines(FILE* fp)
-{
-    int     i       = 0,
-            lines   = 0;
-
-    rewind(fp);     /* seek file-stream to the top */
-    while ((i = getc(fp)) != EOF) {
-        if (i == '\n')
-            lines++;
-    }
-
-    return lines;
-}
-
-int read_file(int lines, size_t length, char** buf, FILE* fp)
-{
-    int     i       = 0;
-
-    char*   str     = NULL;
-
-    if ((str = (char*)
-                malloc(sizeof(char) * length)) == NULL) {   /* allocate buffer */
-
-        return 0;
-    }
-    while (i <= lines && fgets(str, sizeof(char) * length, fp) != NULL) {
-        *(buf + i) = (char*)malloc(     /* allocate array for X coordinate */
-                    (strlen(str) + 1) * sizeof(char)
-                );
-        if (*(buf + i) == NULL) {
-            free(str);
-            
-            return 0;
-        }
-        /* copy, str to buffer */
-        memcpy(*(buf + i), str, strlen(str));
-        i++;                        /* count line */
-    }
-    free(str);
-
-    return i;
-}
-
 int p_count_file_lines(char** buf)
 {
+    if (buf == NULL)
+        return -1;
+
     int     i   = 0;
 
     while (*(buf + i) != NULL)
@@ -132,12 +49,19 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
         **  buf     = NULL;
 
     if ((str = (char*)
-                malloc(sizeof(char) * t_length)) == NULL)
-        return -2;
+                malloc(sizeof(char) * t_length)) == NULL) {
+        fprintf(stderr, "%s: %d: p_read_file_char(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
 
+        return -1;
+    }
     if ((buf = (char**)
-                malloc(sizeof(char*) * t_lines)) == NULL)
+                malloc(sizeof(char*) * t_lines)) == NULL) {
+        fprintf(stderr, "%s: %d: p_read_file_char(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
+
         goto ERR;
+    }
 
     while ((c = fgetc(fp)) != EOF) {
         switch (c) {
@@ -152,13 +76,21 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 if (y == (lines - 1)) {
                     lines += t_lines;
                     if ((buf = (char**)
-                                realloc(buf, sizeof(char*) * lines)) == NULL)
+                                realloc(buf, sizeof(char*) * lines)) == NULL) {
+                        fprintf(stderr, "%s: %d: p_read_file_char(): realloc(): %s\n",
+                                __FILE__, __LINE__, strerror(errno));
+
                         goto ERR;
+                    }
                 }
                 /* allocate array for X coordinate */
                 if ((*(buf + y) = (char*)
-                            malloc(sizeof(char) * (tmplen + 1))) == NULL)
+                            malloc(sizeof(char) * (tmplen + 1))) == NULL) {
+                    fprintf(stderr, "%s: %d: p_read_file_char(): malloc(): %s\n",
+                            __FILE__, __LINE__, strerror(errno));
+
                     goto ERR;
+                }
 
                 /* copy, str to buffer */
                 memcpy(*(buf + y), str, tmplen);
@@ -173,8 +105,12 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 if (x == (length - 1)) {
                     length += t_length;
                     if ((str = (char*)
-                                realloc(str, length)) == NULL)
+                                realloc(str, length)) == NULL) {
+                        fprintf(stderr, "%s: %d: p_read_file_char(): realloc(): %s\n",
+                                __FILE__, __LINE__, strerror(errno));
+
                         goto ERR;
+                    }
                 }
                 *(str + x) = c;
                 x++;
@@ -195,13 +131,21 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
         if (y == (lines - 1)) {
             lines += t_lines;
             if ((buf = (char**)
-                        realloc(buf, sizeof(char*) * lines)) == NULL)
+                        realloc(buf, sizeof(char*) * lines)) == NULL) {
+                fprintf(stderr, "%s: %d: p_read_file_char(): realloc(): %s\n",
+                        __FILE__, __LINE__, strerror(errno));
+
                 goto ERR;
+            }
         }
         /* allocate array for X coordinate */
         if ((*(buf + y) = (char*)
-                    malloc(sizeof(char) * (tmplen + 1))) == NULL)
+                    malloc(sizeof(char) * (tmplen + 1))) == NULL) {
+            fprintf(stderr, "%s: %d: p_read_file_char(): malloc(): %s\n",
+                    __FILE__, __LINE__, strerror(errno));
+
             goto ERR;
+        }
 
         /* copy, str to buffer */
         memcpy(*(buf + y), str, tmplen);
@@ -255,5 +199,5 @@ int watch_fd(int fd, long timeout)
 
     tm.tv_sec = tm.tv_usec = timeout;
 
-    return select(fd+1, &fdset, NULL, NULL, &tm);
+    return select(fd + 1, &fdset, NULL, NULL, &tm);
 }

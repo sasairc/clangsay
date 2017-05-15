@@ -42,9 +42,9 @@ int strrep(char* src, char* haystack, char* needle)
         /* reallocate memory */
         if ((src = (char*)
                     realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack))) == NULL) {
-            fprintf(stderr, "strrep(): realloc(): %s\n",
-                    strerror(errno));
-
+            fprintf(stderr, "%s: %d: strrep(): realloc(): %s\n",
+                    __FILE__, __LINE__, strerror(errno));
+    
             return -3;
         }
 
@@ -85,9 +85,8 @@ char* strlion(int argnum, ...)
 
     if ((argmnt = (char**)
                 malloc(sizeof(char*) * argnum)) == NULL) {
-        fprintf(stderr, "strlion(): malloc(): %s\n",
-                strerror(errno));
-
+        fprintf(stderr, "%s: %d: strlion(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
         return NULL;
     }
 
@@ -103,15 +102,13 @@ char* strlion(int argnum, ...)
     /* memory allocation */
     if ((dest = (char*)
                 malloc(sizeof(char) * (arglen + 1))) == NULL) {
-        fprintf(stderr, "strlion(): malloc(): %s\n",
-                strerror(errno));
-
-        return NULL;
+        fprintf(stderr, "%s: %d: strlion(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
+        goto ERR;
     }
 
     /* concat strings */
     i = destlen = blklen = 0;
-
     blklen = strlen(*(argmnt + i));
     memcpy(dest, *(argmnt + i), blklen);
     destlen += blklen;
@@ -128,6 +125,18 @@ char* strlion(int argnum, ...)
     free(argmnt);
 
     return dest;
+
+ERR:
+    if (argmnt != NULL) {
+        free(argmnt);
+        argmnt = NULL;
+    }
+    if (dest != NULL) {
+        free(dest);
+        dest = NULL;
+    }
+
+    return NULL;
 }
 
 #ifdef  WITH_GLIB

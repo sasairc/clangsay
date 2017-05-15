@@ -11,9 +11,11 @@
  */
 
 #include "./memory.h"
+#include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 char** malloc2d(int x, int y)
 {
@@ -23,21 +25,27 @@ char** malloc2d(int x, int y)
 
     /* Allocate array for Y coordinate */
     if ((buf = (char**)
-                malloc(sizeof(char*) * y)) == NULL)
-        return NULL;
+                malloc(sizeof(char*) * y)) == NULL) {
+        fprintf(stderr, "%s: %d: malloc2d(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
 
+        return NULL;
+    }
     /* Allocate array for X coordinate */
     while (i < y) {
         if ((*(buf + i) = (char*)
-                    malloc(sizeof(char) * x)) == NULL)
+                    malloc(sizeof(char) * x)) == NULL) {
+            fprintf(stderr, "%s: %d: malloc2d(): malloc(): %s\n",
+                    __FILE__, __LINE__, strerror(errno));
+
             goto ERR;
+        }
         i++;
     }
 
     return buf;
 
 ERR:
-
     while (i >= 0) {
         if (*(buf + i) != NULL) {
             free(*(buf + i));
@@ -57,8 +65,12 @@ int init2d(char** buf, int x, int y)
     while (i < y) {
         if (*(buf + i) == NULL) {
             if ((*(buf + i) = (char*)
-                        malloc(sizeof(char) * x)) == NULL)
+                        malloc(sizeof(char) * x)) == NULL) {
+                fprintf(stderr, "%s: %d: init2d(): malloc(): %s\n",
+                        __FILE__, __LINE__, strerror(errno));
+    
                 return -1;
+            }
         }
         memset(*(buf + i), '\0', x);
         i++;

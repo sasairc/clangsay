@@ -11,11 +11,16 @@
  */
 
 #include "./env.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
-env_t* split_env(char* env)
+int split_env(char* env, env_t **dest)
 {
+    if (env == NULL)
+        return -1;
+
     int     i       = 0,
             x       = 0,
             y       = 0;
@@ -25,10 +30,12 @@ env_t* split_env(char* env)
 
     env_t*  buf     = NULL;
 
-    if (env == NULL || (buf = (env_t*)
+    if ((buf = (env_t*)
                 malloc(sizeof(env_t))) == NULL) {
+        fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
 
-        return NULL;
+        return -1;
     }
 
     i = 0;
@@ -40,16 +47,22 @@ env_t* split_env(char* env)
     }
     if ((buf->envs = (char**)
                 malloc(sizeof(char*) * buf->envc)) == NULL) {
-        free(buf);
+        fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
+                __FILE__, __LINE__, strerror(errno));
 
-        return NULL;
+        goto ERR;
     }
 
     i = x = y = head = tail = 0;
     do {
         if (*(env + tail) == ':' || *(env + tail) == '\0') {
-            *(buf->envs + y) = (char*)
-                malloc(sizeof(char) * (tail - head + 1));
+            if ((*(buf->envs + y) = (char*)
+                        malloc(sizeof(char) * (tail - head + 1))) == NULL) {
+                fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
+                        __FILE__, __LINE__, strerror(errno));
+
+                goto ERR;
+            }
             while (head < tail) {
                 *(*(buf->envs + y) + x) = *(env + head);
                 head++;
@@ -63,19 +76,36 @@ env_t* split_env(char* env)
         tail++;
     } while (y < buf->envc);
 
-    return buf;
+    *dest = buf;
+
+    return 0;
+
+ERR:
+    release_env_t(buf);
+
+    return -2;
 }
 
 void release_env_t(env_t* env)
 {
-    int i = 0;
+    if (env == NULL)
+        return;
 
-    while (i < env->envc) {
+    int i   = 0,
+        j   = 0;
+
+    j = env->envc - 1;
+    while (i <= j) {
         if (*(env->envs + i) != NULL) {
             free(*(env->envs + i));
             *(env->envs + i) = NULL;
         }
+        if (*(env->envs + j) != NULL) {
+            free(*(env->envs + j));
+            *(env->envs + j) = NULL;
+        }
         i++;
+        j--;
     }
     if (env->envs != NULL) {
         free(env->envs);

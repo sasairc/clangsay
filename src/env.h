@@ -22,7 +22,7 @@ typedef struct ENV_T {
     char**  envs;
 } env_t;
 
-extern env_t* split_env(char* env);
+extern int split_env(char* env, env_t** dest);
 extern void release_env_t(env_t* env);
 
 #ifdef  __cplusplus

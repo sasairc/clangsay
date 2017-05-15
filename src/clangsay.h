@@ -20,7 +20,8 @@
 #define false       0
 
 #define CLANGSAY_ALLNO_FLAG \
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false,   \
+    false, false, false, false, false, false, false, \
+    false, false, false, false, false, false, false, \
     NULL, NULL, NULL,   \
     {0, NULL}, {0, NULL}
 
@@ -37,23 +38,23 @@ struct  CLANGSAY_MSG_T {
 };
 
 typedef struct  CLANGSAY_T {
-    bool                    bflag;
-    bool                    dflag;
-    bool                    gflag;
-    bool                    pflag;
-    bool                    sflag;
-    bool                    tflag;
-    bool                    wflag;
-    bool                    yflag;
-    bool                    eflag;
-    bool                    Tflag;
-    bool                    fflag;
-    bool                    lflag;
-    bool                    syflag; /* say */
-    bool                    thflag; /* think */
-    char*                   earg;
-    char*                   Targ;
-    char*                   farg;
+    bool    bflag;
+    bool    dflag;
+    bool    gflag;
+    bool    pflag;
+    bool    sflag;
+    bool    tflag;
+    bool    wflag;
+    bool    yflag;
+    bool    eflag;
+    bool    Tflag;
+    bool    fflag;
+    bool    lflag;
+    bool    syflag; /* say */
+    bool    thflag; /* think */
+    char*   earg;
+    char*   Targ;
+    char*   farg;
     struct CLANGSAY_COW_T   cow;
     struct CLANGSAY_MSG_T   msg;
 } clangsay_t;

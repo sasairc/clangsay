@@ -16,12 +16,9 @@
 #include "./subset.h"
 #include "./string.h"
 #include "./file.h"
-#include "./memory.h"
 #include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <getopt.h>
 
 int main(int argc, char* argv[])
@@ -137,7 +134,7 @@ int main(int argc, char* argv[])
         env = COWPATH;
 
     /* env string to struct */
-    if ((envt = split_env(env)) == NULL) {
+    if (split_env(env, &envt) < 0) {
         fprintf(stderr, "%s: main(): split_env() failure\n",
                 PROGNAME);
 

@@ -110,7 +110,7 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
         case    1:
             if ((*dest = (char*)
                         malloc(sizeof(char) * strlen(file))) != NULL)
-            memcpy(*dest, file, strlen(file) + 1);
+                memcpy(*dest, file, strlen(file) + 1);
             break;
         case    2:
             *dest = strlion(3, path, "/", file);
@@ -393,7 +393,7 @@ int list_cowfiles(void)
     if ((env = getenv("COWPATH")) == NULL)
         env = COWPATH;
 
-    if ((envt = split_env(env)) == NULL) {
+    if (split_env(env, &envt) < 0) {
         fprintf(stderr, "%s: list_cowfiles(): split_env() failure\n",
                 PROGNAME);
 
