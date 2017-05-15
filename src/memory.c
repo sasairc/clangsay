@@ -28,7 +28,7 @@ char** malloc2d(int x, int y)
 
     /* Allocate array for X coordinate */
     while (i < y) {
-        if ((buf[i] = (char*)
+        if ((*(buf + i) = (char*)
                     malloc(sizeof(char) * x)) == NULL)
             goto ERR;
         i++;
@@ -39,9 +39,9 @@ char** malloc2d(int x, int y)
 ERR:
 
     while (i >= 0) {
-        if (buf[i] != NULL) {
-            free(buf[i]);
-            buf[i] = NULL;
+        if (*(buf + i) != NULL) {
+            free(*(buf + i));
+            *(buf + i) = NULL;
         }
         i--;
     }
@@ -51,16 +51,16 @@ ERR:
 
 int init2d(char** buf, int x, int y)
 {
-    int i = 0;
+    int     i   = 0;
 
     /* Initialize each element of array */
     while (i < y) {
-        if (buf[i] == NULL) {
-            if ((buf[i] = (char*)
+        if (*(buf + i) == NULL) {
+            if ((*(buf + i) = (char*)
                         malloc(sizeof(char) * x)) == NULL)
                 return -1;
         }
-        memset(buf[i], '\0', x);
+        memset(*(buf + i), '\0', x);
         i++;
     }
 
@@ -69,14 +69,20 @@ int init2d(char** buf, int x, int y)
             
 void free2d(char** buf, int y)
 {
-    int i = 0;
+    int     i   = 0,
+            j   = y - 1;
 
-    while (i < y) {
-        if (buf[i] != NULL) {
-            free(buf[i]);
-            buf[i] = NULL;
+    while (i <= j) {
+        if (*(buf + i) != NULL) {
+            free(*(buf + i));
+            *(buf + i) = NULL;
+        }
+        if (*(buf + j) != NULL) {
+            free(*(buf + j));
+            *(buf + j) = NULL;
         }
         i++;
+        j--;
     }
     free(buf);
 

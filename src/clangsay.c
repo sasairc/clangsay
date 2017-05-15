@@ -1,6 +1,6 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
- *
+
  * clangsay.c
  *
  * Copyright (c) 2015 sasairc
@@ -153,8 +153,8 @@ int main(int argc, char* argv[])
      * 3: short argument(filename)
      */
     do {
-        if ((res = check_file_exists(envt->envs[i], clsay.farg)) != 0) {
-            envp = envt->envs[i];
+        if ((res = check_file_exists(*(envt->envs + i), clsay.farg)) != 0) {
+            envp = *(envt->envs + i);
 
             break;
         }
@@ -221,13 +221,13 @@ void release(env_t* envt, char* path, clangsay_t* clsay)
         i = 0;
         j = clsay->cow.lines - 1;
         while (i <= j) {
-            if (clsay->cow.cow[i] != NULL) {
-                free(clsay->cow.cow[i]);
-                clsay->cow.cow[i] = NULL;
+            if (*(clsay->cow.cow + i) != NULL) {
+                free(*(clsay->cow.cow + i));
+                *(clsay->cow.cow + i) = NULL;
             }
-            if (clsay->cow.cow[j] != NULL) {
-                free(clsay->cow.cow[j]);
-                clsay->cow.cow[j] = NULL;
+            if (*(clsay->cow.cow + j) != NULL) {
+                free(*(clsay->cow.cow + j));
+                *(clsay->cow.cow + j) = NULL;
             }
             i++;
             j--;
@@ -239,13 +239,13 @@ void release(env_t* envt, char* path, clangsay_t* clsay)
         i = 0;
         j = clsay->msg.lines - 1;
         while (i <= j) {
-            if (clsay->msg.msg[i] != NULL) {
-                free(clsay->msg.msg[i]);
-                clsay->msg.msg[i] = NULL;
+            if (*(clsay->msg.msg + i) != NULL) {
+                free(*(clsay->msg.msg + i));
+                *(clsay->msg.msg + i) = NULL;
             }
-            if (clsay->msg.msg[j] != NULL) {
-                free(clsay->msg.msg[j]);
-                clsay->msg.msg[j] = NULL;
+            if (*(clsay->msg.msg + j) != NULL) {
+                free(*(clsay->msg.msg + j));
+                *(clsay->msg.msg + j) = NULL;
             }
             i++;
             j--;

@@ -21,6 +21,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <regex.h>
+#include <errno.h>
 #include <sys/stat.h>
 
 int open_cowfile(char* path, FILE** fp)
@@ -28,29 +29,29 @@ int open_cowfile(char* path, FILE** fp)
     struct  stat st;
 
     if (stat(path, &st) < 0) {
-        fprintf(stderr, "%s: %s: stat failure\n",
-                PROGNAME, path);
+        fprintf(stderr, "%s: %s: %s\n",
+                PROGNAME, path, strerror(ENOENT));
 
         return -1;
     }
 
-    if (S_ISDIR(st.st_mode & S_IFMT)) {
-        fprintf(stderr, "%s: %s: is a directory\n",
-                PROGNAME, path);
-        
+    if ((st.st_mode & S_IFMT) == S_IFDIR) {
+        fprintf(stderr, "%s: %s: %s\n",
+                PROGNAME, path, strerror(EISDIR));
+
         return -2;
     }
 
     if ((st.st_mode & S_IREAD) == 0) {
-        fprintf(stderr, "%s: %s: permission denied\n",
-                PROGNAME, path);
+        fprintf(stderr, "%s: %s: %s\n",
+                PROGNAME, path, strerror(EACCES));
 
         return -3;
     }
 
     if ((*fp = fopen(path, "r")) == NULL) {
-        fprintf(stderr, "%s: open_cowfile(): fp is NULL\n",
-                PROGNAME);
+        fprintf(stderr, "%s: %s\n",
+                PROGNAME, strerror(errno));
 
         return -4;
     }
@@ -148,21 +149,21 @@ int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
     if (optind < argc) {    
         if ((clsay->msg.msg = (char**)
                     malloc(sizeof(char*) * (argc - optind))) == NULL) {
-            fprintf(stderr, "%s: read_string(): malloc() failure\n",
-                    PROGNAME);
+            fprintf(stderr, "%s: read_string(): malloc(): %s\n",
+                    PROGNAME, strerror(errno));
             
             return -1;
         }
         while (optind < argc) {
-            if ((clsay->msg.msg[clsay->msg.lines] = (char*)
-                        malloc(sizeof(char) * (strlen(argv[optind]) + 1))) == NULL) {
-                fprintf(stderr, "%s: read_string(): malloc() failure\n",
-                        PROGNAME);
+            if ((*(clsay->msg.msg + clsay->msg.lines) = (char*)
+                        malloc(sizeof(char) * (strlen(*(argv + optind)) + 1))) == NULL) {
+                fprintf(stderr, "%s: read_string(): malloc(): %s\n",
+                        PROGNAME, strerror(errno));
 
                 return -2;
             }
-            memcpy(clsay->msg.msg[clsay->msg.lines],
-                    argv[optind], strlen(argv[optind]) + 1);
+            memcpy(*(clsay->msg.msg + clsay->msg.lines),
+                    *(argv + optind), strlen(*(argv + optind)) + 1);
             clsay->msg.lines++;
             optind++;
         }
@@ -227,7 +228,7 @@ int print_string(clangsay_t* clsay)
     }
     if (clsay->msg.lines == 1) {
         fprintf(stdout, "\n< %s >\n ",
-                clsay->msg.msg[0]);
+                *(clsay->msg.msg));
 
         while (maxlen >= 0) {
             putchar('-');
@@ -243,16 +244,16 @@ int print_string(clangsay_t* clsay)
      */
     i = 0;
     while (i < clsay->msg.lines) {
-        len = mbstrlen_with_regex(clsay->msg.msg[i], &reg);
+        len = mbstrlen_with_regex(*(clsay->msg.msg + i), &reg);
         if (i == 0)
             fprintf(stdout, "\n/ %s",
-                    clsay->msg.msg[i]);
+                    *(clsay->msg.msg + i));
         else if (i == (clsay->msg.lines - 1))
             fprintf(stdout, "\\ %s",
-                    clsay->msg.msg[i]);
+                    *(clsay->msg.msg + i));
         else
             fprintf(stdout, "| %s",
-                    clsay->msg.msg[i]);
+                    *(clsay->msg.msg + i));
 
         j = maxlen - len;
         while (j > 0) {
@@ -322,41 +323,41 @@ int print_cow(clangsay_t* clsay)
     i = 0;
     while (i < clsay->cow.lines) {
         /* replace thoughts */
-        strrep(clsay->cow.cow[i], THOUGHTS, though);
+        strrep(*(clsay->cow.cow + i), THOUGHTS, though);
 
-        while (strrep(clsay->cow.cow[i], "\\\\", "\\") == 0);
+        while (strrep(*(clsay->cow.cow + i), "\\\\", "\\") == 0);
 
         /* replace eyes*/
         j = 0;
         while (eyes[j].haystack != NULL || eyes[j].needle != NULL) {
             if (eyes[j].flag == true)
-                strrep(clsay->cow.cow[i], eyes[j].haystack, eyes[j].needle);
+                strrep(*(clsay->cow.cow + i), eyes[j].haystack, eyes[j].needle);
             j++;
         }
         /* default_eyes */
-        strrep(clsay->cow.cow[i], EYES, DEFAULT_EYES);
+        strrep(*(clsay->cow.cow + i), EYES, DEFAULT_EYES);
 
         /* replace tongue */
         j = 0;
         while (tongue[j].haystack != NULL || tongue[j].needle != NULL) {
             if (tongue[j].flag == true)
-                strrep(clsay->cow.cow[i], tongue[j].haystack, tongue[j].needle);
+                strrep(*(clsay->cow.cow + i), tongue[j].haystack, tongue[j].needle);
             j++;
         }
         /* default tongue */
-        strrep(clsay->cow.cow[i], TONGUE, DEFAULT_TONGUE);
+        strrep(*(clsay->cow.cow + i), TONGUE, DEFAULT_TONGUE);
 
         /* EOC to EOC */
-        if (strstr(clsay->cow.cow[i], "EOC")) {
+        if (strstr(*(clsay->cow.cow + i), "EOC")) {
             block = true;
             i++;
             continue;
-        } else if (strstr(clsay->cow.cow[i], "EOC") && block == true) {
+        } else if (strstr(*(clsay->cow.cow + i), "EOC") && block == true) {
             block = false;
         }
         if (block == true)
             fprintf(stdout, "%s\n",
-                    clsay->cow.cow[i]);
+                    *(clsay->cow.cow + i));
         i++;
     }
 
@@ -401,7 +402,8 @@ int list_cowfiles(void)
 
     /* get file entry and sort */
     do {
-        if ((entry = scandir(envt->envs[i], &list, selects_cowfiles, alphasort)) == -1) {
+        if ((entry = scandir(*(envt->envs + i),
+                        &list, selects_cowfiles, alphasort)) == -1) {
             i++;
             continue;
         } else {
@@ -409,13 +411,13 @@ int list_cowfiles(void)
                 puts("");
 
             fprintf(stdout, "%s:\n",
-                    envt->envs[i]);
+                    *(envt->envs + i));
         }
         j = 0;
         while (j < entry) {
             fprintf(stdout, "%s\n",
                     list[j]->d_name);
-            free(list[j]);
+            free(*(list + j));
             j++;
         }
         free(list);

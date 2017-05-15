@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * file.h 
+ * file.h
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
@@ -12,9 +12,12 @@
 
 #ifndef FILE_H
 #define FILE_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 #include <stdio.h>
-#include <sys/time.h>
 
 extern int check_file_type(char* filename);
 extern int count_file_lines(FILE* fp);
@@ -23,5 +26,9 @@ extern int p_count_file_lines(char** buf);
 extern int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int chomp);
 extern int watch_fd(int fd, long timeout);
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* FILE_H */
 #endif

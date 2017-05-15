@@ -64,13 +64,13 @@ int check_file_type(char* filename)
 
 int count_file_lines(FILE* fp)
 {
-    int i       = 0,
-        lines   = 0;
+    int     i       = 0,
+            lines   = 0;
 
     rewind(fp);     /* seek file-stream to the top */
     while ((i = getc(fp)) != EOF) {
-    if (i == '\n')
-        lines++;
+        if (i == '\n')
+            lines++;
     }
 
     return lines;
@@ -78,9 +78,9 @@ int count_file_lines(FILE* fp)
 
 int read_file(int lines, size_t length, char** buf, FILE* fp)
 {
-    int     i   = 0;
+    int     i       = 0;
 
-    char*   str = NULL;
+    char*   str     = NULL;
 
     if ((str = (char*)
                 malloc(sizeof(char) * length)) == NULL) {   /* allocate buffer */
@@ -88,15 +88,16 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
         return 0;
     }
     while (i <= lines && fgets(str, sizeof(char) * length, fp) != NULL) {
-        buf[i] = (char*)malloc(     /* allocate array for X coordinate */
+        *(buf + i) = (char*)malloc(     /* allocate array for X coordinate */
                     (strlen(str) + 1) * sizeof(char)
                 );
-        if (buf[i] == NULL) {
+        if (*(buf + i) == NULL) {
             free(str);
             
             return 0;
         }
-        strcpy(buf[i], str);        /* copy, str to buffer */
+        /* copy, str to buffer */
+        memcpy(*(buf + i), str, strlen(str));
         i++;                        /* count line */
     }
     free(str);
@@ -106,9 +107,9 @@ int read_file(int lines, size_t length, char** buf, FILE* fp)
 
 int p_count_file_lines(char** buf)
 {
-    int i   = 0;
+    int     i   = 0;
 
-    while (buf[i] != NULL)
+    while (*(buf + i) != NULL)
         i++;
 
     return i;
@@ -127,8 +128,7 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
             length  = t_length,
             tmplen  = 0;
 
-    char    end     = '\0',
-        *   str     = NULL,
+    char*   str     = NULL,
         **  buf     = NULL;
 
     if ((str = (char*)
@@ -139,16 +139,14 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 malloc(sizeof(char*) * t_lines)) == NULL)
         goto ERR;
 
-    /* lf to ? */
-    if (chomp > 0)
-        end = '\0';
-    else
-        end = '\n';
-
     while ((c = fgetc(fp)) != EOF) {
         switch (c) {
             case    '\n':
-                str[x] = end;
+                if (chomp > 0)
+                    *(str + x) = '\0';
+                else
+                    *(str + x) = c;
+
                 tmplen = strlen(str);
                 /* reallocate array of Y coordinate */
                 if (y == (lines - 1)) {
@@ -158,13 +156,13 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                         goto ERR;
                 }
                 /* allocate array for X coordinate */
-                if ((buf[y] = (char*)
+                if ((*(buf + y) = (char*)
                             malloc(sizeof(char) * (tmplen + 1))) == NULL)
                     goto ERR;
 
                 /* copy, str to buffer */
-                memcpy(buf[y], str, tmplen);
-                buf[y][tmplen] = '\0';
+                memcpy(*(buf + y), str, tmplen);
+                *(*(buf + y) + tmplen) = '\0';
                 /* initialize temporary buffer */
                 memset(str, '\0', length);
                 x = tmplen = 0;
@@ -178,7 +176,7 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                                 realloc(str, length)) == NULL)
                         goto ERR;
                 }
-                str[x] = c;
+                *(str + x) = c;
                 x++;
                 continue;
         }
@@ -186,7 +184,12 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
 
     /* \n -{data}- EOF */
     if (x > 0) {
-        str[x] = end;
+        /* remove lf? */
+        if (chomp > 0)
+            *(str + x) = '\0';
+        else
+            *(str + x) = c;
+
         tmplen = strlen(str);
         /* reallocate array of Y coordinate */
         if (y == (lines - 1)) {
@@ -196,24 +199,26 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 goto ERR;
         }
         /* allocate array for X coordinate */
-        if ((buf[y] = (char*)
+        if ((*(buf + y) = (char*)
                     malloc(sizeof(char) * (tmplen + 1))) == NULL)
             goto ERR;
 
         /* copy, str to buffer */
-        memcpy(buf[y], str, tmplen);
-        buf[y][tmplen] = '\0';
+        memcpy(*(buf + y), str, tmplen);
+        *(*(buf + y) + tmplen - 1) = '\0';
         y++;
     }
 
     /* no data */
     if (x == 0 && y == 0) {
-        buf[y] = NULL;
-        free(str);
+        if (buf != NULL)
+            free(buf);
+        if (str != NULL)
+            free(str);
 
         return 0;
     }
-    buf[y] = NULL;
+    *(buf + y) = NULL;
     free(str);
 
     *dest = buf;
@@ -226,8 +231,8 @@ ERR:
 
     if (buf != NULL) {
         while (lines >= 0) {
-            if (buf[lines] != NULL)
-                free(buf[lines]);
+            if (*(buf + lines) != NULL)
+                free(*(buf + lines));
 
             lines--;
         }

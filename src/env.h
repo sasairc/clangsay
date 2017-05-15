@@ -12,6 +12,10 @@
 
 #ifndef ENV_H
 #define ENV_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 typedef struct ENV_T {
     int     envc;
@@ -21,5 +25,9 @@ typedef struct ENV_T {
 extern env_t* split_env(char* env);
 extern void release_env_t(env_t* env);
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* ENV_H */
 #endif

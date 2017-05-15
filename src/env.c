@@ -34,7 +34,7 @@ env_t* split_env(char* env)
     i = 0;
     buf->envc = 1;
     while (i < strlen(env)) {
-        if (env[i] == ':')
+        if (*(env + i) == ':')
             buf->envc++;
         i++;
     }
@@ -47,15 +47,15 @@ env_t* split_env(char* env)
 
     i = x = y = head = tail = 0;
     do {
-        if (env[tail] == ':' || env[tail] == '\0') {
-            buf->envs[y] = (char*)
+        if (*(env + tail) == ':' || *(env + tail) == '\0') {
+            *(buf->envs + y) = (char*)
                 malloc(sizeof(char) * (tail - head + 1));
             while (head < tail) {
-                buf->envs[y][x] = env[head];
+                *(*(buf->envs + y) + x) = *(env + head);
                 head++;
                 x++;
             }
-            buf->envs[y][x + 1] = '\0';
+            *(*(buf->envs + y) + x + 1) = '\0';
             x = 0;
             head++;
             y++;
@@ -71,9 +71,9 @@ void release_env_t(env_t* env)
     int i = 0;
 
     while (i < env->envc) {
-        if (env->envs[i] != NULL) {
-            free(env->envs[i]);
-            env->envs[i] = NULL;
+        if (*(env->envs + i) != NULL) {
+            free(*(env->envs + i));
+            *(env->envs + i) = NULL;
         }
         i++;
     }

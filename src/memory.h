@@ -12,10 +12,18 @@
 
 #ifndef MEMORY_H
 #define MEMORY_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 extern char** malloc2d(int x, int y);
 extern int init2d(char** buf, int x, int y);
 extern void free2d(char** buf, int y);
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* MEMORY_H */
 #endif
