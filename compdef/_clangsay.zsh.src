@@ -24,8 +24,11 @@ function _list_cowfile() {
         local COWPATH="_COWPATH"
     fi
 
-    _files -W `echo "$COWPATH" | sed 's/:/ /g'` && \
-        return 0;
+    for p in "${(ps.:.)COWPATH}"; do
+        for c in $(ls "${p}" 2>/dev/null); do
+            compadd "${c}"
+        done
+    done
 
     return 1;
 }
