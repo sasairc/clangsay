@@ -42,7 +42,7 @@ int strrep(char* src, char* haystack, char* needle)
     if (strlen(haystack) < strlen(needle)) {
         /* reallocate memory */
         if ((src = (char*)
-                    neo_realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack), NULL)) == NULL)
+                    srealloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack), NULL)) == NULL)
             return -3;
 
         /* move match word to specified location in memory */
@@ -81,7 +81,7 @@ char* strlion(int argnum, ...)
     va_list list;       /* list of variable arguments */
 
     if ((argmnt = (char**)
-                neo_malloc(sizeof(char*) * argnum, NULL)) == NULL)
+                smalloc(sizeof(char*) * argnum, NULL)) == NULL)
         return NULL;
 
     /* processing of variable arguments */
@@ -95,7 +95,7 @@ char* strlion(int argnum, ...)
 
     /* memory allocation */
     if ((dest = (char*)
-                neo_malloc(sizeof(char) * (arglen + 1), NULL)) == NULL)
+                smalloc(sizeof(char) * (arglen + 1), NULL)) == NULL)
         goto ERR;
 
     /* concat strings */
@@ -162,9 +162,10 @@ int mbstrlen(char* src)
             }
             g_free(cpoints);
         } else {
-            len++;                    /* ascii */
+            /* ascii */
+            len++;
         }
-        p += ch;                      /* seek offset */
+        p += ch;
     }
 
     return len;
@@ -177,16 +178,18 @@ int mbstrlen(char* src)
 
     char*   p       = src;
 
-    setlocale(LC_CTYPE, LOCALE);      /* set locale (string.h) */
+    setlocale(LC_CTYPE, LOCALE);
 
     while (*p != '\0') {
-        ch = mblen(p, MB_CUR_MAX);    /* get string length */
+        ch = mblen(p, MB_CUR_MAX);
+        /* multi byte */
         if (ch > 1) {
-            len += 2;                 /* multi byte */
+            len += 2;
+        /* ascii */
         } else {
-            len++;                    /* ascii */
+            len++;
         }
-        p += ch;                      /* seek offset */
+        p += ch;
     }
 
     return len;
@@ -297,7 +300,7 @@ char** str_to_args(char* str)
     }
     if (elmc > 0) {
         if ((args = (char**)
-                    neo_malloc(sizeof(char*) * (elmc + 1), NULL)) == NULL)
+                    smalloc(sizeof(char*) * (elmc + 1), NULL)) == NULL)
             return NULL;
     } else {
         return NULL;
@@ -330,7 +333,7 @@ char** str_to_args(char* str)
                 continue;
             }
             if ((args[ay] = (char*)
-                        neo_malloc(sizeof(char) * (sx - xt + 1), NULL)) == NULL)
+                        smalloc(sizeof(char) * (sx - xt + 1), NULL)) == NULL)
                 goto ERR;
 
             for (ax = 0; xt < sx; xt++, ax++)

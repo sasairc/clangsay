@@ -17,7 +17,7 @@
 #include <string.h>
 #include <errno.h>
     
-void* neo_malloc(size_t size, const char* fmt, ...)
+void* smalloc(size_t size, const char* fmt, ...)
 {
     if (size <= 0)
         NULL;
@@ -38,12 +38,12 @@ void* neo_malloc(size_t size, const char* fmt, ...)
 
         return NULL;
     }
-    memset(buf, 0, size);
+    memset(buf, '\0', size);
 
     return buf;
 }
 
-void* neo_realloc(void* ptr, size_t size, const char* fmt, ...)
+void* srealloc(void* ptr, size_t size, const char* fmt, ...)
 {
     if (size <= 0)
         return ptr;

@@ -20,8 +20,8 @@ extern "C" {
 #include <stddef.h>
 #include <stdarg.h>
 
-extern void* neo_malloc(size_t size, const char* fmt, ...);
-extern void* neo_realloc(void* ptr, size_t size, const char* fmt, ...);
+extern void* smalloc(size_t size, const char* fmt, ...);
+extern void* srealloc(void* ptr, size_t size, const char* fmt, ...);
 extern void free2d(char** buf, int y);
 
 #ifdef  __cplusplus

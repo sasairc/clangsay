@@ -32,7 +32,7 @@ int split_env(char* env, env_t **dest)
     env_t*  buf     = NULL;
 
     if ((buf = (env_t*)
-                neo_malloc(sizeof(env_t), NULL)) == NULL)
+                smalloc(sizeof(env_t), NULL)) == NULL)
         return -1;
 
     i = 0;
@@ -43,14 +43,14 @@ int split_env(char* env, env_t **dest)
         i++;
     }
     if ((buf->envs = (char**)
-                neo_malloc(sizeof(char*) * buf->envc, NULL)) == NULL)
+                smalloc(sizeof(char*) * buf->envc, NULL)) == NULL)
         goto ERR;
 
     i = x = y = head = tail = 0;
     do {
         if (*(env + tail) == ':' || *(env + tail) == '\0') {
             if ((*(buf->envs + y) = (char*)
-                        neo_malloc(sizeof(char) * (tail - head + 1), NULL)) == NULL)
+                        smalloc(sizeof(char) * (tail - head + 1), NULL)) == NULL)
                 goto ERR;
 
             while (head < tail) {

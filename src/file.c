@@ -50,11 +50,11 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
         **  buf     = NULL;
 
     if ((str = (char*)
-                neo_malloc(sizeof(char) * t_length, NULL)) == NULL)
+                smalloc(sizeof(char) * t_length, NULL)) == NULL)
         return -1;
 
     if ((buf = (char**)
-                neo_malloc(sizeof(char*) * t_lines, NULL)) == NULL)
+                smalloc(sizeof(char*) * t_lines, NULL)) == NULL)
         goto ERR;
 
     while ((c = fgetc(fp)) != EOF) {
@@ -70,12 +70,12 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 if (y == (lines - 1)) {
                     lines += t_lines;
                     if ((buf = (char**)
-                                neo_realloc(buf, sizeof(char*) * lines, NULL)) == NULL)
+                                srealloc(buf, sizeof(char*) * lines, NULL)) == NULL)
                         goto ERR;
                 }
                 /* allocate array for X coordinate */
                 if ((*(buf + y) = (char*)
-                            neo_malloc(sizeof(char) * (tmplen + 1), NULL)) == NULL)
+                            smalloc(sizeof(char) * (tmplen + 1), NULL)) == NULL)
                     goto ERR;
 
                 /* copy, str to buffer */
@@ -91,7 +91,7 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
                 if (x == (length - 1)) {
                     length += t_length;
                     if ((str = (char*)
-                                neo_realloc(str, sizeof(char) * length, NULL)) == NULL)
+                                srealloc(str, sizeof(char) * length, NULL)) == NULL)
                         goto ERR;
                 }
                 *(str + x) = c;
@@ -113,12 +113,12 @@ int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int c
         if (y == (lines - 1)) {
             lines += t_lines;
             if ((buf = (char**)
-                        neo_realloc(buf, sizeof(char*) * lines, NULL)) == NULL)
+                        srealloc(buf, sizeof(char*) * lines, NULL)) == NULL)
                 goto ERR;
         }
         /* allocate array for X coordinate */
         if ((*(buf + y) = (char*)
-                    neo_malloc(sizeof(char) * (tmplen + 1), NULL)) == NULL)
+                    smalloc(sizeof(char) * (tmplen + 1), NULL)) == NULL)
             goto ERR;
 
         /* copy, str to buffer */

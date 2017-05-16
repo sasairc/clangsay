@@ -110,7 +110,7 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
     switch (mode) {
         case    1:
             if ((*dest = (char*)
-                        neo_malloc(sizeof(char) * strlen(file), NULL)) == NULL)
+                        smalloc(sizeof(char) * strlen(file), NULL)) == NULL)
                 return -1;
 
                 memcpy(*dest, file, strlen(file) + 1);
@@ -151,12 +151,12 @@ int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
 {
     if (optind < argc) {    
         if ((clsay->msg.msg = (char**)
-                    neo_malloc(sizeof(char*) * (argc - optind), NULL)) == NULL)
+                    smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL)
             return -1;
 
         while (optind < argc) {
             if ((*(clsay->msg.msg + clsay->msg.lines) = (char*)
-                    neo_malloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL)
+                    smalloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL)
                 return -2;
 
             memcpy(*(clsay->msg.msg + clsay->msg.lines),
