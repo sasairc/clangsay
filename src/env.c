@@ -11,6 +11,7 @@
  */
 
 #include "./env.h"
+#include "./memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,12 +32,8 @@ int split_env(char* env, env_t **dest)
     env_t*  buf     = NULL;
 
     if ((buf = (env_t*)
-                malloc(sizeof(env_t))) == NULL) {
-        fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
-                __FILE__, __LINE__, strerror(errno));
-
+                neo_malloc(sizeof(env_t), NULL)) == NULL)
         return -1;
-    }
 
     i = 0;
     buf->envc = 1;
@@ -46,23 +43,16 @@ int split_env(char* env, env_t **dest)
         i++;
     }
     if ((buf->envs = (char**)
-                malloc(sizeof(char*) * buf->envc)) == NULL) {
-        fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
-                __FILE__, __LINE__, strerror(errno));
-
+                neo_malloc(sizeof(char*) * buf->envc, NULL)) == NULL)
         goto ERR;
-    }
 
     i = x = y = head = tail = 0;
     do {
         if (*(env + tail) == ':' || *(env + tail) == '\0') {
             if ((*(buf->envs + y) = (char*)
-                        malloc(sizeof(char) * (tail - head + 1))) == NULL) {
-                fprintf(stderr, "%s: %d: split_env(): malloc(): %s\n",
-                        __FILE__, __LINE__, strerror(errno));
-
+                        neo_malloc(sizeof(char) * (tail - head + 1), NULL)) == NULL)
                 goto ERR;
-            }
+
             while (head < tail) {
                 *(*(buf->envs + y) + x) = *(env + head);
                 head++;

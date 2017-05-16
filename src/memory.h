@@ -17,8 +17,11 @@ extern "C" {
 /* __cplusplus */
 #endif
 
-extern char** malloc2d(int x, int y);
-extern int init2d(char** buf, int x, int y);
+#include <stddef.h>
+#include <stdarg.h>
+
+extern void* neo_malloc(size_t size, const char* fmt, ...);
+extern void* neo_realloc(void* ptr, size_t size, const char* fmt, ...);
 extern void free2d(char** buf, int y);
 
 #ifdef  __cplusplus

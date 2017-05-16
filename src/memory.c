@@ -16,69 +16,60 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
-char** malloc2d(int x, int y)
+    
+void* neo_malloc(size_t size, const char* fmt, ...)
 {
-    int     i   = 0;
+    if (size <= 0)
+        NULL;
 
-    char**  buf = NULL;
+    void*   buf = NULL;
 
-    /* Allocate array for Y coordinate */
-    if ((buf = (char**)
-                malloc(sizeof(char*) * y)) == NULL) {
-        fprintf(stderr, "%s: %d: malloc2d(): malloc(): %s\n",
-                __FILE__, __LINE__, strerror(errno));
+    va_list args;
+
+    if ((buf = malloc(size)) == NULL) {
+        if (fmt != NULL) {
+            va_start(args, fmt);
+            vfprintf(stderr, fmt, args);
+            va_end(args);
+        } else {
+            fprintf(stderr, "%s: %d: neo_malloc(): %s\n",
+                    __FILE__, __LINE__, strerror(errno));
+        }
 
         return NULL;
     }
-    /* Allocate array for X coordinate */
-    while (i < y) {
-        if ((*(buf + i) = (char*)
-                    malloc(sizeof(char) * x)) == NULL) {
-            fprintf(stderr, "%s: %d: malloc2d(): malloc(): %s\n",
-                    __FILE__, __LINE__, strerror(errno));
+    memset(buf, 0, size);
 
-            goto ERR;
+    return buf;
+}
+
+void* neo_realloc(void* ptr, size_t size, const char* fmt, ...)
+{
+    if (size <= 0)
+        return ptr;
+
+    void*   buf = NULL;
+
+    va_list args;
+
+    if ((buf = realloc(ptr, size)) == NULL) {
+        if (fmt != NULL) {
+            va_start(args, fmt);
+            vfprintf(stderr, fmt, args);
+            va_end(args);
+        } else {
+            fprintf(stderr, "%s: %d: neo_realloc(): %s\n",
+                    __FILE__, __LINE__, strerror(errno));
         }
-        i++;
+        if (ptr != NULL)
+            free(ptr);
+
+        return NULL;
     }
 
     return buf;
-
-ERR:
-    while (i >= 0) {
-        if (*(buf + i) != NULL) {
-            free(*(buf + i));
-            *(buf + i) = NULL;
-        }
-        i--;
-    }
-
-    return NULL;
 }
 
-int init2d(char** buf, int x, int y)
-{
-    int     i   = 0;
-
-    /* Initialize each element of array */
-    while (i < y) {
-        if (*(buf + i) == NULL) {
-            if ((*(buf + i) = (char*)
-                        malloc(sizeof(char) * x)) == NULL) {
-                fprintf(stderr, "%s: %d: init2d(): malloc(): %s\n",
-                        __FILE__, __LINE__, strerror(errno));
-    
-                return -1;
-            }
-        }
-        memset(*(buf + i), '\0', x);
-        i++;
-    }
-
-    return 0;
-}
-            
 void free2d(char** buf, int y)
 {
     int     i   = 0,

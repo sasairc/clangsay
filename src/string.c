@@ -11,6 +11,7 @@
  */
 
 #include "./string.h"
+#include "./memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -41,12 +42,8 @@ int strrep(char* src, char* haystack, char* needle)
     if (strlen(haystack) < strlen(needle)) {
         /* reallocate memory */
         if ((src = (char*)
-                    realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack))) == NULL) {
-            fprintf(stderr, "%s: %d: strrep(): realloc(): %s\n",
-                    __FILE__, __LINE__, strerror(errno));
-    
+                    neo_realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack), NULL)) == NULL)
             return -3;
-        }
 
         /* move match word to specified location in memory */
         memmove(
@@ -84,11 +81,8 @@ char* strlion(int argnum, ...)
     va_list list;       /* list of variable arguments */
 
     if ((argmnt = (char**)
-                malloc(sizeof(char*) * argnum)) == NULL) {
-        fprintf(stderr, "%s: %d: strlion(): malloc(): %s\n",
-                __FILE__, __LINE__, strerror(errno));
+                neo_malloc(sizeof(char*) * argnum, NULL)) == NULL)
         return NULL;
-    }
 
     /* processing of variable arguments */
     va_start(list, argnum);
@@ -101,11 +95,8 @@ char* strlion(int argnum, ...)
 
     /* memory allocation */
     if ((dest = (char*)
-                malloc(sizeof(char) * (arglen + 1))) == NULL) {
-        fprintf(stderr, "%s: %d: strlion(): malloc(): %s\n",
-                __FILE__, __LINE__, strerror(errno));
+                neo_malloc(sizeof(char) * (arglen + 1), NULL)) == NULL)
         goto ERR;
-    }
 
     /* concat strings */
     i = destlen = blklen = 0;
@@ -306,7 +297,7 @@ char** str_to_args(char* str)
     }
     if (elmc > 0) {
         if ((args = (char**)
-                    malloc(sizeof(char*) * (elmc + 1))) == NULL)
+                    neo_malloc(sizeof(char*) * (elmc + 1), NULL)) == NULL)
             return NULL;
     } else {
         return NULL;
@@ -339,12 +330,9 @@ char** str_to_args(char* str)
                 continue;
             }
             if ((args[ay] = (char*)
-                        malloc(sizeof(char) * (sx - xt + 1))) == NULL) {
-                fprintf(stderr, "str_to_args(): malloc(): %s\n",
-                        strerror(errno));
-
+                        neo_malloc(sizeof(char) * (sx - xt + 1), NULL)) == NULL)
                 goto ERR;
-            }
+
             for (ax = 0; xt < sx; xt++, ax++)
                     args[ay][ax] = str[xt];
 

@@ -11,6 +11,7 @@
  */
 
 #include "./config.h"
+#include "./memory.h"
 #include "./clangsay.h"
 #include "./subset.h"
 #include "./string.h"
@@ -109,7 +110,9 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
     switch (mode) {
         case    1:
             if ((*dest = (char*)
-                        malloc(sizeof(char) * strlen(file))) != NULL)
+                        neo_malloc(sizeof(char) * strlen(file), NULL)) == NULL)
+                return -1;
+
                 memcpy(*dest, file, strlen(file) + 1);
             break;
         case    2:
@@ -123,7 +126,7 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
         fprintf(stderr, "%s: concat_file_path() failure\n",
                 PROGNAME);
     
-        return -1;
+        return -2;
     }
 
     return 0;
@@ -148,20 +151,14 @@ int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
 {
     if (optind < argc) {    
         if ((clsay->msg.msg = (char**)
-                    malloc(sizeof(char*) * (argc - optind))) == NULL) {
-            fprintf(stderr, "%s: read_string(): malloc(): %s\n",
-                    PROGNAME, strerror(errno));
-            
+                    neo_malloc(sizeof(char*) * (argc - optind), NULL)) == NULL)
             return -1;
-        }
+
         while (optind < argc) {
             if ((*(clsay->msg.msg + clsay->msg.lines) = (char*)
-                        malloc(sizeof(char) * (strlen(*(argv + optind)) + 1))) == NULL) {
-                fprintf(stderr, "%s: read_string(): malloc(): %s\n",
-                        PROGNAME, strerror(errno));
-
+                    neo_malloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL)
                 return -2;
-            }
+
             memcpy(*(clsay->msg.msg + clsay->msg.lines),
                     *(argv + optind), strlen(*(argv + optind)) + 1);
             clsay->msg.lines++;
