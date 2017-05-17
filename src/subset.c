@@ -60,6 +60,68 @@ int open_cowfile(char* path, FILE** fp)
     return 0;
 }
 
+int check_cowfile_exists(char* env, char* file, char** dest)
+{
+    int     i       = 0,
+            res     = 0;
+
+    char*   path    = NULL,
+        *   envp    = NULL;
+
+    env_t*  envt    = NULL;
+
+    /* env string to struct */
+    if (split_env(env, &envt) < 0) {
+        fprintf(stderr, "%s: check_file_exists(): split_env() failure\n",
+                PROGNAME);
+
+        goto ERR;
+    }
+
+    /*
+     * # check_file_exists()
+     *
+     * 0: not found
+     * 1: keep argument(path)
+     * 2: long argument(filename.cow)
+     * 3: short argument(filename)
+     */
+    do {
+        if ((res = check_file_exists(*(envt->envs + i), file)) != 0) {
+            envp = *(envt->envs + i);
+
+            break;
+        }
+        i++;
+    } while (i < envt->envc);
+
+    /* cow file not found */
+    if (res == 0) {
+        fprintf(stderr, "%s: %s: cowfile not found\n",
+                PROGNAME, file);
+
+        goto ERR;
+    }
+
+    /* concat path */
+    if (concat_file_path(res, &path, envp, file) < 0)
+        goto ERR;
+
+    release_env_t(envt);
+    *dest = path;
+
+    return 0;
+
+ERR:
+    if (envt != NULL)
+        release_env_t(envt);
+
+    if (path != NULL)
+        free(path);
+
+    return -1;
+}
+
 int check_file_exists(char* path, char* file)
 {
     int     ret     = 0;
@@ -138,8 +200,8 @@ void strunsecs(struct CLANGSAY_MSG_T* msg)
         j   = msg->lines - 1;
 
     while (i <= j && i < msg->lines) {
-        strunesc(*(msg->msg + i));
-        strunesc(*(msg->msg + j));
+        strunesc(*(msg->data + i));
+        strunesc(*(msg->data + j));
         i++;
         j--;
     }
@@ -150,23 +212,23 @@ void strunsecs(struct CLANGSAY_MSG_T* msg)
 int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
 {
     if (optind < argc) {    
-        if ((clsay->msg.msg = (char**)
+        if ((clsay->msg.data = (char**)
                     smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL)
             return -1;
 
         while (optind < argc) {
-            if ((*(clsay->msg.msg + clsay->msg.lines) = (char*)
+            if ((*(clsay->msg.data + clsay->msg.lines) = (char*)
                     smalloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL)
                 return -2;
 
-            memcpy(*(clsay->msg.msg + clsay->msg.lines),
+            memcpy(*(clsay->msg.data + clsay->msg.lines),
                     *(argv + optind), strlen(*(argv + optind)) + 1);
             clsay->msg.lines++;
             optind++;
         }
     } else {
         if ((clsay->msg.lines =
-                    p_read_file_char(&clsay->msg.msg, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
+                    p_read_file_char(&clsay->msg.data, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
             fprintf(stderr, "%s: read_string(): p_read_file_char() failure\n",
                     PROGNAME);
 
@@ -188,7 +250,7 @@ int read_cowfile(clangsay_t* clsay, FILE* fp)
         return -1;
     }
     if ((clsay->cow.lines =
-                p_read_file_char(&clsay->cow.cow, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
+                p_read_file_char(&clsay->cow.data, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
         fprintf(stderr, "%s: read_cowfile(): p_read_file_char() failure\n",
                 PROGNAME);
 
@@ -212,7 +274,7 @@ int print_string(clangsay_t* clsay)
     regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
 
     /* get max length */
-    maxlen = strmax_with_regex(clsay->msg.lines, clsay->msg.msg, &reg);
+    maxlen = strmax_with_regex(clsay->msg.lines, clsay->msg.data, &reg);
 
     /*
      * single line
@@ -225,7 +287,7 @@ int print_string(clangsay_t* clsay)
     }
     if (clsay->msg.lines == 1) {
         fprintf(stdout, "\n< %s >\n ",
-                *(clsay->msg.msg));
+                *(clsay->msg.data));
 
         while (maxlen >= 0) {
             putchar('-');
@@ -241,16 +303,16 @@ int print_string(clangsay_t* clsay)
      */
     i = 0;
     while (i < clsay->msg.lines) {
-        len = mbstrlen_with_regex(*(clsay->msg.msg + i), &reg);
+        len = mbstrlen_with_regex(*(clsay->msg.data + i), &reg);
         if (i == 0)
             fprintf(stdout, "\n/ %s",
-                    *(clsay->msg.msg + i));
+                    *(clsay->msg.data + i));
         else if (i == (clsay->msg.lines - 1))
             fprintf(stdout, "\\ %s",
-                    *(clsay->msg.msg + i));
+                    *(clsay->msg.data + i));
         else
             fprintf(stdout, "| %s",
-                    *(clsay->msg.msg + i));
+                    *(clsay->msg.data + i));
 
         j = maxlen - len;
         while (j > 0) {
@@ -285,76 +347,80 @@ int print_cow(clangsay_t* clsay)
 
     char*   though  = NULL;
 
-    bool    block   = false;
+    short   block   = 0;
 
     /* eyes table */
     struct  reptarg eyes[] = {
-        {clsay->eflag,  EYES,   clsay->earg},
-        {clsay->bflag,  EYES,   BORG_EYES},
-        {clsay->dflag,  EYES,   DEAD_EYES},
-        {clsay->gflag,  EYES,   GREEDY_EYES},
-        {clsay->pflag,  EYES,   PARANOID_EYES},
-        {clsay->sflag,  EYES,   STONED_EYES},
-        {clsay->tflag,  EYES,   TIRED_EYES},
-        {clsay->wflag,  EYES,   WIRED_EYES},
-        {clsay->yflag,  EYES,   YOUTHFUL_EYES},
-        {false,         NULL,   NULL},
+        {MODE_M_EYE,    EYES,   clsay->eye},
+        {MODE_BORG,     EYES,   BORG_EYES},
+        {MODE_DEAD,     EYES,   DEAD_EYES},
+        {MODE_GREEDY,   EYES,   GREEDY_EYES},
+        {MODE_PARANOID, EYES,   PARANOID_EYES},
+        {MODE_STONED,   EYES,   STONED_EYES},
+        {MODE_TIRED,    EYES,   TIRED_EYES},
+        {MODE_WIRED,    EYES,   WIRED_EYES},
+        {MODE_YOUTHFUL, EYES,   YOUTHFUL_EYES},
+        {0,             NULL,   NULL},
     };
     /* tongue table */
     struct  reptarg tongue[] = {
-        {clsay->Tflag,  TONGUE, clsay->Targ},
-        {clsay->dflag,  TONGUE, DEAD_TONGUE},
-        {clsay->sflag,  TONGUE, DEAD_TONGUE},
-        {false,         NULL,   NULL},
+        {MODE_M_TONGUE, TONGUE, clsay->tongue},
+        {MODE_DEAD,     TONGUE, DEAD_TONGUE},
+        {MODE_STONED,   TONGUE, DEAD_TONGUE},
+        {0,             NULL,   NULL},
     };
 
-    /* setting thoughts */
-    if (clsay->syflag == false && clsay->thflag == false)
-        though = SAY_THOUGHTS;      /* default */
-    else if (clsay->syflag == true)
-        though = SAY_THOUGHTS;      /* --say switch */
-    else if (clsay->thflag == true)
-        though = THINK_THOUGHTS;    /* --think switch */
+    /* setting thoughts
+     * 1. default
+     * 2. --say
+     * 3. --think
+     */
+    if (!(clsay->mode & MODE_SAY) && !(clsay->mode & MODE_THINK))
+        though = SAY_THOUGHTS;
+    else if (clsay->mode & MODE_SAY)
+        though = SAY_THOUGHTS;
+    else if (clsay->mode & MODE_THINK)
+        though = THINK_THOUGHTS;
 
     /* print cow */
     i = 0;
     while (i < clsay->cow.lines) {
         /* replace thoughts */
-        strrep(*(clsay->cow.cow + i), THOUGHTS, though);
+        strrep(*(clsay->cow.data + i), THOUGHTS, though);
 
-        while (strrep(*(clsay->cow.cow + i), "\\\\", "\\") == 0);
+        while (strrep(*(clsay->cow.data + i), "\\\\", "\\") == 0);
 
         /* replace eyes*/
         j = 0;
         while (eyes[j].haystack != NULL || eyes[j].needle != NULL) {
-            if (eyes[j].flag == true)
-                strrep(*(clsay->cow.cow + i), eyes[j].haystack, eyes[j].needle);
+            if (clsay->mode & eyes[j].mode)
+                strrep(*(clsay->cow.data + i), eyes[j].haystack, eyes[j].needle);
             j++;
         }
         /* default_eyes */
-        strrep(*(clsay->cow.cow + i), EYES, DEFAULT_EYES);
+        strrep(*(clsay->cow.data + i), EYES, DEFAULT_EYES);
 
         /* replace tongue */
         j = 0;
         while (tongue[j].haystack != NULL || tongue[j].needle != NULL) {
-            if (tongue[j].flag == true)
-                strrep(*(clsay->cow.cow + i), tongue[j].haystack, tongue[j].needle);
+            if (clsay->mode & tongue[j].mode)
+                strrep(*(clsay->cow.data + i), tongue[j].haystack, tongue[j].needle);
             j++;
         }
         /* default tongue */
-        strrep(*(clsay->cow.cow + i), TONGUE, DEFAULT_TONGUE);
+        strrep(*(clsay->cow.data + i), TONGUE, DEFAULT_TONGUE);
 
         /* EOC to EOC */
-        if (strstr(*(clsay->cow.cow + i), "EOC")) {
-            block = true;
+        if (strstr(*(clsay->cow.data + i), "EOC")) {
+            block = 1;
             i++;
             continue;
-        } else if (strstr(*(clsay->cow.cow + i), "EOC") && block == true) {
-            block = false;
+        } else if (strstr(*(clsay->cow.data + i), "EOC") && block == 1) {
+            block = 0;
         }
-        if (block == true)
+        if (block == 1)
             fprintf(stdout, "%s\n",
-                    *(clsay->cow.cow + i));
+                    *(clsay->cow.data + i));
         i++;
     }
 
