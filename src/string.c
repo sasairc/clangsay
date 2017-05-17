@@ -11,12 +11,14 @@
  */
 
 #include "./string.h"
+#include "./memory.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include <string.h>
 #include <locale.h>
+#include <errno.h>
 
 #ifdef  WITH_GLIB
 #include <glib.h>
@@ -28,7 +30,7 @@
 
 int strrep(char* src, char* haystack, char* needle)
 {
-    char*   find = NULL;
+    char*   find    = NULL;
 
     if (src == NULL || haystack == NULL || needle == NULL)
         return -1;
@@ -40,7 +42,7 @@ int strrep(char* src, char* haystack, char* needle)
     if (strlen(haystack) < strlen(needle)) {
         /* reallocate memory */
         if ((src = (char*)
-                    realloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack))) == NULL)
+                    srealloc(src, strlen(src) + strlen(needle) + 1 - strlen(haystack), NULL)) == NULL)
             return -3;
 
         /* move match word to specified location in memory */
@@ -79,79 +81,91 @@ char* strlion(int argnum, ...)
     va_list list;       /* list of variable arguments */
 
     if ((argmnt = (char**)
-                malloc(sizeof(char*) * argnum)) == NULL)
+                smalloc(sizeof(char*) * argnum, NULL)) == NULL)
         return NULL;
 
     /* processing of variable arguments */
     va_start(list, argnum);
     while (i < argnum) {
-        argmnt[i] = va_arg(list, char*);
-        arglen += strlen(argmnt[i]);
+        *(argmnt + i) = va_arg(list, char*);
+        arglen += strlen(*(argmnt + i));
         i++;
     }
     va_end(list);
 
     /* memory allocation */
     if ((dest = (char*)
-                malloc(sizeof(char) * (arglen + 1))) == NULL)
-        return NULL;
+                smalloc(sizeof(char) * (arglen + 1), NULL)) == NULL)
+        goto ERR;
 
     /* concat strings */
     i = destlen = blklen = 0;
-
-    blklen = strlen(argmnt[i]);
-    memcpy(dest, argmnt[i], blklen);
+    blklen = strlen(*(argmnt + i));
+    memcpy(dest, *(argmnt + i), blklen);
     destlen += blklen;
 
     i++;
     while(i < argnum) {
-        blklen = strlen(argmnt[i]);
-        memcpy(dest + destlen, argmnt[i], blklen);
+        blklen = strlen(*(argmnt + i));
+        memcpy(dest + destlen, *(argmnt + i), blklen);
         destlen += blklen;
         i++;
     }
-    dest[destlen] = '\0';
+    *(dest + destlen) = '\0';
 
     free(argmnt);
 
     return dest;
+
+ERR:
+    if (argmnt != NULL) {
+        free(argmnt);
+        argmnt = NULL;
+    }
+    if (dest != NULL) {
+        free(dest);
+        dest = NULL;
+    }
+
+    return NULL;
 }
 
 #ifdef  WITH_GLIB
 int mbstrlen(char* src)
 {
-    int         i   = 0,
-                ch  = 0,
-                len = 0;
+    int         ch      = 0,
+                len     = 0;
+
+    char*       p       = src;
 
     gunichar*   cpoints;
 
     setlocale(LC_CTYPE, LOCALE);
-
-    while (src[i] != '\0') {
+    while (*p != '\0') {
         /* get string length */
-        if ((ch = mblen(&src[i], MB_CUR_MAX)) < 0)
+        if ((ch = mblen(p, MB_CUR_MAX)) < 0)
             return 0;
 
         if (ch > 1) {
-            cpoints = g_utf8_to_ucs4_fast(&src[i], sizeof(src[i]), NULL);   /* get unicode code point */
+            /* get unicode code point */
+            cpoints = g_utf8_to_ucs4_fast(p, sizeof(*p), NULL);
 
             /*
              * multi byte
              * true : hankaku kana
              * false: other
              */
-            if (cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) {
+            if (*cpoints >= 0xff65 && *cpoints <= 0xff9f) {
                 len++;
             } else {
                 len += 2;
             }
-
             g_free(cpoints);
         } else {
-            len++;                          /* ascii */
+            /* ascii */
+            len++;
         }
-        i += ch;                            /* seek offset */
+        p += ch;
     }
 
     return len;
@@ -159,54 +173,61 @@ int mbstrlen(char* src)
 #else
 int mbstrlen(char* src)
 {
-    int i   = 0,
-        ch  = 0,
-        len = 0;
+    int     ch      = 0,
+            len     = 0;
 
-    setlocale(LC_CTYPE, LOCALE);            /* set locale (string.h) */
+    char*   p       = src;
 
-    while (src[i] != '\0') {
-        ch = mblen(&src[i], MB_CUR_MAX);    /* get string length */
+    setlocale(LC_CTYPE, LOCALE);
+
+    while (*p != '\0') {
+        ch = mblen(p, MB_CUR_MAX);
+        /* multi byte */
         if (ch > 1) {
-            len += 2;                       /* multi byte */
+            len += 2;
+        /* ascii */
         } else {
-            len++;                          /* ascii */
+            len++;
         }
-        i += ch;                            /* seek offset */
+        p += ch;
     }
 
     return len;
 }
-/* WITH_GLIB */
 #endif
 
 int strunesc(char* src)
 {
-    int i       = 0,
-        count   = 0;
+    int     count   = 0;
 
-    while (src[i] != '\0') {
-        if (src[i] == '\t' || src[i] == '\b') {
-            src[i] = ' ';
+    char*   p       = src;
+
+    while (*p != '\0') {
+        if (*p == '\t' || *p == '\b') {
+            *p = ' ';
             count++;
         }
-        i++;
+        p++;
     }
 
     return count;
 }
-
+            
 int strmax(int val, char** src)
 {
-    int i   = 0,
-        len = 0,
-        max = 0;
+    int     i       = 0,
+            j       = 0,
+            len     = 0,
+            max     = 0;
 
-    while (i < val) {
-        len = mbstrlen(src[i]);
-        if (max < len)
+    j = val - 1;
+    while (i <= j) {
+        if ((len = mbstrlen(*(src + i))) > max)
+            max = len;
+        if ((len = mbstrlen(*(src + j))) > max)
             max = len;
         i++;
+        j--;
     }
 
     return max;
@@ -214,14 +235,16 @@ int strmax(int val, char** src)
 
 int strlftonull(char* str)
 {
-    int i   = 0,
-        ret = 0;
+    int     ret     = 0;
 
-    while (i < strlen(str)) {
-        if (str[i] == '\n') {
-            str[i] = '\n';
+    char*   p       = str;
+
+    while (*p != '\0') {
+        if (*p == '\n') {
+            *p = '\0';
             ret++;
         }
+        p++;
     }
 
     return ret;
@@ -277,7 +300,7 @@ char** str_to_args(char* str)
     }
     if (elmc > 0) {
         if ((args = (char**)
-                    malloc(sizeof(char*) * (elmc + 1))) == NULL)
+                    smalloc(sizeof(char*) * (elmc + 1), NULL)) == NULL)
             return NULL;
     } else {
         return NULL;
@@ -310,7 +333,7 @@ char** str_to_args(char* str)
                 continue;
             }
             if ((args[ay] = (char*)
-                        malloc(sizeof(char) * (sx - xt + 1))) == NULL)
+                        smalloc(sizeof(char) * (sx - xt + 1), NULL)) == NULL)
                 goto ERR;
 
             for (ax = 0; xt < sx; xt++, ax++)
@@ -371,8 +394,8 @@ char* mbstrtok(char* str, char* delimiter)
 
 int trim(char* str)
 {
-    int i   = 0,
-        j   = 0;
+    int     i       = 0,
+            j       = 0;
 
     i = strlen(str) - 1;
     while (i >= 0 && isspace(*(str + i))) {
@@ -421,9 +444,10 @@ int strcmp_lite(const char* str1, const char* str2)
 #ifdef  WITH_REGEX
 int mbstrlen_with_regex(char* src, regex_t* reg)
 {
-    int         i   = 0,
-                ch  = 0,
-                len = 0;
+    int         ch      = 0,
+                len     = 0;
+
+    char*       p       = src;
 
     gunichar*   cpoints;
 
@@ -431,20 +455,22 @@ int mbstrlen_with_regex(char* src, regex_t* reg)
 
     setlocale(LC_CTYPE, LOCALE);
 
-    while (src[i] != '\0') {
+    while (*p != '\0') {
         /* get string length */
-        if ((ch = mblen(&src[i], MB_CUR_MAX)) < 0)
+        if ((ch = mblen(p, MB_CUR_MAX)) < 0)
             return 0;
 
         if (ch > 1) {
-            cpoints = g_utf8_to_ucs4_fast(&src[i], sizeof(src[i]), NULL);   /* get unicode code point */
+            /* get unicode code point */
+            cpoints = g_utf8_to_ucs4_fast(p, sizeof(*p), NULL);
 
             /*
              * multi byte
              * true : hankaku kana
              * false: other
              */
-            if ((cpoints[0] >= 0xff65 && cpoints[0] <= 0xff9f) || cpoints[0] == 0x001b) {
+            if ((*cpoints >= 0xff65 && *cpoints <= 0xff9f) ||
+                    *cpoints == 0x001b) {
                 len++;
             } else {
                 len += 2;
@@ -452,9 +478,9 @@ int mbstrlen_with_regex(char* src, regex_t* reg)
 
             g_free(cpoints);
         } else {
-            len++;                          /* ascii */
+            len++;    /* ascii */
         }
-        i += ch;                            /* seek offset */
+        p += ch;      /* seek offset */
     }
 
     /* regex match */
@@ -468,15 +494,19 @@ int mbstrlen_with_regex(char* src, regex_t* reg)
 
 int strmax_with_regex(int val, char** src, regex_t* reg)
 {
-    int     i   = 0,
-            len = 0,
-            max = 0;
+    int     i       = 0,
+            j       = 0,
+            len     = 0,
+            max     = 0;
 
-    while (i < val) {
-        len = mbstrlen_with_regex(src[i], reg);
-        if (max < len)
+    j = val - 1;
+    while (i <= j) {
+        if ((len = mbstrlen_with_regex(*(src + i), reg)) > max)
+            max = len;
+        if ((len = mbstrlen_with_regex(*(src + j), reg)) > max)
             max = len;
         i++;
+        j--;
     }
 
     return max;

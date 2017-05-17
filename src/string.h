@@ -10,13 +10,14 @@
  * for more details.
  */
 
-
 #ifndef YSTRING_H
 #define YSTRING_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 #undef  DEBUG
-#define WITH_GLIB   /* use glib */
-#define WITH_REGEX  /* use regex */
 #define LOCALE      ""
 
 extern int strrep(char* src, char* haystack, char* needle);
@@ -39,6 +40,9 @@ extern int strmax_with_regex(int val, char** src, regex_t* reg);
 #endif
 /* WITH_REGEX */
 #endif
-
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* YSTRING_H */
 #endif

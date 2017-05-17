@@ -11,11 +11,17 @@
  */
 
 #include "./env.h"
+#include "./memory.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
-env_t* split_env(char* env)
+int split_env(char* env, env_t **dest)
 {
+    if (env == NULL)
+        return -1;
+
     int     i       = 0,
             x       = 0,
             y       = 0;
@@ -25,37 +31,34 @@ env_t* split_env(char* env)
 
     env_t*  buf     = NULL;
 
-    if (env == NULL || (buf = (env_t*)
-                malloc(sizeof(env_t))) == NULL) {
-
-        return NULL;
-    }
+    if ((buf = (env_t*)
+                smalloc(sizeof(env_t), NULL)) == NULL)
+        return -1;
 
     i = 0;
     buf->envc = 1;
     while (i < strlen(env)) {
-        if (env[i] == ':')
+        if (*(env + i) == ':')
             buf->envc++;
         i++;
     }
     if ((buf->envs = (char**)
-                malloc(sizeof(char*) * buf->envc)) == NULL) {
-        free(buf);
-
-        return NULL;
-    }
+                smalloc(sizeof(char*) * buf->envc, NULL)) == NULL)
+        goto ERR;
 
     i = x = y = head = tail = 0;
     do {
-        if (env[tail] == ':' || env[tail] == '\0') {
-            buf->envs[y] = (char*)
-                malloc(sizeof(char) * (tail - head + 1));
+        if (*(env + tail) == ':' || *(env + tail) == '\0') {
+            if ((*(buf->envs + y) = (char*)
+                        smalloc(sizeof(char) * (tail - head + 1), NULL)) == NULL)
+                goto ERR;
+
             while (head < tail) {
-                buf->envs[y][x] = env[head];
+                *(*(buf->envs + y) + x) = *(env + head);
                 head++;
                 x++;
             }
-            buf->envs[y][x + 1] = '\0';
+            *(*(buf->envs + y) + x + 1) = '\0';
             x = 0;
             head++;
             y++;
@@ -63,19 +66,36 @@ env_t* split_env(char* env)
         tail++;
     } while (y < buf->envc);
 
-    return buf;
+    *dest = buf;
+
+    return 0;
+
+ERR:
+    release_env_t(buf);
+
+    return -2;
 }
 
 void release_env_t(env_t* env)
 {
-    int i = 0;
+    if (env == NULL)
+        return;
 
-    while (i < env->envc) {
-        if (env->envs[i] != NULL) {
-            free(env->envs[i]);
-            env->envs[i] = NULL;
+    int i   = 0,
+        j   = 0;
+
+    j = env->envc - 1;
+    while (i <= j) {
+        if (*(env->envs + i) != NULL) {
+            free(*(env->envs + i));
+            *(env->envs + i) = NULL;
+        }
+        if (*(env->envs + j) != NULL) {
+            free(*(env->envs + j));
+            *(env->envs + j) = NULL;
         }
         i++;
+        j--;
     }
     if (env->envs != NULL) {
         free(env->envs);

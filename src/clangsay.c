@@ -1,6 +1,6 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
- *
+
  * clangsay.c
  *
  * Copyright (c) 2015 sasairc
@@ -14,29 +14,19 @@
 #include "./clangsay.h"
 #include "./info.h"
 #include "./subset.h"
-#include "./string.h"
-#include "./file.h"
-#include "./memory.h"
-#include "./env.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <getopt.h>
 
 int main(int argc, char* argv[])
 {
-    int     i       = 0,
-            res     = 0,
+    int     res     = 0,
             index   = 0;
 
     FILE*   fp      = NULL;
 
     char*   path    = NULL,
-        *   env     = NULL,
-        *   envp    = NULL;
-
-    env_t*  envt    = NULL;
+        *   env     = NULL;
 
     /* flag and args */
     clangsay_t  clsay = {
@@ -74,48 +64,48 @@ int main(int argc, char* argv[])
                     &index)) != -1) {
         switch (res) {
             case    'e':
-                clsay.earg = optarg;
-                clsay.eflag = true;
+                clsay.mode |= MODE_M_EYE;
+                clsay.eye= optarg;
                 break;
             case    'T':
-                clsay.Targ = optarg;
-                clsay.Tflag = true;
+                clsay.mode |= MODE_M_TONGUE;
+                clsay.tongue = optarg;
                 break;
             case    'f':
-                clsay.farg = optarg;
-                clsay.fflag = true;
+                clsay.mode |= MODE_M_FILE;
+                clsay.file = optarg;
                 break;
             case    'b':
-                clsay.bflag = true;
+                clsay.mode |= MODE_BORG;
                 break;
             case    'd':
-                clsay.dflag = true;
+                clsay.mode |= MODE_DEAD;
                 break;
             case    'g':
-                clsay.gflag = true;
+                clsay.mode |= MODE_GREEDY;
                 break;
             case    'p':
-                clsay.pflag = true;
+                clsay.mode |= MODE_PARANOID;
                 break;
             case    's':
-                clsay.sflag = true;
+                clsay.mode |= MODE_STONED;
                 break;
             case    't':
-                clsay.tflag = true;
+                clsay.mode |= MODE_TIRED;
                 break;
             case    'w':
-                clsay.wflag = true;
+                clsay.mode |= MODE_WIRED;
                 break;
             case    'y':
-                clsay.yflag = true;
+                clsay.mode |= MODE_YOUTHFUL;
                 break;
             case    'l':
                 list_cowfiles();
             case    0:
-                clsay.syflag = true;
+                clsay.mode |= MODE_SAY;
                 break;
             case    1:
-                clsay.thflag = true;
+                clsay.mode |= MODE_THINK;
                 break;
             case    2:
                 print_usage();
@@ -127,72 +117,38 @@ int main(int argc, char* argv[])
     }
 
     /* check env $DEFAULT_COWFILE */
-    if (clsay.fflag == false) {
-        if ((clsay.farg = getenv("DEFAULT_COWFILE")) == NULL)
-            clsay.farg = DEFAULT_COWFILE;
+    if (!(clsay.mode & MODE_M_FILE)) {
+        if ((clsay.file = getenv("DEFAULT_COWFILE")) == NULL)
+            clsay.file = DEFAULT_COWFILE;
     }
 
     /* check env $COWPATH */
     if ((env = getenv("COWPATH")) == NULL)
         env = COWPATH;
 
-    /* env string to struct */
-    if ((envt = split_env(env)) == NULL) {
-        fprintf(stderr, "%s: main(): split_env() failure\n",
-                PROGNAME);
-
+    /* check cow file exists */
+    if (check_cowfile_exists(env, clsay.file, &path) < 0)
         return 1;
-    }
 
-    /*
-     * # check_file_exists()
-     *
-     * 0: not found
-     * 1: keep argument(path)
-     * 2: long argument(filename.cow)
-     * 3: short argument(filename)
-     */
-    do {
-        if ((res = check_file_exists(envt->envs[i], clsay.farg)) != 0) {
-            envp = envt->envs[i];
-
-            break;
-        }
-        i++;
-    } while (i < envt->envc);
-
-    if (res == 0) {
-        fprintf(stderr, "%s: %s: cowfile not found\n",
-                PROGNAME, clsay.farg);
-        release(envt, NULL, NULL);
+    /* open cow file */
+    if (open_cowfile(path, &fp) < 0) {
+        release(path, NULL);
 
         return 2;
     }
 
-    if (concat_file_path(res, &path, envp, clsay.farg) < 0) {
-        release(envt, NULL, NULL);
+    /* reading cow file to array */
+    if (read_cowfile(&clsay, fp) < 0) {
+        release(path, &clsay);
 
         return 3;
     }
 
-    if (open_cowfile(path, &fp) < 0) {
-        release(envt, path, NULL);
-
-        return 4;
-    }
-
-    /* reading cow file to array */
-    if (read_cowfile(&clsay, fp) < 0) {
-        release(envt, path, &clsay);
-
-        return 5;
-    }
-
     /* read argv or stdin */
     if (read_string(&clsay, argc, optind, argv) < 0) {
-        release(envt, path, &clsay);
+        release(path, &clsay);
 
-        return 6;
+        return 4;
     }
 
     /* print string */
@@ -200,58 +156,57 @@ int main(int argc, char* argv[])
     /* print cow */
     print_cow(&clsay);
     /* memory release */
-    release(envt, path, &clsay);
+    release(path, &clsay);
 
     return 0;
 }
 
-void release(env_t* envt, char* path, clangsay_t* clsay)
+void release(char* path, clangsay_t* clsay)
 {
     int     i   = 0,
             j   = 0;
 
-    if (envt != NULL) {
-        release_env_t(envt);
-    }
     if (path != NULL) {
         free(path);
         path = NULL;
     }
-    if (clsay->cow.cow != NULL) {
-        i = 0;
-        j = clsay->cow.lines - 1;
-        while (i <= j) {
-            if (clsay->cow.cow[i] != NULL) {
-                free(clsay->cow.cow[i]);
-                clsay->cow.cow[i] = NULL;
+    if (clsay != NULL) {
+        if (clsay->cow.data != NULL) {
+            i = 0;
+            j = clsay->cow.lines - 1;
+            while (i <= j) {
+                if (*(clsay->cow.data + i) != NULL) {
+                    free(*(clsay->cow.data + i));
+                    *(clsay->cow.data + i) = NULL;
+                }
+                if (*(clsay->cow.data + j) != NULL) {
+                    free(*(clsay->cow.data + j));
+                    *(clsay->cow.data + j) = NULL;
+                }
+                i++;
+                j--;
             }
-            if (clsay->cow.cow[j] != NULL) {
-                free(clsay->cow.cow[j]);
-                clsay->cow.cow[j] = NULL;
-            }
-            i++;
-            j--;
+            free(clsay->cow.data);
+            clsay->cow.data = NULL;
         }
-        free(clsay->cow.cow);
-        clsay->cow.cow = NULL;
-    }
-    if (clsay->msg.msg != NULL) {
-        i = 0;
-        j = clsay->msg.lines - 1;
-        while (i <= j) {
-            if (clsay->msg.msg[i] != NULL) {
-                free(clsay->msg.msg[i]);
-                clsay->msg.msg[i] = NULL;
+        if (clsay->msg.data != NULL) {
+            i = 0;
+            j = clsay->msg.lines - 1;
+            while (i <= j) {
+                if (*(clsay->msg.data + i) != NULL) {
+                    free(*(clsay->msg.data + i));
+                    *(clsay->msg.data + i) = NULL;
+                }
+                if (*(clsay->msg.data + j) != NULL) {
+                    free(*(clsay->msg.data + j));
+                    *(clsay->msg.data + j) = NULL;
+                }
+                i++;
+                j--;
             }
-            if (clsay->msg.msg[j] != NULL) {
-                free(clsay->msg.msg[j]);
-                clsay->msg.msg[j] = NULL;
-            }
-            i++;
-            j--;
+            free(clsay->msg.data);
+            clsay->msg.data = NULL;
         }
-        free(clsay->msg.msg);
-        clsay->msg.msg = NULL;
     }
 
     return;

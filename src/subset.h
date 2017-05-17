@@ -19,12 +19,13 @@
 #include "./clangsay.h"
 
 struct  reptarg {
-    bool    flag;
+    int     mode;
     char*   haystack;
     char*   needle;
 };
-    
+
 extern int open_cowfile(char* path, FILE** fp);
+extern int check_cowfile_exists(char* env, char* file, char** dest);
 extern int check_file_exists(char* path, char* file);
 extern int concat_file_path(int mode, char** dest, char* path, char* file);
 extern void strunsecs(struct CLANGSAY_MSG_T* msg);

@@ -5,6 +5,7 @@ function _clangsay() {
         {-b,--borg}'[borg mode]' \
         {-d,--dead}'[dead mode]' \
         {-g,--greedy}'[greedy mode]' \
+        {-p,--paranoid}'[paranoid mode]' \
         {-s,--stoned}'[stoned mode]' \
         {-t,--tired}'[tired mode]' \
         {-w,--wired}'[wired mode]' \
