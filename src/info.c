@@ -34,6 +34,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -b,  --borg                borg mode\n\
   -d,  --dead                dead mode\n\
   -g,  --greedy              greedy mode\n\
+  -p,  --paranoid            paranoid mode\n\
   -s,  --stoned              stoned mode\n\
   -t,  --tired               tired mode\n\
   -w,  --wired               wired mode\n\
