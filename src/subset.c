@@ -27,43 +27,57 @@
 
 int open_cowfile(char* path, FILE** fp)
 {
+    short   status  = 0;
+
     struct  stat st;
 
     if (stat(path, &st) < 0) {
-        fprintf(stderr, "%s: %s: %s\n",
-                PROGNAME, path, strerror(ENOENT));
-
-        return -1;
+        status = -1; goto ERR;
     }
 
     if ((st.st_mode & S_IFMT) == S_IFDIR) {
-        fprintf(stderr, "%s: %s: %s\n",
-                PROGNAME, path, strerror(EISDIR));
-
-        return -2;
+        status = -2; goto ERR;
     }
 
     if ((st.st_mode & S_IREAD) == 0) {
-        fprintf(stderr, "%s: %s: %s\n",
-                PROGNAME, path, strerror(EACCES));
-
-        return -3;
+        status = -3; goto ERR;
     }
 
     if ((*fp = fopen(path, "r")) == NULL) {
-        fprintf(stderr, "%s: %s\n",
-                PROGNAME, strerror(errno));
-
-        return -4;
+        status = -4; goto ERR;
     }
 
     return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+            fprintf(stderr, "%s: %s: %s\n",
+                    PROGNAME, path, strerror(ENOENT));
+            break;
+        case    -2:
+            fprintf(stderr, "%s: %s: %s\n",
+                    PROGNAME, path, strerror(EISDIR));
+            break;
+        case    -3:
+            fprintf(stderr, "%s: %s: %s\n",
+                    PROGNAME, path, strerror(EACCES));
+            break;
+        case    -4:
+            fprintf(stderr, "%s: %s\n",
+                    PROGNAME, strerror(errno));
+            break;
+    }
+
+    return status;
 }
 
 int check_cowfile_exists(char* env, char* file, char** dest)
 {
     int     i       = 0,
             res     = 0;
+
+    short   status  = 0;
 
     char*   path    = NULL,
         *   envp    = NULL;
@@ -72,10 +86,7 @@ int check_cowfile_exists(char* env, char* file, char** dest)
 
     /* env string to struct */
     if (split_env(env, &envt) < 0) {
-        fprintf(stderr, "%s: check_file_exists(): split_env() failure\n",
-                PROGNAME);
-
-        goto ERR;
+        status = -1; goto ERR;
     }
 
     /*
@@ -97,15 +108,13 @@ int check_cowfile_exists(char* env, char* file, char** dest)
 
     /* cow file not found */
     if (res == 0) {
-        fprintf(stderr, "%s: %s: cowfile not found\n",
-                PROGNAME, file);
-
-        goto ERR;
+        status = -2; goto ERR;
     }
 
     /* concat path */
-    if (concat_file_path(res, &path, envp, file) < 0)
-        goto ERR;
+    if (concat_file_path(res, &path, envp, file) < 0) {
+        status = -3; goto ERR;
+    }
 
     release_env_t(envt);
     *dest = path;
@@ -113,13 +122,24 @@ int check_cowfile_exists(char* env, char* file, char** dest)
     return 0;
 
 ERR:
-    if (envt != NULL)
-        release_env_t(envt);
+    switch (status) {
+        case    -1:
+            fprintf(stderr, "%s: check_file_exists(): split_env() failure\n",
+                    PROGNAME);
+            break;
+        case    -2:
+            fprintf(stderr, "%s: %s: cowfile not found\n",
+                    PROGNAME, file);
+        case    -3:
+        default:
+            if (envt != NULL)
+                release_env_t(envt);
 
-    if (path != NULL)
-        free(path);
+            if (path != NULL)
+                free(path);
+    }
 
-    return -1;
+    return status;
 }
 
 int check_file_exists(char* path, char* file)
@@ -169,13 +189,15 @@ int check_file_exists(char* path, char* file)
 
 int concat_file_path(int mode, char** dest, char* path, char* file)
 {
+    short   status  = 0;
+
     switch (mode) {
         case    1:
             if ((*dest = (char*)
-                        smalloc(sizeof(char) * strlen(file), NULL)) == NULL)
-                return -1;
-
-                memcpy(*dest, file, strlen(file) + 1);
+                        smalloc(sizeof(char) * strlen(file), NULL)) == NULL) {
+                status = -1; goto ERR;
+            }
+            memcpy(*dest, file, strlen(file) + 1);
             break;
         case    2:
             *dest = strlion(3, path, "/", file);
@@ -185,13 +207,22 @@ int concat_file_path(int mode, char** dest, char* path, char* file)
             break;
     }
     if (*dest == NULL) {
-        fprintf(stderr, "%s: concat_file_path() failure\n",
-                PROGNAME);
-    
-        return -2;
+        status =  -2; goto ERR;
     }
 
     return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+            break;
+        case    -2:
+            fprintf(stderr, "%s: concat_file_path() failure\n",
+                    PROGNAME);
+            break;
+    }
+
+    return status;
 }
 
 void strunsecs(struct CLANGSAY_MSG_T* msg)
@@ -211,16 +242,18 @@ void strunsecs(struct CLANGSAY_MSG_T* msg)
 
 int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
 {
+    short   status  = 0;
+
     if (optind < argc) {    
         if ((clsay->msg.data = (char**)
-                    smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL)
-            return -1;
-
+                    smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL) {
+            status = -1; goto ERR;
+        }
         while (optind < argc) {
             if ((*(clsay->msg.data + clsay->msg.lines) = (char*)
-                    smalloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL)
-                return -2;
-
+                    smalloc(sizeof(char) * (strlen(*(argv + optind)) + 1), NULL)) == NULL) {
+                status = -2; goto ERR;
+            }
             memcpy(*(clsay->msg.data + clsay->msg.lines),
                     *(argv + optind), strlen(*(argv + optind)) + 1);
             clsay->msg.lines++;
@@ -229,36 +262,60 @@ int read_string(clangsay_t* clsay, int argc, int optind, char** argv)
     } else {
         if ((clsay->msg.lines =
                     p_read_file_char(&clsay->msg.data, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
-            fprintf(stderr, "%s: read_string(): p_read_file_char() failure\n",
-                    PROGNAME);
-
-            return -3;
+            status = -3; goto ERR;
         }
     }
     /* remove escape sequence */
     strunsecs(&clsay->msg);
 
     return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+        case    -2:
+            break;
+        case    -3:
+            fprintf(stderr, "%s: read_string(): p_read_file_char() failure\n",
+                    PROGNAME);
+            break;
+    }
+
+    return status;
 }
 
 int read_cowfile(clangsay_t* clsay, FILE* fp)
 {
-    if (fp == NULL) {
-        fprintf(stdout, "%s: read_cowfile(): fp is NULL\n",
-                PROGNAME);
+    short   status  = 0;
 
-        return -1;
+    if (fp == NULL) {
+        status = -1; goto ERR;
     }
     if ((clsay->cow.lines =
                 p_read_file_char(&clsay->cow.data, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
-        fprintf(stderr, "%s: read_cowfile(): p_read_file_char() failure\n",
-                PROGNAME);
-
-        return -2;
+        status = -2; goto ERR;
     }
     fclose(fp);
 
     return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+            fprintf(stdout, "%s: read_cowfile(): fp is NULL\n",
+                    PROGNAME);
+            break;
+        case    -2:
+            fprintf(stderr, "%s: read_cowfile(): p_read_file_char() failure\n",
+                    PROGNAME);
+        default:
+            if (fp != NULL) {
+                fclose(fp);
+                fp = NULL;
+            }
+    }
+
+    return status;
 }
 
 int print_string(clangsay_t* clsay)
