@@ -10,6 +10,7 @@ LIBS	= `pkg-config --cflags --libs glib-2.0`
 DEFCFLAGS = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 		-DARCH=\"$(ARCH)\"	  \
+		-DLOCALE=\"\"             \
 		-DWITH_REGEX              \
 		-DWITH_GLIB		  \
 		$(LIBS)

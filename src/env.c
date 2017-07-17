@@ -26,14 +26,17 @@ int split_env(char* env, env_t **dest)
             x       = 0,
             y       = 0;
 
+    short   status  = 0;
+
     size_t  head    = 0,
             tail    = 0;
 
     env_t*  buf     = NULL;
 
     if ((buf = (env_t*)
-                smalloc(sizeof(env_t), NULL)) == NULL)
-        return -1;
+                smalloc(sizeof(env_t), NULL)) == NULL) {
+        status = -1; goto ERR;
+    }
 
     i = 0;
     buf->envc = 1;
@@ -43,15 +46,17 @@ int split_env(char* env, env_t **dest)
         i++;
     }
     if ((buf->envs = (char**)
-                smalloc(sizeof(char*) * buf->envc, NULL)) == NULL)
-        goto ERR;
+                smalloc(sizeof(char*) * buf->envc, NULL)) == NULL) {
+        status = -2; goto ERR;
+    }
 
     i = x = y = head = tail = 0;
     do {
         if (*(env + tail) == ':' || *(env + tail) == '\0') {
             if ((*(buf->envs + y) = (char*)
-                        smalloc(sizeof(char) * (tail - head + 1), NULL)) == NULL)
-                goto ERR;
+                        smalloc(sizeof(char) * (tail - head + 1), NULL)) == NULL) {
+                status = -3; goto ERR;
+            }
 
             while (head < tail) {
                 *(*(buf->envs + y) + x) = *(env + head);
@@ -71,9 +76,16 @@ int split_env(char* env, env_t **dest)
     return 0;
 
 ERR:
-    release_env_t(buf);
+    switch (status) {
+        case    -1:
+            break;
+        case    -2:
+        case    -3:
+        default:
+            release_env_t(buf);
+    }
 
-    return -2;
+    return status;
 }
 
 void release_env_t(env_t* env)

@@ -17,9 +17,7 @@ extern "C" {
 /* __cplusplus */
 #endif
 
-#undef  DEBUG
-#define LOCALE      ""
-
+extern int strisdigit(char* str);
 extern int strrep(char* src, char* haystack, char* needle);
 extern char* strlion(int argnum, ...);
 extern int mbstrlen(char* src);
