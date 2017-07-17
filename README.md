@@ -91,7 +91,6 @@ zsh completion has been installed to:
 ## zshでの補完
 
 `$(PREFIX)/share/clangsay/compdef/_clangsay.zsh`を`_clangsay`として、`$fpath`の通ったディレクトリにコピーして下さい。	
-現状では、シェルの環境変数`$COWPATH`に対して複数のディレクトリを登録している場合、優先順位の一番高いディレクトリの補完しかできません。（ごめんなさい）
 
 
 ## Usage
@@ -173,9 +172,7 @@ cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.j
 % export COWPATH="/foo/bar/baz:/hoge/fuga/piyo:/ramen/oudon"
 ```
 
-しかし「zshでの補完」で書いた通り、同補完ファイルを利用する際には優先順位の一番高いディレクトリしか補完されません。	
-補完対象外のファイルの詳細は、`-l, --list`オプションにてご確認下さい。	
-なお、環境変数`$COWPATH`に存在しないディレクトリが登録されている場合は無視されます。
+環境変数`$COWPATH`に存在しないディレクトリが登録されている場合は無視されます。
 
 ### DEFAULT_COWFILE
 
