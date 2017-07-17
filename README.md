@@ -48,6 +48,29 @@ zsh completion has been installed to:
 
 このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。
 
+#### Docker
+
+ビルド済みバイナリとcowfileがバンドルされたイメージを生成するための `Dockerfile` が同梱されています。
+
+```shellsession
+% HEAD=`git rev-parse --short HEAD`
+% make docker-image IMGTAG=$HEAD
+% yasuna | docker run --rm -i clangsay:$HEAD -f yasuna_16
+ _______________________
+< 自分でやったんじゃん！ >
+ -----------------------
+   \
+    \
+         ..: ￣￣￣￣: :.
+       ／::  /｜.:/ |.: .:＼
+      ,  /｜/  |./  |.ﾊ.: .:ヽ
+    ./.:ｲ__ノ   ヽ､___∨.: .:.
+   ./: .:≡≡     ≡≡.|.: .:｜
+   /ノ|/} }.      } } |:ﾊ:.:｜
+     .ヽ{,{ -~~~- {,{｜:/ﾉ:从
+      ∨v､＞z-r-x-:r＜/ﾚﾚへ
+```
+
 #### Other systems.
 
 * 全てインストールする場合	
