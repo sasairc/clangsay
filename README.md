@@ -6,7 +6,7 @@ clangsay
 [![issues](http://img.shields.io/github/issues/sasairc/clangsay.svg?style=flat)](https://github.com/sasairc/clangsay/issues)
 [![build](https://img.shields.io/travis/sasairc/clangsay.svg?style=flat)](https://travis-ci.org/sasairc/clangsay)
 
-![default](https://github.com/sasairc/clangsay/img/screenshot.png)
+![default](https://raw.githubusercontent.com/sasairc/clangsay/master/img/screenshot.png)
 
 マルチバイト準対応のUnicode環境専用cowsayクローン。  
 ただし、特殊文字が含まれる場合は、相変わらずズレてしまいます。	
