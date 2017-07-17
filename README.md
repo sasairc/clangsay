@@ -6,7 +6,7 @@ clangsay
 [![issues](http://img.shields.io/github/issues/sasairc/clangsay.svg?style=flat)](https://github.com/sasairc/clangsay/issues)
 [![build](https://img.shields.io/travis/sasairc/clangsay.svg?style=flat)](https://travis-ci.org/sasairc/clangsay)
 
-![default](http://36.media.tumblr.com/5adcfbb3b5bfeaf27c6c3c858b1f7ddb/tumblr_ntae8cQ7wE1u2jamko1_1280.png)
+![default](https://raw.githubusercontent.com/sasairc/clangsay/master/img/screenshot.png)
 
 マルチバイト準対応のUnicode環境専用cowsayクローン。  
 ただし、特殊文字が含まれる場合は、相変わらずズレてしまいます。	
@@ -208,3 +208,5 @@ doseisan.cow
 ## Author
 
 sasairc (https://github.com/sasairc)
+
+Masaya Tk (https://github.com/844196)
