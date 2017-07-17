@@ -13,6 +13,8 @@ RM	:= rm
 CFLAGS	:= -O2 -g -Wall
 LDFLAGS	:=
 CMDLINE	:= 0
+DOCKER	:= docker
+IMGTAG	:= latest
 export
 
 all clean:
@@ -36,6 +38,9 @@ install: install-bin		\
 	 install-cows		\
 	 install-zsh-compdef
 
+docker-image:
+	@$(DOCKER) build -t clangsay:$(IMGTAG) .
+
 .PHONY: all			\
 	install			\
 	install-bin		\
@@ -44,4 +49,5 @@ install: install-bin		\
 	install-cows-asciiart	\
 	install-cows-pixelart	\
 	install-zsh-compdef	\
-	clean
+	clean			\
+	docker-image
