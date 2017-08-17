@@ -21,7 +21,7 @@ all clean:
 	@$(MAKE) -C ./src	$@
 	@$(MAKE) -C ./compdef	$@
 
-install-bin:
+build-dep clean-dep install-bin:
 	@$(MAKE) -C ./src	$@
 
 install-man:
@@ -42,6 +42,8 @@ docker-image:
 	@$(DOCKER) build -t clangsay:$(IMGTAG) .
 
 .PHONY: all			\
+	build-dep               \
+	clean-dep               \
 	install			\
 	install-bin		\
 	install-man		\

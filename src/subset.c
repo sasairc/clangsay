@@ -11,12 +11,12 @@
  */
 
 #include "./config.h"
-#include "./memory.h"
 #include "./clangsay.h"
 #include "./subset.h"
-#include "./string.h"
-#include "./file.h"
-#include "./env.h"
+#include "./libbenly/src/memory.h"
+#include "./libbenly/src/string.h"
+#include "./libbenly/src/file.h"
+#include "./libbenly/src/env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
