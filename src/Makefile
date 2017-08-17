@@ -4,7 +4,8 @@
 
 SRCS       = $(wildcard *.c)
 OBJS       = $(SRCS:.c=.o)
-DEPOBJS    = ./libbenly/src/*.o
+DEPSRCS    = $(wildcard ./libbenly/src/*.c)
+DEPOBJS    = $(DEPSRCS:.c=.o)
 ARCH       = $(shell gcc -print-multiarch)
 DEFLDFLAGS = `pkg-config --cflags --libs glib-2.0`
 DEFCFLAGS  = -DPREFIX=\"$(PREFIX)\"	  \
@@ -17,14 +18,14 @@ WITH_GLIB  = 1
 WITH_REGEX = 1
 export
 
-all: $(TARGET) $(OBJS)
+all: $(TARGET)
 
-$(TARGET): build-dep $(OBJS)
+$(TARGET): $(DEPOBJS) $(OBJS)
 ifeq ($(CMDLINE), 0)
 	@echo "  BUILD   $@"
-	@$(CC) $(LDFLAGS) $(OBJS) $(DEPOBJS) -o $@ $(DEFLDFLAGS)
+	@$(CC) $(LDFLAGS) $^ -o $@ $(DEFLDFLAGS)
 else
-	$(CC) $(LDFLAGS) $(OBJS) $(DEPOBJS) -o $@ $(DEFLDFLAGS)
+	$(CC) $(LDFLAGS) $^ -o $@ $(DEFLDFLAGS)
 endif
 
 %.o: %.c %.h
@@ -35,7 +36,7 @@ else
 	$(CC) $(CFLAGS) -c $< -o $@ $(DEFCFLAGS)
 endif
 
-build-dep:
+build-dep $(DEPOBJS):
 	@$(MAKE) -C ./libbenly	all
 
 clean-dep:
