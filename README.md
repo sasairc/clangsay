@@ -75,6 +75,7 @@ zsh completion has been installed to:
 
 * 全てインストールする場合	
 	```shellsession
+  % git clone --recursive https://github.com/sasairc/clangsay.git && cd clangsay
 	% make
 	# make install
 	```
@@ -184,7 +185,7 @@ cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.j
 % clangsay -l | grep doseisan
 doseisan.cow
 % export DEFAULT_COWFILE="doseisan.cow"	# ファイル名
-% export DEFAULT_COWFILE="doseisan"		# 拡張子省略
+% export DEFAULT_COWFILE="doseisan"     # 拡張子省略
 % export DEFAULT_COWFILE="/usr/local/share/clangsay/cows/doseisan.cow"	# パス指定
 ```
 

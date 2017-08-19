@@ -7,15 +7,17 @@ OBJS       = $(SRCS:.c=.o)
 DEPSRCS    = $(wildcard ./libbenly/src/*.c)
 DEPOBJS    = $(DEPSRCS:.c=.o)
 ARCH       = $(shell gcc -print-multiarch)
-DEFLDFLAGS = `pkg-config --cflags --libs glib-2.0`
 DEFCFLAGS  = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 		-DARCH=\"$(ARCH)\"	  \
-		-DLOCALE=\"\"             \
-		-DWITH_GLIB               \
-		-DWITH_REGEX
+		-DLOCALE=\"\"
+# enable use of GLib (libglib-2.0) with the library
 WITH_GLIB  = 1
+DEFCFLAGS  += -DWITH_GLIB
+DEFLDFLAGS += `pkg-config --cflags --libs glib-2.0`
+# enable use of POSIX Regular Expressions (posix.h) with the libbenly
 WITH_REGEX = 1
+DEFCFLAGS  += -DWITH_REGEX
 export
 
 all: $(TARGET)
