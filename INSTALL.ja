@@ -11,14 +11,16 @@
     Debian GNU/Linux 6.x (squeeze)
     Debian GNU/Linux 7.x (wheezy)
     Debian GNU/Linux 8.x (jessie)
+	Debian GNU/Linux 9.x (stretch)
 
   * MacOS X/Homebrew
 
 * make に必要なツール及びライブラリ
 
-  * pkg-config
-  * glib-2.0
-  * make
+  * pkg-config >= 0.26
+  * GLib >= 2.0
+  * libbenly >= 1.0.0 (同梱)
+  * GNU make
   * gcc または llvm+clang
 
 
@@ -66,9 +68,15 @@ make に関する追加情報
   指定できるオプションに関しては、 gcc の最適化オプションに関してのドキュメントを参照。
   未指定の場合は、 CFLAGS="-O2 -g -Wall" となる。
 
+  * WITH_SHARED
+  共有ライブラリとして libbenly がインストールしてある場合、それを使用する為のオプション。
+  既に sasairc/libbenly 単体または make install-dep でインストールしてある場合用いる事ができる。
+  未指定の場合の値は 0 であり、その他の値がセットされた場合は、有効化される。
+
   * CMDLINE
   make 時のメッセージを抑制する為のオプション。
   未指定の場合の値は 0 であり、その他の値がセットされた場合は、抑制せずに出力される。
+
 
 * make のターゲット
 
@@ -80,6 +88,9 @@ make に関する追加情報
 
   * install-bin
   実行ファイルのみをインストールする。
+
+  * install-dep
+  libbenly を Shared Library としてインストールする。
 
   * install-man
   manページのみをインストールする。
@@ -102,4 +113,22 @@ make に関する追加情報
   上記の install-* を実行する。
 
 
--- sasairc <sasairc@ssiserver.moe.hm>  Sun, 18 Oct 2015 00:53:59 +0900
+利用するライブラリの有効化/無効化
+================================
+
+  下に示す src/Makefile の変数を削除、またはコメントアウトする事により無効化する事ができる。
+
+  * GLib を無効化する
+
+  # enable use of GLib (libglib-2.0) with the libbenly
+  WITH_GLIB  = 1
+  DEFCFLAGS  += -DWITH_GLIB
+  DEFLDFLAGS += `pkg-config --cflags --libs glib-2.0`
+
+  * POSIX C Regular Expression (regex.h) を無効化する
+
+  # enable use of POSIX Regular Expressions (regex.h) with the libbenly
+  WITH_REGEX = 1
+  DEFCFLAGS  += -DWITH_REGEX
+
+-- sasairc <sasairc@ssiserver.moe.hm>  Sun, 19 Oct 2017 18:15:13 +0900

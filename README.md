@@ -15,10 +15,12 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 
 ## Requirements
 
-* GNU Make
-* gcc or clang
-* pkg-config
-* glib-2.0	
+* pkg-config >= 0.26
+* GLib >= 2.0
+* libbenly >= 1.0.0 (同梱)
+
+* GNU make
+* gcc or llvm+clang
 
 
 ## Install
@@ -78,6 +80,12 @@ zsh completion has been installed to:
   % git clone --recursive https://github.com/sasairc/clangsay.git && cd clangsay
 	% make
 	# make install
+	```
+
+* *libbenly*を共有ライブラリとしてインストールし、それを利用する場合	
+	```shellsession
+	# make install-dep
+	# make WITH_SHARED=1 install
 	```
 
 * 実行ファイルのみをインストールし、cowsayとcowsを共有する場合	

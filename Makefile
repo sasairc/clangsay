@@ -21,7 +21,7 @@ all clean:
 	@$(MAKE) -C ./src	$@
 	@$(MAKE) -C ./compdef	$@
 
-build-dep clean-dep install-bin:
+build-dep clean-dep install-dep install-bin:
 	@$(MAKE) -C ./src	$@
 
 install-man:
@@ -45,6 +45,7 @@ docker-image:
 	build-dep               \
 	clean-dep               \
 	install			\
+	install-dep		\
 	install-bin		\
 	install-man		\
 	install-cows		\

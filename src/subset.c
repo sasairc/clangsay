@@ -21,9 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
-#include <regex.h>
 #include <errno.h>
 #include <sys/stat.h>
+
+#ifdef  WITH_REGEX
+#include <regex.h>
+/* WITH_REGEX */
+#endif
 
 int open_cowfile(char* path, FILE** fp)
 {
@@ -325,13 +329,17 @@ int print_string(clangsay_t* clsay)
                 len     = 0,
                 maxlen  = 0;    /* get max length */
 
+#ifdef  WITH_REGEX
     regex_t     reg;
 
     /* compile regex */
     regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
-
     /* get max length */
     maxlen = strmax_with_regex(clsay->msg.lines, clsay->msg.data, &reg);
+#else
+    maxlen = strmax(clsay->msg.lines, clsay->msg.data);
+/* WITH_REGEX */
+#endif
 
     /*
      * single line
@@ -360,7 +368,12 @@ int print_string(clangsay_t* clsay)
      */
     i = 0;
     while (i < clsay->msg.lines) {
+#ifdef  WITH_REGEX
         len = mbstrlen_with_regex(*(clsay->msg.data + i), &reg);
+#else
+        len = mbstrlen(*(clsay->msg.data + i));
+/* WITH_REGEX */
+#endif
         if (i == 0)
             fprintf(stdout, "\n/ %s",
                     *(clsay->msg.data + i));
@@ -391,8 +404,10 @@ int print_string(clangsay_t* clsay)
         maxlen--;
     }
     puts("");
-
+#ifdef  WITH_REGEX
     regfree(&reg);
+/* WITH_REGEX */
+#endif
 
     return 0;
 }
