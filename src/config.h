@@ -26,14 +26,23 @@
  * TH_LINES  : threshold of lines (sizeof(char*) * TH_LINES)
  * TH_LENGTH : threshold of string (sizeof(char) * TH_LENGTH)
  */
+#ifndef TH_LINES
 #define TH_LINES        256
+/* TH_LINES */
+#endif
+#ifndef TH_LENGTH
 #define TH_LENGTH       512
+/* TH_LENGTH */
+#endif
 
 #define EYES            "$eyes"
 #define THOUGHTS        "$thoughts"
 #define TONGUE          "$tongue"
 
+#ifndef DEFAULT_COWFILE
 #define DEFAULT_COWFILE "default.cow"
+/* DEFAULT_COWFILE */
+#endif
 #define DEFAULT_EYES    "oo"
 #define DEFAULT_TONGUE  "  "
 

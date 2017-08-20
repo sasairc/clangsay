@@ -2,6 +2,8 @@
 #    Makefile for clangsay
 #
 
+include ../config.mk
+
 SRCS        = $(wildcard *.c)
 OBJS        = $(SRCS:.c=.o)
 DEPSRCS     = $(wildcard ./libbenly/src/*.c)
@@ -11,15 +13,37 @@ DEFCFLAGS   = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 		-DARCH=\"$(ARCH)\"	  \
 		-DLOCALE=\"\"
+
 # use shared libraries (default: disable)
-WITH_SHARED = 0
+WITH_SHARED ?= 0
 # enable use of GLib (libglib-2.0) with the libbenly
-WITH_GLIB   = 1
+ifeq ($(WITH_GLIB), 1)
+WITH_GLIB   ?= 1
 DEFCFLAGS   += -DWITH_GLIB
 DEFLDFLAGS  += `pkg-config --cflags --libs glib-2.0`
+# WITH_GLIB
+endif
 # enable use of POSIX Regular Expressions (regex.h) with the libbenly
-WITH_REGEX  = 1
+ifeq ($(WITH_REGEX), 1)
+WITH_REGEX  ?= 1
 DEFCFLAGS   += -DWITH_REGEX
+# WITH_REGEX
+endif
+# manually specifies default cowfile
+ifdef DEFAULT_COWFILE
+DEFCFLAGS   += -DDEFAULT_COWFILE=\"$(DEFAULT_COWFILE)\"
+# DEFAULT_COWFILE
+endif
+# threshold of lines (sizeof(char*) * TH_LINES)
+ifdef TH_LINES
+DEFCFLAGS   += -DTH_LINES=$(TH_LINES)
+# TH_LINES
+endif
+# threshold of string (sizeof(char) * TH_LENGTH)
+ifdef TH_LENGTH
+DEFCFLAGS   += -DTH_LENGTH=$(TH_LENGTH)
+# TH_LENGTH
+endif
 export
 
 all: $(TARGET)
@@ -52,6 +76,7 @@ ifeq ($(CMDLINE), 0)
 	@$(CC) $(CFLAGS) -c $< -o $@ $(DEFCFLAGS)
 else
 	$(CC) $(CFLAGS) -c $< -o $@ $(DEFCFLAGS)
+# CMDLINE
 endif
 
 build-dep $(DEPOBJS):
