@@ -73,10 +73,31 @@ make に関する追加情報
   既に sasairc/libbenly 単体または make install-dep でインストールしてある場合用いる事ができる。
   未指定の場合の値は 0 であり、その他の値がセットされた場合は、有効化される。
 
+  * WITH_GLIB
+  GLib (libglib2.0) を使用する為のオプション。
+  このオプションを有効化した場合、コードポイントに基づいた処理及び、半角カタカナを含む特殊文字をサポートする。
+  未指定の場合の値は 1 であり有効。 0 がセットされた場合は、無効化される。
+
+  * WITH_REGEX
+  POSIX C Library に含まれる Regular Expressions (regex.h) を使用する為のオプション。
+  このオプションを有効化した場合、ANSIエスケープシーケンス等の端末制御文字を含む文字列を正常に表示する事ができる。
+  未指定の場合の値は 1 であり有効。 0 がセットされた場合は、無効化される。
+
   * CMDLINE
   make 時のメッセージを抑制する為のオプション。
   未指定の場合の値は 0 であり、その他の値がセットされた場合は、抑制せずに出力される。
 
+  * DEFAULT_COWFILE
+  デフォルトで使用する COWFILE を指定するオプション。
+  未指定の場合は default.cow が使用される。
+
+  * TH_LINES
+  p_read_file_char() 関数にて、メモリの初期確保サイズ(Y軸)、および再確保の閾値を指定するオプション。
+  未指定の場合は 256 であり、再確保の際は TH_LINES += TH_LINES となる。
+
+  * TH_LENGTH
+  p_read_file_char() 関数にて、メモリの初期値確保サイズ(X軸)、および再確保の閾値を指定するオプション。
+  未指定の場合は 512 であり、再確保の際は TH_LENGTH += TH_LENGTH となる。
 
 * make のターゲット
 
@@ -113,22 +134,19 @@ make に関する追加情報
   上記の install-* を実行する。
 
 
-利用するライブラリの有効化/無効化
-================================
+== 著作権
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
 
-  下に示す src/Makefile の変数を削除、またはコメントアウトする事により無効化する事ができる。
+ Copyright (C) 2015 sasairc <sasairc@ssiserver.moe.hm>
 
-  * GLib を無効化する
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
 
-  # enable use of GLib (libglib-2.0) with the libbenly
-  WITH_GLIB  = 1
-  DEFCFLAGS  += -DWITH_GLIB
-  DEFLDFLAGS += `pkg-config --cflags --libs glib-2.0`
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
-  * POSIX C Regular Expression (regex.h) を無効化する
+  0. You just DO WHAT THE FUCK YOU WANT TO.
 
-  # enable use of POSIX Regular Expressions (regex.h) with the libbenly
-  WITH_REGEX = 1
-  DEFCFLAGS  += -DWITH_REGEX
-
--- sasairc <sasairc@ssiserver.moe.hm>  Sun, 19 Oct 2017 18:15:13 +0900
+-- sasairc <sasairc@ssiserver.moe.hm>  Mon, 21 Aug 2017 07:08:46 +0900
