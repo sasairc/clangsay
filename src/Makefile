@@ -15,7 +15,10 @@ DEFCFLAGS   = -DPREFIX=\"$(PREFIX)\"	  \
 		-DLOCALE=\"\"
 
 # use shared libraries (default: disable)
-WITH_SHARED ?= 0
+ifeq ($(WITH_SHARED), 1)
+DEFCFLAGS   += -DWITH_SHARED
+# WITH_SHARED
+endif
 # enable use of GLib (libglib-2.0) with the libbenly
 ifeq ($(WITH_GLIB), 1)
 WITH_GLIB   ?= 1
@@ -83,7 +86,7 @@ build-dep $(DEPOBJS):
 	@$(MAKE) -C ./libbenly	CFLAGS="$(CFLAGS)" all
 
 clean-dep:
-	@$(MAKE) -C ./libbenly	clean
+	-$(MAKE) -C ./libbenly	clean
 
 install-dep:
 	@$(MAKE) -C ./libbenly	install
