@@ -80,7 +80,7 @@ else
 endif
 
 build-dep $(DEPOBJS):
-	@$(MAKE) -C ./libbenly	all
+	@$(MAKE) -C ./libbenly	CFLAGS="$(CFLAGS)" all
 
 clean-dep:
 	@$(MAKE) -C ./libbenly	clean
