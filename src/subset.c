@@ -21,10 +21,10 @@
 #include <sys/stat.h>
 
 #ifdef  WITH_SHARED
-#include <libbenly/memory.h>
-#include <libbenly/string.h>
-#include <libbenly/file.h>
-#include <libbenly/env.h>
+#include <benly/memory.h>
+#include <benly/string.h>
+#include <benly/file.h>
+#include <benly/env.h>
 #else
 #include "./libbenly/src/memory.h"
 #include "./libbenly/src/string.h"
