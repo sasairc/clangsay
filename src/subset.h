@@ -13,10 +13,10 @@
 #ifndef CLANGSAY_SUB_H
 #define CLANGSAY_SUB_H
 
+#include "./clangsay.h"
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include "./clangsay.h"
 
 struct  reptarg {
     int     mode;

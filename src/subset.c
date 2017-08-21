@@ -13,16 +13,25 @@
 #include "./config.h"
 #include "./clangsay.h"
 #include "./subset.h"
-#include "./libbenly/src/memory.h"
-#include "./libbenly/src/string.h"
-#include "./libbenly/src/file.h"
-#include "./libbenly/src/env.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>
 #include <errno.h>
 #include <sys/stat.h>
+
+#ifdef  WITH_SHARED
+#include <libbenly/memory.h>
+#include <libbenly/string.h>
+#include <libbenly/file.h>
+#include <libbenly/env.h>
+#else
+#include "./libbenly/src/memory.h"
+#include "./libbenly/src/string.h"
+#include "./libbenly/src/file.h"
+#include "./libbenly/src/env.h"
+/* WITH_SHARED */
+#endif
 
 #ifdef  WITH_REGEX
 #include <regex.h>
