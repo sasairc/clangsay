@@ -17,6 +17,9 @@ DEFCFLAGS   = -DPREFIX=\"$(PREFIX)\"	  \
 # use shared libraries (default: disable)
 ifeq ($(WITH_SHARED), 1)
 DEFCFLAGS   += -DWITH_SHARED
+else
+INCLUDE     += -I.
+DEFCFLAGS   += $(INCLUDE)
 # WITH_SHARED
 endif
 # enable use of GLib (libglib-2.0) with the libbenly

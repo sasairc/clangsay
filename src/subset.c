@@ -26,10 +26,10 @@
 #include <benly/file.h>
 #include <benly/env.h>
 #else
-#include "./libbenly/src/memory.h"
-#include "./libbenly/src/string.h"
-#include "./libbenly/src/file.h"
-#include "./libbenly/src/env.h"
+#include <libbenly/src/memory.h>
+#include <libbenly/src/string.h>
+#include <libbenly/src/file.h>
+#include <libbenly/src/env.h>
 /* WITH_SHARED */
 #endif
 
