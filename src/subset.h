@@ -26,14 +26,10 @@ struct  reptarg {
 
 extern int open_cowfile(char* path, FILE** fp);
 extern int check_cowfile_exists(char* env, char* file, char** dest);
-extern int check_file_exists(char* path, char* file);
-extern int concat_file_path(int mode, char** dest, char* path, char* file);
-extern void strunsecs(struct CLANGSAY_MSG_T* msg);
 extern int read_string(clangsay_t* clsay, int argc, int optind, char** argv);
 extern int read_cowfile(clangsay_t* clsay, FILE* fp);
 extern int print_string(clangsay_t* clsay);
 extern int print_cow(clangsay_t* clsay);
-extern int selects_cowfiles(const struct dirent* dir);
 extern int list_cowfiles(void);
 
 /* CLANGSAY_SUB_H */

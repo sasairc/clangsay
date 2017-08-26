@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 
+static void release(char* path, clangsay_t* clsay);
+
 int main(int argc, char* argv[])
 {
     int     res     = 0,
@@ -161,6 +163,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+static
 void release(char* path, clangsay_t* clsay)
 {
     int     i   = 0,

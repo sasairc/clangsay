@@ -50,7 +50,5 @@ typedef struct  CLANGSAY_T {
     struct CLANGSAY_MSG_T   msg;
 } clangsay_t;
 
-extern void release(char* path, clangsay_t* clsay);
-
 /* CLANGSAY_H */
 #endif

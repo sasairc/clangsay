@@ -38,6 +38,11 @@
 /* WITH_REGEX */
 #endif
 
+static int check_file_exists(char* path, char* file);
+static int concat_file_path(int mode, char** dest, char* path, char* file);
+static void strunsecs(struct CLANGSAY_MSG_T* msg);
+static int selects_cowfiles(const struct dirent* dir);
+
 int open_cowfile(char* path, FILE** fp)
 {
     short   status  = 0;
@@ -155,6 +160,7 @@ ERR:
     return status;
 }
 
+static
 int check_file_exists(char* path, char* file)
 {
     int     ret     = 0;
@@ -200,6 +206,7 @@ int check_file_exists(char* path, char* file)
     return ret;
 }
 
+static
 int concat_file_path(int mode, char** dest, char* path, char* file)
 {
     short   status  = 0;
@@ -238,6 +245,7 @@ ERR:
     return status;
 }
 
+static
 void strunsecs(struct CLANGSAY_MSG_T* msg)
 {
     int i   = 0,
@@ -508,6 +516,7 @@ int print_cow(clangsay_t* clsay)
     return 0;
 }
 
+static
 int selects_cowfiles(const struct dirent* dir)
 {
     char* tcow  = ".cow\0";
