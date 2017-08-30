@@ -12,6 +12,10 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 #define PROGNAME        "clangsay"
 #define VERSION         1
@@ -43,6 +47,7 @@
 #define DEFAULT_COWFILE "default.cow"
 /* DEFAULT_COWFILE */
 #endif
+
 #define DEFAULT_EYES    "oo"
 #define DEFAULT_TONGUE  "  "
 
@@ -62,5 +67,9 @@
 
 #define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* CONFIG_H */
 #endif

@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * subset.h
+ * msg.h
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
@@ -10,18 +10,26 @@
  * for more details.
  */
 
-#ifndef CLANGSAY_SUB_H
-#define CLANGSAY_SUB_H
+#ifndef MSG_H
+#define MSG_H
 #ifdef  __cplusplus
 extern "C" {
 /* __cplusplus */
 #endif
 
-extern int list_cowfiles(void);
+typedef struct MSG {
+    char**  data;
+    int     lines;
+    int     (*read)(struct MSG** msg, int argc, int optind, char** argv);
+    int     (*print)(struct MSG* msg);
+    void    (*release)(struct MSG* msg);
+} MSG;
+
+extern int init_msg(MSG** msg);
 
 #ifdef  __cplusplus
 }
 /* __cplusplus */
 #endif
-/* CLANGSAY_SUB_H */
+/* MSG_H */
 #endif

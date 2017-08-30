@@ -12,9 +12,17 @@
 
 #ifndef INFO_H
 #define INFO_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 extern int print_version(void);
 extern int print_usage(void);
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* INFO_H */
 #endif

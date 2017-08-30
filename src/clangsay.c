@@ -12,27 +12,30 @@
 
 #include "./config.h"
 #include "./clangsay.h"
+#include "./cow.h"
+#include "./msg.h"
 #include "./info.h"
 #include "./subset.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
 
-static void release(char* path, clangsay_t* clsay);
+static void release(COW* cow, MSG* msg);
 
 int main(int argc, char* argv[])
 {
     int     res     = 0,
-            index   = 0;
+            index   = 0,
+            status  = 0;
 
-    FILE*   fp      = NULL;
+    char*   cowfile = NULL;
 
-    char*   path    = NULL,
-        *   env     = NULL;
+    COW*    cow     = NULL;
 
-    /* flag and args */
-    clangsay_t  clsay = {
-        CLANGSAY_ALLNO_FLAG,
+    MSG*    msg     = NULL;
+
+    COWOPT  opt     = {
+        COWOPT_ALLNO_FLAGS,
     };
 
     /* option for getopt_long() */
@@ -66,48 +69,47 @@ int main(int argc, char* argv[])
                     &index)) != -1) {
         switch (res) {
             case    'e':
-                clsay.mode |= MODE_M_EYE;
-                clsay.eye= optarg;
+                opt.mode |= MODE_M_EYE;
+                opt.eye= optarg;
                 break;
             case    'T':
-                clsay.mode |= MODE_M_TONGUE;
-                clsay.tongue = optarg;
+                opt.mode |= MODE_M_TONGUE;
+                opt.tongue = optarg;
                 break;
             case    'f':
-                clsay.mode |= MODE_M_FILE;
-                clsay.file = optarg;
+                cowfile = optarg;
                 break;
             case    'b':
-                clsay.mode |= MODE_BORG;
+                opt.mode |= MODE_BORG;
                 break;
             case    'd':
-                clsay.mode |= MODE_DEAD;
+                opt.mode |= MODE_DEAD;
                 break;
             case    'g':
-                clsay.mode |= MODE_GREEDY;
+                opt.mode |= MODE_GREEDY;
                 break;
             case    'p':
-                clsay.mode |= MODE_PARANOID;
+                opt.mode |= MODE_PARANOID;
                 break;
             case    's':
-                clsay.mode |= MODE_STONED;
+                opt.mode |= MODE_STONED;
                 break;
             case    't':
-                clsay.mode |= MODE_TIRED;
+                opt.mode |= MODE_TIRED;
                 break;
             case    'w':
-                clsay.mode |= MODE_WIRED;
+                opt.mode |= MODE_WIRED;
                 break;
             case    'y':
-                clsay.mode |= MODE_YOUTHFUL;
+                opt.mode |= MODE_YOUTHFUL;
                 break;
             case    'l':
                 list_cowfiles();
             case    0:
-                clsay.mode |= MODE_SAY;
+                opt.mode |= MODE_SAY;
                 break;
             case    1:
-                clsay.mode |= MODE_THINK;
+                opt.mode |= MODE_THINK;
                 break;
             case    2:
                 print_usage();
@@ -119,98 +121,59 @@ int main(int argc, char* argv[])
     }
 
     /* check env $DEFAULT_COWFILE */
-    if (!(clsay.mode & MODE_M_FILE)) {
-        if ((clsay.file = getenv("DEFAULT_COWFILE")) == NULL)
-            clsay.file = DEFAULT_COWFILE;
+    if (cowfile == NULL) {
+        if ((cowfile = getenv("DEFAULT_COWFILE")) == NULL)
+            cowfile = DEFAULT_COWFILE;
     }
 
-    /* check env $COWPATH */
-    if ((env = getenv("COWPATH")) == NULL)
-        env = COWPATH;
-
-    /* check cow file exists */
-    if (check_cowfile_exists(env, clsay.file, &path) < 0)
-        return 1;
+    /* initialize cow */
+    if (init_cow(&cow) < 0) {
+        status = 1; goto ERR;
+    }
 
     /* open cow file */
-    if (open_cowfile(path, &fp) < 0) {
-        release(path, NULL);
-
-        return 2;
+    if (cow->open(&cow, cowfile) < 0) {
+        status = 2; goto ERR;
     }
 
     /* reading cow file to array */
-    if (read_cowfile(&clsay, fp) < 0) {
-        release(path, &clsay);
+    if (cow->read(&cow) < 0) {
+        status = 3; goto ERR;
+    }
 
-        return 3;
+    /* initialize msg */
+    if (init_msg(&msg) < 0) {
+        status = 4; goto ERR;
     }
 
     /* read argv or stdin */
-    if (read_string(&clsay, argc, optind, argv) < 0) {
-        release(path, &clsay);
-
-        return 4;
+    if (msg->read(&msg, argc, optind, argv) < 0) {
+        status = 5; goto ERR;
     }
 
     /* print string */
-    print_string(&clsay);
+    msg->print(msg);
     /* print cow */
-    print_cow(&clsay);
+    cow->print(cow, &opt);
     /* memory release */
-    release(path, &clsay);
+    release(cow, msg);
 
     return 0;
+
+ERR:
+    release(cow, msg);
+
+    return status;
 }
 
 static
-void release(char* path, clangsay_t* clsay)
+void release(COW* cow, MSG* msg)
 {
-    int     i   = 0,
-            j   = 0;
+    if (cow != NULL)
+        cow->release(cow);
 
-    if (path != NULL) {
-        free(path);
-        path = NULL;
-    }
-    if (clsay != NULL) {
-        if (clsay->cow.data != NULL) {
-            i = 0;
-            j = clsay->cow.lines - 1;
-            while (i <= j) {
-                if (*(clsay->cow.data + i) != NULL) {
-                    free(*(clsay->cow.data + i));
-                    *(clsay->cow.data + i) = NULL;
-                }
-                if (*(clsay->cow.data + j) != NULL) {
-                    free(*(clsay->cow.data + j));
-                    *(clsay->cow.data + j) = NULL;
-                }
-                i++;
-                j--;
-            }
-            free(clsay->cow.data);
-            clsay->cow.data = NULL;
-        }
-        if (clsay->msg.data != NULL) {
-            i = 0;
-            j = clsay->msg.lines - 1;
-            while (i <= j) {
-                if (*(clsay->msg.data + i) != NULL) {
-                    free(*(clsay->msg.data + i));
-                    *(clsay->msg.data + i) = NULL;
-                }
-                if (*(clsay->msg.data + j) != NULL) {
-                    free(*(clsay->msg.data + j));
-                    *(clsay->msg.data + j) = NULL;
-                }
-                i++;
-                j--;
-            }
-            free(clsay->msg.data);
-            clsay->msg.data = NULL;
-        }
-    }
+    if (msg != NULL)
+        msg->release(msg);
 
     return;
 }
