@@ -1,0 +1,3 @@
+[submodule "src/libbenly"]
+	path = src/libbenly
+	url = https://github.com/sasairc/libbenly

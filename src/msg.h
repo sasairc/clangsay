@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * file.h
+ * msg.h
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
@@ -10,22 +10,26 @@
  * for more details.
  */
 
-#ifndef FILE_H
-#define FILE_H
+#ifndef MSG_H
+#define MSG_H
 #ifdef  __cplusplus
 extern "C" {
 /* __cplusplus */
 #endif
 
-#include <stdio.h>
+typedef struct MSG {
+    char**  data;
+    int     lines;
+    int     (*read)(struct MSG** msg, int argc, int optind, char** argv);
+    int     (*print)(struct MSG* msg);
+    void    (*release)(struct MSG* msg);
+} MSG;
 
-extern int p_count_file_lines(char** buf);
-extern int p_read_file_char(char*** dest, int t_lines, size_t t_length, FILE* fp, int chomp);
-extern int watch_fd(int fd, long timeout);
+extern int init_msg(MSG** msg);
 
 #ifdef  __cplusplus
 }
 /* __cplusplus */
 #endif
-/* FILE_H */
+/* MSG_H */
 #endif

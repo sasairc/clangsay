@@ -12,29 +12,16 @@
 
 #ifndef CLANGSAY_SUB_H
 #define CLANGSAY_SUB_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
-#include <stdio.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include "./clangsay.h"
-
-struct  reptarg {
-    int     mode;
-    char*   haystack;
-    char*   needle;
-};
-
-extern int open_cowfile(char* path, FILE** fp);
-extern int check_cowfile_exists(char* env, char* file, char** dest);
-extern int check_file_exists(char* path, char* file);
-extern int concat_file_path(int mode, char** dest, char* path, char* file);
-extern void strunsecs(struct CLANGSAY_MSG_T* msg);
-extern int read_string(clangsay_t* clsay, int argc, int optind, char** argv);
-extern int read_cowfile(clangsay_t* clsay, FILE* fp);
-extern int print_string(clangsay_t* clsay);
-extern int print_cow(clangsay_t* clsay);
-extern int selects_cowfiles(const struct dirent* dir);
 extern int list_cowfiles(void);
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* CLANGSAY_SUB_H */
 #endif

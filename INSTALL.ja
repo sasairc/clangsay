@@ -11,14 +11,16 @@
     Debian GNU/Linux 6.x (squeeze)
     Debian GNU/Linux 7.x (wheezy)
     Debian GNU/Linux 8.x (jessie)
+	Debian GNU/Linux 9.x (stretch)
 
   * MacOS X/Homebrew
 
 * make に必要なツール及びライブラリ
 
-  * pkg-config
-  * glib-2.0
-  * make
+  * pkg-config >= 0.26
+  * GLib >= 2.0
+  * libbenly >= 1.0.0 (同梱)
+  * GNU make
   * gcc または llvm+clang
 
 
@@ -66,9 +68,36 @@ make に関する追加情報
   指定できるオプションに関しては、 gcc の最適化オプションに関してのドキュメントを参照。
   未指定の場合は、 CFLAGS="-O2 -g -Wall" となる。
 
+  * WITH_SHARED
+  共有ライブラリとして libbenly がインストールしてある場合、それを使用する為のオプション。
+  既に sasairc/libbenly 単体または make install-dep でインストールしてある場合用いる事ができる。
+  未指定の場合の値は 0 であり、その他の値がセットされた場合は、有効化される。
+
+  * WITH_GLIB
+  GLib (libglib2.0) を使用する為のオプション。
+  このオプションを有効化した場合、コードポイントに基づいた処理及び、半角カタカナを含む特殊文字をサポートする。
+  未指定の場合の値は 1 であり有効。 0 がセットされた場合は、無効化される。
+
+  * WITH_REGEX
+  POSIX C Library に含まれる Regular Expressions (regex.h) を使用する為のオプション。
+  このオプションを有効化した場合、ANSIエスケープシーケンス等の端末制御文字を含む文字列を正常に表示する事ができる。
+  未指定の場合の値は 1 であり有効。 0 がセットされた場合は、無効化される。
+
   * CMDLINE
   make 時のメッセージを抑制する為のオプション。
   未指定の場合の値は 0 であり、その他の値がセットされた場合は、抑制せずに出力される。
+
+  * DEFAULT_COWFILE
+  デフォルトで使用する COWFILE を指定するオプション。
+  未指定の場合は default.cow が使用される。
+
+  * TH_LINES
+  p_read_file_char() 関数にて、メモリの初期確保サイズ(Y軸)、および再確保の閾値を指定するオプション。
+  未指定の場合は 256 であり、再確保の際は TH_LINES += TH_LINES となる。
+
+  * TH_LENGTH
+  p_read_file_char() 関数にて、メモリの初期値確保サイズ(X軸)、および再確保の閾値を指定するオプション。
+  未指定の場合は 512 であり、再確保の際は TH_LENGTH += TH_LENGTH となる。
 
 * make のターゲット
 
@@ -80,6 +109,9 @@ make に関する追加情報
 
   * install-bin
   実行ファイルのみをインストールする。
+
+  * install-dep
+  libbenly を Shared Library としてインストールする。
 
   * install-man
   manページのみをインストールする。
@@ -102,4 +134,19 @@ make に関する追加情報
   上記の install-* を実行する。
 
 
--- sasairc <sasairc@ssiserver.moe.hm>  Sun, 18 Oct 2015 00:53:59 +0900
+== 著作権
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                    Version 2, December 2004
+
+ Copyright (C) 2015 sasairc <sasairc@ssiserver.moe.hm>
+
+ Everyone is permitted to copy and distribute verbatim or modified
+ copies of this license document, and changing it is allowed as long
+ as the name is changed.
+
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. You just DO WHAT THE FUCK YOU WANT TO.
+
+-- sasairc <sasairc@ssiserver.moe.hm>  Mon, 21 Aug 2017 07:08:46 +0900
