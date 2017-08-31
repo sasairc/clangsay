@@ -61,30 +61,26 @@ int list_cowfiles(void)
         fprintf(stderr, "%s: list_cowfiles(): split_env() failure\n",
                 PROGNAME);
 
-        exit(7);
+        exit(8);
     }
 
     /* get file entry and sort */
     do {
         if ((entry = scandir(*(envt->envs + i),
-                        &list, selects_cowfiles, alphasort)) == -1) {
-            i++;
-            continue;
-        } else {
-            if (i != 0)
+                        &list, selects_cowfiles, alphasort)) != -1) {
+            if (i > 0)
                 puts("");
-
             fprintf(stdout, "%s:\n",
                     *(envt->envs + i));
+            j = 0;
+            while (j < entry) {
+                fprintf(stdout, "%s\n",
+                        list[j]->d_name);
+                free(*(list + j));
+                j++;
+            }
+            free(list);
         }
-        j = 0;
-        while (j < entry) {
-            fprintf(stdout, "%s\n",
-                    list[j]->d_name);
-            free(*(list + j));
-            j++;
-        }
-        free(list);
         i++;
     } while (i < envt->envc);
     release_env_t(envt);
