@@ -14,8 +14,10 @@
 #include "./msg.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/wait.h>
 
 #ifdef  WITH_SHARED
 #include <benly/memory.h>
@@ -35,6 +37,7 @@
 
 static int read_msg(MSG** msg, int argc, int optind, char** argv);
 static int print_msg(MSG* msg);
+static int recursive_msg(MSG* msg, int n);
 static void release_msg(MSG* msg);
 static void strunsecs(MSG** msg);
 
@@ -53,6 +56,7 @@ int init_msg(MSG** msg)
         tmp->lines      = 0;
         tmp->read       = read_msg;
         tmp->print      = print_msg;
+        tmp->recursive  = recursive_msg;
         tmp->release    = release_msg;
     } while (0);
     *msg = tmp;
@@ -247,6 +251,54 @@ void release_msg(MSG* msg)
     }
 
     return;
+}
+
+static
+int recursive_msg(MSG* msg, int n)
+{
+    int     status  = 0,
+            fd[2]   = {0};
+
+    while (n > 1) {
+        if (pipe(fd) < 0) {
+            status = -1; goto ERR;
+        }
+        switch (fork()) {
+            case    -1:
+                status = -2; goto ERR;
+            case    0:
+                close(fd[0]);
+                dup2(fd[1], STDOUT_FILENO);
+                close(fd[1]);
+                msg->print(msg);
+                msg->release(msg);
+                exit(0);
+            default:
+                close(fd[1]);
+                dup2(fd[0], STDIN_FILENO);
+                close(fd[0]);
+                free2d(msg->data, msg->lines);
+                msg->read(&msg, 0, 0, NULL);
+        }
+        wait(&status);
+        n--;
+    }
+
+    return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+            fprintf(stderr, "%s: pipe(): %s\n",
+                    PROGNAME, strerror(errno));
+            break;
+        case    -2:
+            fprintf(stderr, "%s: fork(): %s\n",
+                    PROGNAME, strerror(errno));
+            break;
+    }
+
+    return status;
 }
 
 static

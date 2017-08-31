@@ -20,6 +20,8 @@ extern "C" {
 #define COWOPT_ALLNO_FLAGS  \
     0, NULL, NULL
 
+#define MODE_MSG_RECURSIVE  (1 << 13)
+
 #ifdef  __cplusplus
 }
 /* __cplusplus */

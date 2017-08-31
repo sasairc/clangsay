@@ -20,12 +20,20 @@
 #include <stdlib.h>
 #include <getopt.h>
 
+#ifdef  WITH_SHARED
+#include <benly/string.h>
+#else
+#include <libbenly/src/string.h>
+/* WITH_SHARED */
+#endif
+
 static void release(COW* cow, MSG* msg);
 
 int main(int argc, char* argv[])
 {
     int     res     = 0,
             index   = 0,
+            rarg    = 0,
             status  = 0;
 
     char*   cowfile = NULL;
@@ -40,23 +48,24 @@ int main(int argc, char* argv[])
 
     /* option for getopt_long() */
     struct  option opts[] = {
-        {"eye",      required_argument, NULL, 'e'},
-        {"tongue",   required_argument, NULL, 'T'},
-        {"file",     required_argument, NULL, 'f'},
-        {"nowrap",   no_argument,       NULL, 'n'},
-        {"borg",     no_argument,       NULL, 'b'},
-        {"dead",     no_argument,       NULL, 'd'},
-        {"greedy",   no_argument,       NULL, 'g'},
-        {"paranoid", no_argument,       NULL, 'p'},
-        {"stoned",   no_argument,       NULL, 's'},
-        {"tired",    no_argument,       NULL, 't'},
-        {"wired",    no_argument,       NULL, 'w'},
-        {"youtuful", no_argument,       NULL, 'y'},
-        {"list",     no_argument,       NULL, 'l'},
-        {"say",      no_argument,       NULL,  0 },
-        {"think",    no_argument,       NULL,  1 },
-        {"help",     no_argument,       NULL,  2 },
-        {"version",  no_argument,       NULL,  3 },
+        {"eye",       required_argument, NULL, 'e'},
+        {"tongue",    required_argument, NULL, 'T'},
+        {"file",      required_argument, NULL, 'f'},
+        {"recursive", required_argument, NULL, 'R'},
+        {"nowrap",    no_argument,       NULL, 'n'},
+        {"borg",      no_argument,       NULL, 'b'},
+        {"dead",      no_argument,       NULL, 'd'},
+        {"greedy",    no_argument,       NULL, 'g'},
+        {"paranoid",  no_argument,       NULL, 'p'},
+        {"stoned",    no_argument,       NULL, 's'},
+        {"tired",     no_argument,       NULL, 't'},
+        {"wired",     no_argument,       NULL, 'w'},
+        {"youtuful",  no_argument,       NULL, 'y'},
+        {"list",      no_argument,       NULL, 'l'},
+        {"say",       no_argument,       NULL,  0 },
+        {"think",     no_argument,       NULL,  1 },
+        {"help",      no_argument,       NULL,  2 },
+        {"version",   no_argument,       NULL,  3 },
         {0, 0, 0, 0},
     };
 
@@ -64,7 +73,7 @@ int main(int argc, char* argv[])
     while ((res = getopt_long(
                     argc,
                     argv,
-                    "nW;bdgpstwye:T:f:l",
+                    "nbdgpstwye:T:f:R:l",
                     opts,
                     &index)) != -1) {
         switch (res) {
@@ -78,6 +87,15 @@ int main(int argc, char* argv[])
                 break;
             case    'f':
                 cowfile = optarg;
+                break;
+            case    'R':
+                opt.mode |= MODE_MSG_RECURSIVE;
+                if (strisdigit(optarg) < 0) {
+                    fprintf(stderr, "%s: %s: invalid number\n",
+                            PROGNAME, optarg);
+                    return -1;
+                }
+                rarg = atoi(optarg);
                 break;
             case    'b':
                 opt.mode |= MODE_BORG;
@@ -151,9 +169,16 @@ int main(int argc, char* argv[])
         status = 5; goto ERR;
     }
 
+    /* <<<< recursive message box >>>> */
+    if (opt.mode & MODE_MSG_RECURSIVE) {
+        if (msg->recursive(msg, rarg) < 0) {
+            status = 6; goto ERR;
+        }
+    }
+
     /* print string */
     if (msg->print(msg) < 0) {
-        status = 6; goto ERR;
+        status = 7; goto ERR;
     }
 
     /* print cow */

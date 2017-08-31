@@ -42,6 +42,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -e,  --eyes=EYES           manually specifies eyes\n\
   -T,  --tongue=TONGUE       manually specifies tongue\n\
   -f,  --file=COWFILE        select cow file\n\
+  -R,  --recursive=INT       recursive write message box\n\
   -l,  --list                display COWPATH directory and exit\n\
 \n\
        --say                 speaking mode (default)\n\
