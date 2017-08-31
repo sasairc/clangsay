@@ -57,14 +57,15 @@ int init_cow(COW** cow)
                 malloc(sizeof(COW))) == NULL) {
         status = -1; goto ERR;
     }
-
-    tmp->fp         = NULL;
-    tmp->data       = NULL;
-    tmp->lines      = 0;
-    tmp->open       = open_cow;
-    tmp->read       = read_cow;
-    tmp->print      = print_cow;
-    tmp->release    = release_cow;
+    do {
+        tmp->fp         = NULL;
+        tmp->data       = NULL;
+        tmp->lines      = 0;
+        tmp->open       = open_cow;
+        tmp->read       = read_cow;
+        tmp->print      = print_cow;
+        tmp->release    = release_cow;
+    } while (0);
     *cow = tmp;
 
     return 0;

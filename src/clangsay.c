@@ -15,7 +15,7 @@
 #include "./cow.h"
 #include "./msg.h"
 #include "./info.h"
-#include "./subset.h"
+#include "./list.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -152,10 +152,14 @@ int main(int argc, char* argv[])
     }
 
     /* print string */
-    msg->print(msg);
+    if (msg->print(msg) < 0) {
+        status = 6; goto ERR;
+    }
+
     /* print cow */
     cow->print(cow, &opt);
-    /* memory release */
+
+    /* release memory */
     release(cow, msg);
 
     return 0;

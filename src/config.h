@@ -65,7 +65,10 @@ extern "C" {
 
 #define DEAD_TONGUE     "U "
 
+#ifdef  WITH_REGEX
 #define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
+/* WITH_REGEX */
+#endif
 
 #ifdef  __cplusplus
 }

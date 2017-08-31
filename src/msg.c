@@ -48,12 +48,13 @@ int init_msg(MSG** msg)
                 malloc(sizeof(MSG))) == NULL) {
         status = -1; goto ERR;
     }
-
-    tmp->data       = NULL;
-    tmp->lines      = 0;
-    tmp->read       = read_msg;
-    tmp->print      = print_msg;
-    tmp->release    = release_msg;
+    do {
+        tmp->data       = NULL;
+        tmp->lines      = 0;
+        tmp->read       = read_msg;
+        tmp->print      = print_msg;
+        tmp->release    = release_msg;
+    } while (0);
     *msg = tmp;
 
     return 0;
@@ -120,13 +121,24 @@ int print_msg(MSG* msg)
     int         i       = 0,
                 j       = 0,
                 len     = 0,
-                maxlen  = 0;    /* get max length */
+                maxlen  = 0;
 
 #ifdef  WITH_REGEX
-    regex_t     reg;
+    int     status      = 0;
+
+    char    errstr[128] = {'\0'};
+
+    regex_t reg;
 
     /* compile regex */
-    regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED);
+    if ((status = regcomp(&reg, ANSI_ESCSEQ, REG_EXTENDED)) != 0) {
+        fprintf(stdout, "error");
+        regerror(status, &reg, errstr, sizeof(errstr));
+        fprintf(stderr, "%s: regcomp(): %s\n",
+                PROGNAME, errstr);
+
+        return -1;
+    }
     /* get max length */
     maxlen = strmax_with_regex(msg->lines, msg->data, &reg);
 #else
