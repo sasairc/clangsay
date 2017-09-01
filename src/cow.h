@@ -18,7 +18,45 @@ extern "C" {
 #endif
 
 /*
- * COWOPT.mode
+ * # reptarg (haystack)
+ * struct reptarg {
+ *     char*  haystack;
+ * };
+ */
+#define EYES            "$eyes"
+#define THOUGHTS        "$thoughts"
+#define TONGUE          "$tongue"
+
+#define DEFAULT_EYES    "oo"
+#define DEFAULT_TONGUE  "  "
+
+#define SAY_THOUGHTS    "\\"
+#define THINK_THOUGHTS  "o"
+
+/*
+ * # reptarg (needle)
+ * struct reptarg {
+ *     char*  needle;
+ * };
+ */
+#define BORG_EYES       "=="
+#define DEAD_EYES       "XX"
+#define GREEDY_EYES     "$$"
+#define PARANOID_EYES   "@@"
+#define STONED_EYES     "**"
+#define TIRED_EYES      "--"
+#define WIRED_EYES      "OO"
+#define YOUTHFUL_EYES   ".."
+#define DEAD_TONGUE     "U "
+
+/*
+ * # mode
+ * struct reptarg {
+ *     int    mode;
+ * };
+ * typedef struct {
+ *     int    mode;
+ * } COWOPT;
  */
 #define MODE_SAY        (1 << 1)
 #define MODE_THINK      (1 << 2)

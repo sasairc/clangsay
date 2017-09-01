@@ -70,12 +70,7 @@ int main(int argc, char* argv[])
     };
 
     /* processing of arguments */
-    while ((res = getopt_long(
-                    argc,
-                    argv,
-                    "nbdgpstwye:T:f:R:l",
-                    opts,
-                    &index)) != -1) {
+    while ((res = getopt_long(argc, argv, "nbdgpstwye:T:f:R:l", opts, &index)) != -1) {
         switch (res) {
             case    'e':
                 opt.mode |= MODE_M_EYE;
@@ -91,7 +86,7 @@ int main(int argc, char* argv[])
             case    'R':
                 opt.mode |= MODE_MSG_RECURSIVE;
                 if (strisdigit(optarg) < 0) {
-                    fprintf(stderr, "%s: %s: invalid number\n",
+                    fprintf(stderr, "%s: %s: invalid argument\n",
                             PROGNAME, optarg);
                     return -1;
                 }

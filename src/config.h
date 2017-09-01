@@ -39,31 +39,10 @@ extern "C" {
 /* TH_LENGTH */
 #endif
 
-#define EYES            "$eyes"
-#define THOUGHTS        "$thoughts"
-#define TONGUE          "$tongue"
-
 #ifndef DEFAULT_COWFILE
 #define DEFAULT_COWFILE "default.cow"
 /* DEFAULT_COWFILE */
 #endif
-
-#define DEFAULT_EYES    "oo"
-#define DEFAULT_TONGUE  "  "
-
-#define SAY_THOUGHTS    "\\"
-#define THINK_THOUGHTS  "o"
-
-#define BORG_EYES       "=="
-#define DEAD_EYES       "XX"
-#define GREEDY_EYES     "$$"
-#define PARANOID_EYES   "@@"
-#define STONED_EYES     "**"
-#define TIRED_EYES      "--"
-#define WIRED_EYES      "OO"
-#define YOUTHFUL_EYES   ".."
-
-#define DEAD_TONGUE     "U "
 
 #ifdef  WITH_REGEX
 #define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
