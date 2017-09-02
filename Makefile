@@ -10,7 +10,7 @@ COWPATH	:= $(PREFIX)/share/$(TARGET)/cows
 MAKE	:= make
 CC	:= cc
 RM	:= rm
-CFLAGS	:= -O2 -g -Wall
+CFLAGS	:= -Wall -O2 -g
 LDFLAGS	:=
 CMDLINE	:= 0
 DOCKER	:= docker
@@ -21,7 +21,7 @@ all clean:
 	@$(MAKE) -C ./src	$@
 	@$(MAKE) -C ./compdef	$@
 
-install-bin:
+build-dep clean-dep install-dep install-bin:
 	@$(MAKE) -C ./src	$@
 
 install-man:
@@ -42,7 +42,10 @@ docker-image:
 	@$(DOCKER) build -t clangsay:$(IMGTAG) .
 
 .PHONY: all			\
+	build-dep               \
+	clean-dep               \
 	install			\
+	install-dep		\
 	install-bin		\
 	install-man		\
 	install-cows		\

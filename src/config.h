@@ -12,11 +12,15 @@
 
 #ifndef CONFIG_H
 #define CONFIG_H
+#ifdef  __cplusplus
+extern "C" {
+/* __cplusplus */
+#endif
 
 #define PROGNAME        "clangsay"
 #define VERSION         1
-#define PATCHLEVEL      6
-#define SUBLEVEL        6
+#define PATCHLEVEL      7
+#define SUBLEVEL        0
 #define EXTRAVERSION    ""
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
@@ -26,32 +30,28 @@
  * TH_LINES  : threshold of lines (sizeof(char*) * TH_LINES)
  * TH_LENGTH : threshold of string (sizeof(char) * TH_LENGTH)
  */
+#ifndef TH_LINES
 #define TH_LINES        256
+/* TH_LINES */
+#endif
+#ifndef TH_LENGTH
 #define TH_LENGTH       512
+/* TH_LENGTH */
+#endif
 
-#define EYES            "$eyes"
-#define THOUGHTS        "$thoughts"
-#define TONGUE          "$tongue"
-
+#ifndef DEFAULT_COWFILE
 #define DEFAULT_COWFILE "default.cow"
-#define DEFAULT_EYES    "oo"
-#define DEFAULT_TONGUE  "  "
+/* DEFAULT_COWFILE */
+#endif
 
-#define SAY_THOUGHTS    "\\"
-#define THINK_THOUGHTS  "o"
-
-#define BORG_EYES       "=="
-#define DEAD_EYES       "XX"
-#define GREEDY_EYES     "$$"
-#define PARANOID_EYES   "@@"
-#define STONED_EYES     "**"
-#define TIRED_EYES      "--"
-#define WIRED_EYES      "OO"
-#define YOUTHFUL_EYES   ".."
-
-#define DEAD_TONGUE     "U "
-
+#ifdef  WITH_REGEX
 #define ANSI_ESCSEQ     "\x1b\[[0-9;]*[a-zA-Z]"
+/* WITH_REGEX */
+#endif
 
+#ifdef  __cplusplus
+}
+/* __cplusplus */
+#endif
 /* CONFIG_H */
 #endif

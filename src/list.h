@@ -1,7 +1,7 @@
 /*
  * clangsay -  The classic cowsay program, written in C.
  *
- * env.h
+ * list.h
  *
  * Copyright (c) 2015 sasairc
  * This work is free. You can redistribute it and/or modify it under the
@@ -10,24 +10,18 @@
  * for more details.
  */
 
-#ifndef ENV_H
-#define ENV_H
+#ifndef COW_LIST_H
+#define COW_LIST_H
 #ifdef  __cplusplus
 extern "C" {
 /* __cplusplus */
 #endif
 
-typedef struct ENV_T {
-    int     envc;
-    char**  envs;
-} env_t;
-
-extern int split_env(char* env, env_t** dest);
-extern void release_env_t(env_t* env);
+extern int list_cowfiles(void);
 
 #ifdef  __cplusplus
 }
 /* __cplusplus */
 #endif
-/* ENV_H */
+/* COW_LIST_H */
 #endif
