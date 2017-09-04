@@ -37,7 +37,7 @@
 
 static int read_msg(MSG** msg, int argc, int optind, char** argv);
 static int print_msg(MSG* msg);
-static int recursive_msg(MSG* msg, int n);
+static int recursive_msg(MSG** msg, int n);
 static void release_msg(MSG* msg);
 static void strunsecs(MSG** msg);
 
@@ -254,7 +254,7 @@ void release_msg(MSG* msg)
 }
 
 static
-int recursive_msg(MSG* msg, int n)
+int recursive_msg(MSG** msg, int n)
 {
     int     status  = 0,
             fd[2]   = {0};
@@ -270,15 +270,15 @@ int recursive_msg(MSG* msg, int n)
                 close(fd[0]);
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[1]);
-                msg->print(msg);
-                msg->release(msg);
+                (*msg)->print(*msg);
+                (*msg)->release(*msg);
                 exit(0);
             default:
                 close(fd[1]);
                 dup2(fd[0], STDIN_FILENO);
                 close(fd[0]);
-                free2d(msg->data, msg->lines);
-                msg->read(&msg, 0, 0, NULL);
+                free2d((*msg)->data, (*msg)->lines);
+                (*msg)->lines = p_read_file_char(&(*msg)->data, TH_LINES, TH_LENGTH, stdin, 1);
         }
         wait(&status);
         n--;

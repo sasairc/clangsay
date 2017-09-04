@@ -21,7 +21,7 @@ typedef struct MSG {
     char**  data;
     int     lines;
     int     (*read)(struct MSG** msg, int argc, int optind, char** argv);
-    int     (*recursive)(struct MSG* msg, int n);
+    int     (*recursive)(struct MSG** msg, int n);
     int     (*print)(struct MSG* msg);
     void    (*release)(struct MSG* msg);
 } MSG;
