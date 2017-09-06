@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 
     /* <<<< recursive message box >>>> */
     if (opt.mode & MODE_MSG_RECURSIVE) {
-        if (msg->recursive(msg, rarg) < 0) {
+        if (msg->recursive(&msg, rarg) < 0) {
             status = 6; goto ERR;
         }
     }

@@ -37,7 +37,8 @@
 
 static int read_msg(MSG** msg, int argc, int optind, char** argv);
 static int print_msg(MSG* msg);
-static int recursive_msg(MSG* msg, int n);
+static int recursive_msg(MSG** msg, int n);
+static int read_recursive_msg(MSG** msg, int fd);
 static void release_msg(MSG* msg);
 static void strunsecs(MSG** msg);
 
@@ -79,6 +80,11 @@ int read_msg(MSG** msg, int argc, int optind, char** argv)
 {
     int     status  = 0;
 
+    if ((*msg)->data != NULL) {
+        free2d((*msg)->data, (*msg)->lines);
+        (*msg)->lines = 0;
+        (*msg)->data = NULL;
+    }
     if (optind < argc) {    
         if (((*msg)->data = (char**)
                     smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL) {
@@ -254,7 +260,7 @@ void release_msg(MSG* msg)
 }
 
 static
-int recursive_msg(MSG* msg, int n)
+int recursive_msg(MSG** msg, int n)
 {
     int     status  = 0,
             fd[2]   = {0};
@@ -270,15 +276,15 @@ int recursive_msg(MSG* msg, int n)
                 close(fd[0]);
                 dup2(fd[1], STDOUT_FILENO);
                 close(fd[1]);
-                msg->print(msg);
-                msg->release(msg);
+                (*msg)->print(*msg);
+                (*msg)->release(*msg);
                 exit(0);
             default:
                 close(fd[1]);
-                dup2(fd[0], STDIN_FILENO);
+                if (read_recursive_msg(&(*msg), fd[0]) < 0) {
+                    status = -3; goto ERR;
+                }
                 close(fd[0]);
-                free2d(msg->data, msg->lines);
-                msg->read(&msg, 0, 0, NULL);
         }
         wait(&status);
         n--;
@@ -296,7 +302,49 @@ ERR:
             fprintf(stderr, "%s: fork(): %s\n",
                     PROGNAME, strerror(errno));
             break;
+        case    -3:
+            break;
     }
+
+    return status;
+}
+
+static
+int read_recursive_msg(MSG** msg, int fd)
+{
+    int     status  = 0;
+
+    FILE*   fp      = NULL;
+
+    if ((*msg)->data != NULL) {
+        free2d((*msg)->data, (*msg)->lines);
+        (*msg)->lines = 0;
+        (*msg)->data = NULL;
+    }
+    if ((fp = fdopen(fd, "r")) == NULL) {
+        status = -1; goto ERR;
+    }
+    if (((*msg)->lines = 
+                p_read_file_char(&(*msg)->data, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
+        status = -2; goto ERR;
+    }
+    fclose(fp);
+
+    return 0;
+
+ERR:
+    switch (status) {
+        case    -1:
+            fprintf(stderr, "%s: read_recursive_msg(): fdopen() %s\n",
+                    PROGNAME, strerror(errno));
+            break;
+        case    -2:
+            fprintf(stderr, "%s: read_recursive_msg(): p_read_file_char() %s\n",
+                    PROGNAME, strerror(errno));
+            break;
+    }
+    if (fp != NULL)
+        fclose(fp);
 
     return status;
 }

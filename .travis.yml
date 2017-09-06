@@ -23,6 +23,7 @@ script:
     - install_all "$CC" "$TEST_PREFIX"
     - ${TEST_PREFIX}/bin/clangsay --version
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -f zen-noh-milk.cow
+    - ls -lF | ${TEST_PREFIX}/bin/clangsay -R 32 -f zen-noh-milk.cow
     - ${TEST_PREFIX}/bin/clangsay --list
     - ${TEST_PREFIX}/bin/clangsay --help
     - cleanup "$TEST_PREFIX"
