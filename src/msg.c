@@ -79,6 +79,11 @@ int read_msg(MSG** msg, int argc, int optind, char** argv)
 {
     int     status  = 0;
 
+	if ((*msg)->data != NULL) {
+		free2d((*msg)->data, (*msg)->lines);
+		(*msg)->lines = 0;
+		(*msg)->data = NULL;
+	}
     if (optind < argc) {    
         if (((*msg)->data = (char**)
                     smalloc(sizeof(char*) * (argc - optind), NULL)) == NULL) {
@@ -277,8 +282,7 @@ int recursive_msg(MSG** msg, int n)
                 close(fd[1]);
                 dup2(fd[0], STDIN_FILENO);
                 close(fd[0]);
-                free2d((*msg)->data, (*msg)->lines);
-                (*msg)->lines = p_read_file_char(&(*msg)->data, TH_LINES, TH_LENGTH, stdin, 1);
+				(*msg)->read(&(*msg), 0, 0, NULL);
         }
         wait(&status);
         n--;
