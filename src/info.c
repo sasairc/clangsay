@@ -39,7 +39,7 @@ Mandatory arguments to long options are mandatory for short options too.\n\
   -t,  --tired               tired mode\n\
   -w,  --wired               wired mode\n\
   -y,  --youthful            youthful mode\n\
-  -e,  --eyes=EYES           manually specifies eyes\n\
+  -e,  --eye=EYE             manually specifies eye\n\
   -T,  --tongue=TONGUE       manually specifies tongue\n\
   -f,  --file=COWFILE        select cow file\n\
   -R,  --recursive=INT       recursive write message box\n\
