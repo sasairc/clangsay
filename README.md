@@ -8,9 +8,9 @@ clangsay
 
 ![default](https://raw.githubusercontent.com/sasairc/clangsay/master/img/screenshot.png)
 
-マルチバイト準対応のUnicode環境専用cowsayクローン。  
-ただし、特殊文字が含まれる場合は、相変わらずズレてしまいます。	
-cowsayの`-W`オプションに該当するものはありません。（常に`-n`つきの状態）	
+マルチバイト文字準対応の Unicode 環境専用 cowsay (設定可能な喋る牛) クローン。  
+ただし、特殊文字が含まれる場合は、相変わらずズレてしまいます。  
+cowsay の`-W`オプションに該当するものはありませんが、後述の方法により同様の機能は実現可能です。
 
 
 ## Requirements
@@ -25,17 +25,37 @@ cowsayの`-W`オプションに該当するものはありません。（常に`
 
 ## Install
 
-#### Debian/GNU Linux or Debian based system.(amd64)
+### Debian GNU/Linux or Debian based system (amd64)
+
+もし、あなたが 64bit PC (amd64) アーキテクチャ用 Debian GNU/Linux を利用している場合、以下の方法で簡単にコンパイル済みバイナリパッケージをインストールする事ができます。また、これをベースとした各 GNU/Linux ディストリビューションでも多くの場合で利用可能でしょう。
 
 ```shellsession
-# echo 'deb http://ssiserver.moe.hm/pub/debian ./' >> /etc/apt/sources.list	
+# echo 'deb [trusted=yes] http://ssiserver.moe.hm/pub/debian ./' >> /etc/apt/sources.list	
 # apt-get update	
 # apt-get install clangsay
 ```
 
-#### Mac OS X/Homebrew
+ソースパッケージをダウンロードし、自分好みの変更や修正を加えたのち、コンパイル済みバイナリパッケージを作成したいというケースもあるでしょう。その場合には、概ね以下の手順で可能です。
 
-依存パッケージとしてcowsay、pkg-config、glibがインストールされます。	
+```shellsession
+# cat <<EOF >> /etc/apt/sources.list
+deb [trusted=yes] http://ssiserver.moe.hm/pub/debian ./
+deb-src [trusted=yes] http://ssiserver.moe.hm/pub/debian ./
+EOF
+# apt-get update
+# apt-get build-dep clangsay
+% apt-get source clangsay    # または apt-source -b clangsay
+% cd clangsay-${VERSION}
+% dpkg-buildpackage -uc -us -d
+# dpkg -i ../*.deb
+```
+
+詳しい情報については[Debian 新メンテナーガイド 日本語版](https://www.debian.org/doc/manuals/maint-guide/index.ja.html)をご覧下さい。
+
+
+### Mac OS X/Homebrew
+
+依存パッケージとして cowsay、pkg-config、glib がインストールされます。	
 
 ```shellsession
 % brew install 844196/Renge/clangsay
@@ -50,9 +70,9 @@ zsh completion has been installed to:
 
 このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。
 
-#### Docker
+### Docker
 
-ビルド済みバイナリとcowfileがバンドルされたイメージを生成するための `Dockerfile` が同梱されています。
+ビルド済みバイナリと cowfile がバンドルされたイメージを生成するための `Dockerfile` が同梱されています。
 
 ```shellsession
 % HEAD=`git rev-parse --short HEAD`
@@ -73,22 +93,22 @@ zsh completion has been installed to:
       ∨v､＞z-r-x-:r＜/ﾚﾚへ
 ```
 
-#### Other systems.
+### Other systems.
 
-* 全てインストールする場合	
+* 全てインストールする場合  
 	```shellsession
   % git clone --recursive https://github.com/sasairc/clangsay.git && cd clangsay
 	% make
 	# make install
 	```
 
-* *libbenly*を共有ライブラリとしてインストールし、それを利用する場合	
+* *libbenly*を共有ライブラリとしてインストールし、それを利用する場合  
 	```shellsession
 	# make install-dep
 	# make WITH_SHARED=1 install
 	```
 
-* 実行ファイルのみをインストールし、cowsayとcowsを共有する場合	
+* 実行ファイルのみをインストールし、cowsay と cows を共有する場合  
 	```shellsession
 	% make COWPATH="/usr/local/share/cowsay/cows"	# パスは環境に合わせてください
 	# make install-bin
@@ -104,7 +124,7 @@ zsh completion has been installed to:
 
 ## Usage
 
-基本的にcowsayのオプションと同様です。		
+基本的に cowsay のオプションと同様です。  
 例外として、ANSIエスケープシーケンスによる色付け等に対応しました。
 
 ```shellsession
@@ -149,7 +169,7 @@ zsh completion has been installed to:
                 ||     ||
 ```
 
-`--think`オプションでは、cowthinkのような「牛さんが考える」動作になります。
+`--think`オプションでは、 cowthink のような「牛さんが考える」動作になります。
 
 ```shellsession
 % echo "ﾌﾟｶﾌﾟｶ" | clangsay --think -f iwashi.cow
@@ -166,7 +186,57 @@ zsh completion has been installed to:
                                                  ￣￣
 ```
 
-cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.jp/projects/nkf/)の`-f`オプションを介すことで、同等の機能を実現できます。  
+`-R`オプションは何かを強調したい時に便利だと思います。これはあくまで主観。
+
+```shellsession
+% lsb_release | clangsay -R 10
+ ________________________________________________________________________________
+/  ____________________________________________________________________________   \
+| /  ________________________________________________________________________   \ |
+| | /  ____________________________________________________________________   \ | |
+| | | /  ________________________________________________________________   \ | | |
+| | | | /  ____________________________________________________________   \ | | | |
+| | | | | /  ________________________________________________________   \ | | | | |
+| | | | | | /  ____________________________________________________   \ | | | | | |
+| | | | | | | /  ________________________________________________   \ | | | | | | |
+| | | | | | | | /  ____________________________________________   \ | | | | | | | |
+| | | | | | | | | / Distributor ID: Debian                      \ | | | | | | | | |
+| | | | | | | | | | Description: Debian GNU/Linux 9.1 (stretch) | | | | | | | | | |
+| | | | | | | | | | Release: 9.1                                | | | | | | | | | |
+| | | | | | | | | \ Codename: stretch                           / | | | | | | | | |
+| | | | | | | | \  --------------------------------------------   / | | | | | | | |
+| | | | | | | \  ------------------------------------------------   / | | | | | | |
+| | | | | | \  ----------------------------------------------------   / | | | | | |
+| | | | | \  --------------------------------------------------------   / | | | | |
+| | | | \  ------------------------------------------------------------   / | | | |
+| | | \  ----------------------------------------------------------------   / | | |
+| | \  --------------------------------------------------------------------   / | |
+| \  ------------------------------------------------------------------------   / |
+\  ----------------------------------------------------------------------------   /
+ --------------------------------------------------------------------------------
+  \
+   \
+    \
+    
+           ____
+       ,: .: .: :.ヽ
+     ,'       /\   ｉ
+     {: .:ﾉﾚﾍ/  Viﾍ:}
+    .{,､〈 Ｏ   Ｏ{.:.
+    ノヽ\!"       }.:ﾊ
+      Ｗﾊw=-､へ,ｬ<,V'      
+         /ﾍ }{./\
+        ;: i:V:!;}
+        |:｜: :｜}
+        |:|:｡: ｡l}
+        >-'-ﾟ-'`ﾟu
+        ｰi-i～i-i~
+         |.|  |.|
+         |-|  |-|
+         ヒｺ  ヒｺ 
+```
+
+cowsay に於ける`-W`オプションはありませんが、[nkf](http://osdn.jp/projects/nkf/)の`-f`オプションを介すことで、同等の機能を実現できます。  
 
 詳しくは`clangsay --help`をご覧下さい。
 
@@ -185,7 +255,7 @@ cowsayに於ける`-W`オプションはありませんが、[nkf](http://osdn.j
 
 ### DEFAULT_COWFILE
 
-環境変数`$DEFAULT_COWFILE`は、`-f, --file`オプションを使用せずに実行した場合のcowfileを置き換えます。
+環境変数`$DEFAULT_COWFILE`は、`-f, --file`オプションを使用せずに実行した場合の cowfile を置き換えます。
 
 ```shellsession
 % echo $COWPATH
@@ -200,15 +270,25 @@ doseisan.cow
 
 ## Thanks
 
-* [Masaya Tk](https://github.com/844196)	
-	yasunaに続き、clangsayのHomebrew用リポジトリまで提供して頂き  
-	更にはユニークなcowfileまで作って頂きました。本当に有難うございました。  
+* [Masaya Tk](https://github.com/844196)  
+	yasuna に続き、clangsay まで MacOS X 向け Homebrew リポジトリへ追加して頂きました。  
+	更には多くのユニーク(！)な cowfile の作成および提供、加えて Dockerfile の作成等々。   
+	全て書きたくても書ききれない程のご厚意に、この場を借りて謝辞を申し上げます。  
 	詳細は`AUTHORS`のクレジットをご覧下さい。
 
 
 ## License
 
 [WTFPL version 2](http://www.wtfpl.net/txt/copying/)
+
+
+## Original
+
+[cowsay and cowthink](https://web.archive.org/web/20071026043648/http://www.nog.net/~tony/warez/cowsay.shtml)  
+Archived from the original on February 25, 2012.
+
+[schacon/cowsay](https://github.com/schacon/cowsay)  
+Git version of awesome cowsay project.
 
 
 ## Author
