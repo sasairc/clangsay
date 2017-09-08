@@ -10,7 +10,7 @@ function _clangsay() {
         {-t,--tired}'[tired mode]' \
         {-w,--wired}'[wired mode]' \
         {-y,--youthful}'[youthful mode]' \
-        {-e,--eyes}'[manually specifies eyes]':keyword \
+        {-e,--eye}'[manually specifies eye]':keyword \
         {-T,--tongue}'[manually specifies tongue]':keyword \
         {-R,--recursive}'[recursive write message box]':keyword \
         {-f,--file}'[select cow file]:cowfile:_list_cowfile' \

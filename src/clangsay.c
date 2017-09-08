@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
         {"stoned",    no_argument,       NULL, 's'},
         {"tired",     no_argument,       NULL, 't'},
         {"wired",     no_argument,       NULL, 'w'},
-        {"youtuful",  no_argument,       NULL, 'y'},
+        {"youthful",  no_argument,       NULL, 'y'},
         {"list",      no_argument,       NULL, 'l'},
         {"say",       no_argument,       NULL,  0 },
         {"think",     no_argument,       NULL,  1 },
