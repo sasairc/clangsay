@@ -35,6 +35,14 @@ WITH_REGEX  ?= 1
 DEFCFLAGS   += -DWITH_REGEX
 # WITH_REGEX
 endif
+# build code coverage information (default: disable)
+GCOV_GCDAS  = $(SRCS:.c=.gcda)
+GCOV_GCOVS  = $(SRCS:.c=.c.gcov)
+ifeq ($(WITH_GCOV), 1)
+CFLAGS      += -coverage
+LDFLAGS     += -coverage
+# WITH_GCOV
+endif
 # manually specifies default cowfile
 ifdef DEFAULT_COWFILE
 DEFCFLAGS   += -DDEFAULT_COWFILE=\"$(DEFAULT_COWFILE)\"
@@ -98,7 +106,17 @@ install-bin: $(TARGET)
 	install -pd $(BINDIR)
 	install -pm 755 $< $(BINDIR)/
 
-clean: clean-dep
+coverage-gcov: all
+	@bash ../testsuite/gcov.bash
+	@gcov -lp $(GCOV_GCDAS) > ../testsuite/result.gcov
+	@tail -n +1 $(GCOV_GCOVS) >> ../testsuite/result.gcov
+	@cat ../testsuite/result.gcov
+
+clean-gcov:
+	-$(RM) -f *.gcno *.gcda *.gcov
+	-$(RM) -f libbenly/src/*.gcno libbenly/src/*.gcda libbenly/src/*.gcov
+
+clean: clean-dep clean-gcov
 	-$(RM) -f $(OBJS)
 	-$(RM) -f $(TARGET)
 
@@ -107,4 +125,5 @@ clean: clean-dep
 	clean-dep	\
 	install-dep	\
 	install-bin	\
+	coverage-gcov	\
 	clean

@@ -24,6 +24,9 @@ all clean:
 build-dep clean-dep install-dep install-bin:
 	@$(MAKE) -C ./src	$@
 
+coverage-gcov:
+	@$(MAKE) -C ./src	\
+		WITH_GCOV=1	$@
 install-man:
 	@$(MAKE) -C ./doc	$@
 
@@ -52,5 +55,6 @@ docker-image:
 	install-cows-asciiart	\
 	install-cows-pixelart	\
 	install-zsh-compdef	\
+	coverage-gcov		\
 	clean			\
 	docker-image
