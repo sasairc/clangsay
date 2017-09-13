@@ -3,30 +3,34 @@ compiler:
     - gcc
     - clang
 before_install:
-    - sudo apt-get update
-    - sudo apt-get -y install pkg-config libglib2.0-0 libglib2.0-dev tree
-script:
-    - export CC="$CC" TEST_PREFIX="`pwd`/test_prefix"
+    - export CC="${CC}"
+    - export TEST_PREFIX="$(pwd)/testprefix"
     - source ./testsuite/travis-ci.bash
+addons:
+    apt:
+        packages:
+            - pkg-config
+            - libglib2.0-0
+            - libglib2.0-dev
+            - tree
+script:
     - make coverage-gcov
     - make clean
-    - install_bin "$CC" "$TEST_PREFIX"
+    - install_bin "${CC}" "${TEST_PREFIX}"
     - cleanup "$TEST_PREFIX"
-    - install_cows "$CC" "$TEST_PREFIX"
+    - install_cows "${CC}" "${TEST_PREFIX}"
+    - cleanup "${TEST_PREFIX}"
+    - install_cows_asciiart "${CC}" "${TEST_PREFIX}"
     - cleanup "$TEST_PREFIX"
-    - install_cows_asciiart "$CC" "$TEST_PREFIX"
-    - cleanup "$TEST_PREFIX"
-    - install_cows_pixelart "$CC" "$TEST_PREFIX"
-    - cleanup "$TEST_PREFIX"
-    - install_man "$CC" "$TEST_PREFIX"
-    - cleanup "$TEST_PREFIX"
-    - install_zsh_compdef "$CC" "$TEST_PREFIX"
-    - cleanup "$TEST_PREFIX"
-    - install_all "$CC" "$TEST_PREFIX"
+    - install_cows_pixelart "${CC}" "${TEST_PREFIX}"
+    - cleanup "${TEST_PREFIX}"
+    - install_man "${CC}" "${TEST_PREFIX}"
+    - cleanup "${TEST_PREFIX}"
+    - install_zsh_compdef "${CC}" "${TEST_PREFIX}"
+    - cleanup "${TEST_PREFIX}"
+    - install_all "${CC}" "${TEST_PREFIX}"
     - ${TEST_PREFIX}/bin/clangsay --version
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -f zen-noh-milk.cow
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -R 32 -f zen-noh-milk.cow
     - ${TEST_PREFIX}/bin/clangsay --list
     - ${TEST_PREFIX}/bin/clangsay --help
-    - cleanup "$TEST_PREFIX"
-    - unset TEST_PREFIX
