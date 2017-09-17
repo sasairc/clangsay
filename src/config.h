@@ -21,7 +21,7 @@ extern "C" {
 #define VERSION         1
 #define PATCHLEVEL      7
 #define SUBLEVEL        1
-#define EXTRAVERSION    "-2"
+#define EXTRAVERSION    "-3"
 #define AUTHOR          "sasairc"
 #define MAIL_TO         "sasairc@ssiserver.moe.hm"
 
