@@ -41,4 +41,4 @@ script:
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -R 32 -f zen-noh-milk.cow
     - ${TEST_PREFIX}/bin/clangsay --list
     - ${TEST_PREFIX}/bin/clangsay --help
-    - rm -r "${TESTPREFIX}"
+    - rm -r "${TEST_PREFIX}"
