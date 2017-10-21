@@ -17,7 +17,7 @@ cowsay の`-W`オプションに該当するものはありませんが、後述
 
 * pkg-config >= 0.26
 * GLib >= 2.0
-* libbenly >= 1.0.0 (同梱)
+* libbenly >= 1.0.0-17 (同梱)
 
 * GNU make
 * gcc or llvm+clang
