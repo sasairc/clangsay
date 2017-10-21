@@ -20,7 +20,7 @@ before_install:
     - test "${TRAVIS_OS_NAME}" = "osx" && brew install tree pkg-config glib; true
     - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && export CC="gcc-4.9"; true
 script:
-    - make coverage-gcov
+    - test "${TRAVIS_OS_NAME}" != "osx" && make coverage-gcov; true
     - make clean
     - install_bin "${CC}" "${TEST_PREFIX}"
     - cleanup "${TEST_PREFIX}"
