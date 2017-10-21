@@ -1,23 +1,29 @@
 language: c
+os:
+    - linux
+    - osx
 compiler:
     - gcc
     - clang
+addons:
+    apt:
+        packages:
+            - tree
+            - pkg-config
+            - libglib2.0-0
+            - libglib2.0-dev
 before_install:
     - export CC="${CC}"
     - export TEST_PREFIX="$(pwd)/testprefix"
     - source ./testsuite/travis-ci.bash
-addons:
-    apt:
-        packages:
-            - pkg-config
-            - libglib2.0-0
-            - libglib2.0-dev
-            - tree
+    - test "${TRAVIS_OS_NAME}" = "osx" && brew update; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && brew install tree pkg-config glib; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && export CC="gcc-4.9"; true
 script:
-    - make coverage-gcov
+    - test "${TRAVIS_OS_NAME}" != "osx" && make coverage-gcov; true
     - make clean
     - install_bin "${CC}" "${TEST_PREFIX}"
-    - cleanup "$TEST_PREFIX"
+    - cleanup "${TEST_PREFIX}"
     - install_cows "${CC}" "${TEST_PREFIX}"
     - cleanup "${TEST_PREFIX}"
     - install_cows_asciiart "${CC}" "${TEST_PREFIX}"
@@ -30,7 +36,9 @@ script:
     - cleanup "${TEST_PREFIX}"
     - install_all "${CC}" "${TEST_PREFIX}"
     - ${TEST_PREFIX}/bin/clangsay --version
+    - uname -a | ${TEST_PREFIX}/bin/clangsay -f yasuna_07.cow
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -f zen-noh-milk.cow
     - ls -lF | ${TEST_PREFIX}/bin/clangsay -R 32 -f zen-noh-milk.cow
     - ${TEST_PREFIX}/bin/clangsay --list
     - ${TEST_PREFIX}/bin/clangsay --help
+    - rm -r "${TEST_PREFIX}"
