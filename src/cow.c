@@ -155,7 +155,7 @@ int read_cow(COW** cow)
         status = -1; goto ERR;
     }
     if (((*cow)->lines =
-                p_read_file_char(&(*cow)->data, TH_LINES, TH_LENGTH, (*cow)->fp, 1)) < 0) {
+                load_file_to_array(&(*cow)->data, TH_LINES, TH_LENGTH, (*cow)->fp)) < 0) {
         status = -2; goto ERR;
     }
     fclose((*cow)->fp);
@@ -169,8 +169,8 @@ ERR:
                     PROGNAME);
             break;
         case    -2:
-            fprintf(stderr, "%s: read_cowfile(): p_read_file_char() failure\n",
-                    PROGNAME);
+            fprintf(stderr, "%s: read_cowfile(): load_file_to_array(): %s\n",
+                    PROGNAME, strerror(errno));
         default:
             if ((*cow)->fp != NULL) {
                 fclose((*cow)->fp);

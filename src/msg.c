@@ -102,7 +102,7 @@ int read_msg(MSG** msg, int argc, int optind, char** argv)
         }
     } else {
         if (((*msg)->lines =
-                    p_read_file_char(&(*msg)->data, TH_LINES, TH_LENGTH, stdin, 1)) < 0) {
+                    load_file_to_array(&(*msg)->data, TH_LINES, TH_LENGTH, stdin)) < 0) {
             status = -3; goto ERR;
         }
     }
@@ -117,8 +117,8 @@ ERR:
         case    -2:
             break;
         case    -3:
-            fprintf(stderr, "%s: read_string(): p_read_file_char() failure\n",
-                    PROGNAME);
+            fprintf(stderr, "%s: read_string(): load_file_to_array(): %s\n",
+                    PROGNAME, strerror(errno));
             break;
     }
 
@@ -325,7 +325,7 @@ int read_recursive_msg(MSG** msg, int fd)
         status = -1; goto ERR;
     }
     if (((*msg)->lines = 
-                p_read_file_char(&(*msg)->data, TH_LINES, TH_LENGTH, fp, 1)) < 0) {
+                load_file_to_array(&(*msg)->data, TH_LINES, TH_LENGTH, fp)) < 0) {
         status = -2; goto ERR;
     }
     fclose(fp);
@@ -339,7 +339,7 @@ ERR:
                     PROGNAME, strerror(errno));
             break;
         case    -2:
-            fprintf(stderr, "%s: read_recursive_msg(): p_read_file_char() %s\n",
+            fprintf(stderr, "%s: read_recursive_msg(): load_file_to_array(): %s\n",
                     PROGNAME, strerror(errno));
             break;
     }
