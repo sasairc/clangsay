@@ -8,7 +8,7 @@ SRCS        = $(wildcard *.c)
 OBJS        = $(SRCS:.c=.o)
 DEPSRCS     = $(wildcard ./libbenly/src/*.c)
 DEPOBJS     = $(DEPSRCS:.c=.o)
-ARCH        = $(shell gcc -print-multiarch)
+ARCH        = $(shell $(CC) -dumpmachine)
 DEFCFLAGS   = -DPREFIX=\"$(PREFIX)\"	  \
 		-DCOWPATH=\"$(COWPATH)/\" \
 		-DARCH=\"$(ARCH)\"	  \
@@ -25,8 +25,8 @@ endif
 # enable use of GLib (libglib-2.0) with the libbenly
 ifeq ($(WITH_GLIB), 1)
 WITH_GLIB   ?= 1
-DEFCFLAGS   += -DWITH_GLIB
-DEFLDFLAGS  += `pkg-config --cflags --libs glib-2.0`
+DEFCFLAGS   += -DWITH_GLIB `pkg-config --cflags glib-2.0`
+DEFLDFLAGS  += `pkg-config --libs glib-2.0`
 # WITH_GLIB
 endif
 # enable use of POSIX Regular Expressions (regex.h) with the libbenly
