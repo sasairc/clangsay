@@ -17,7 +17,7 @@ before_install:
     - export TEST_PREFIX="$(pwd)/testprefix"
     - source ./testsuite/travis-ci.bash
     - test "${TRAVIS_OS_NAME}" = "osx" && brew update; true
-    - test "${TRAVIS_OS_NAME}" = "osx" && brew install tree pkg-config glib; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && brew install tree pkg-config glib gcc49; true
     - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && export CC="gcc-4.9"; true
 script:
     - test "${TRAVIS_OS_NAME}" != "osx" && make coverage-gcov; true
