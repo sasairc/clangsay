@@ -16,9 +16,14 @@ before_install:
     - export CC="${CC}"
     - export TEST_PREFIX="$(pwd)/testprefix"
     - source ./testsuite/travis-ci.bash
+    - test "${TRAVIS_OS_NAME}" = "osx" && chmod -R 755 /usr/local; true
     - test "${TRAVIS_OS_NAME}" = "osx" && brew update; true
     - test "${TRAVIS_OS_NAME}" = "osx" && brew install tree pkg-config glib; true
-    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && export CC="gcc-4.9"; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && rm /usr/local/include/c++; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && brew install gcc49; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && ln -s /usr/local/bin/gcc-4.9 /usr/local/bin/gcc; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && ln -s /usr/local/bin/g++-4.9 /usr/local/bin/g++; true
+    - test "${TRAVIS_OS_NAME}" = "osx" && test "${CC}" = "gcc" && export PATH="/usr/local/bin:${PATH}"; true
 script:
     - test "${TRAVIS_OS_NAME}" != "osx" && make coverage-gcov; true
     - make clean
