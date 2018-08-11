@@ -2,20 +2,20 @@
 #    Makefile for clangsay
 #
 
-TARGET	= clangsay
-PREFIX	:= /usr/local
-BINDIR	:= $(PREFIX)/bin
-MANDIR	:= $(PREFIX)/share/man/ja/man6
-COWPATH	:= $(PREFIX)/share/$(TARGET)/cows
-MAKE	:= make
-CC	:= cc
-RM	:= rm
-CFLAGS	:= -O2 -g -Wall -Wextra -Winit-self -Wno-missing-field-initializers
-LDFLAGS	:=
-INCLUDE	:=
-CMDLINE	:= 0
-DOCKER	:= docker
-IMGTAG	:= latest
+TARGET  = clangsay
+PREFIX  := /usr/local
+BINDIR  := $(PREFIX)/bin
+MANDIR  := $(PREFIX)/share/man/ja/man6
+COWPATH := $(PREFIX)/share/$(TARGET)/cows
+MAKE    := make
+CC      := cc
+RM      := rm
+CFLAGS  := -O2 -g -Wall -Wextra -Winit-self -Wno-missing-field-initializers
+LDFLAGS :=
+INCLUDE :=
+CMDLINE := 0
+DOCKER  := docker
+IMGTAG  := latest
 export
 
 all clean:
