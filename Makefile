@@ -12,6 +12,7 @@ CC	:= cc
 RM	:= rm
 CFLAGS	:= -O2 -g -Wall -Wextra -Winit-self -Wno-missing-field-initializers
 LDFLAGS	:=
+INCLUDE	:=
 CMDLINE	:= 0
 DOCKER	:= docker
 IMGTAG	:= latest
