@@ -18,6 +18,10 @@ DEFCFLAGS   = -DPREFIX=\"$(PREFIX)\"	  \
 ifeq ($(WITH_SHARED), 1)
 DEFCFLAGS   += -DWITH_SHARED
 else
+# for not OS X
+ifneq ($(shell uname), Darwin)
+DEFLDFLAGS  += -lcrypt
+endif
 INCLUDE     += -I.
 DEFCFLAGS   += $(INCLUDE)
 # WITH_SHARED
