@@ -53,23 +53,6 @@ EOF
 詳しい情報については[Debian 新メンテナーガイド 日本語版](https://www.debian.org/doc/manuals/maint-guide/index.ja.html)をご覧下さい。
 
 
-### Mac OS X/Homebrew
-
-依存パッケージとして cowsay、pkg-config、glib がインストールされます。	
-
-```shellsession
-% brew install 844196/Renge/clangsay
-```
-
-上記のコマンドを実行した際に、補完関数をインストールしたディレクトリを示す下記のようなメッセージが出ます。
-
-```shellsession
-zsh completion has been installed to:
-/usr/local/share/zsh/site-functions	# Homebrewの導入先により異なります
-```
-
-このパスを`$fpath`に追加するか、既にパスの通っている任意のディレクトリに`_clangsay`を移動して下さい。
-
 ### Docker
 
 ビルド済みバイナリと cowfile がバンドルされたイメージを生成するための `Dockerfile` が同梱されています。
