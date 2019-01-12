@@ -43,6 +43,7 @@ static int read_cow(COW** cow);
 static int print_cow(COW* cow, COWOPT* opt);
 static void release_cow(COW* cow);
 
+static void replace_escaped_backslash(char* str);
 static int check_cowfile_exists(char* file, char** dest);
 static int check_file_exists(char* path, char* file);
 static int concat_file_path(int mode, char** dest, char* path, char* file);
@@ -229,9 +230,8 @@ int print_cow(COW* cow, COWOPT* opt)
     while (i < cow->lines) {
         /* replace thoughts */
         strrep(*(cow->data + i), THOUGHTS, though);
-
-        while (strrep(*(cow->data + i), "\\\\", "\\") == 0);
-
+        /* replace backslash ( \\ -> \ ) */
+        replace_escaped_backslash(*(cow->data + i));
         /* replace eyes*/
         j = 0;
         while (eyes[j].haystack != NULL || eyes[j].needle != NULL) {
@@ -296,6 +296,28 @@ void release_cow(COW* cow)
         }
         free(cow);
         cow = NULL;
+    }
+
+    return;
+}
+
+static
+void replace_escaped_backslash(char* str)
+{
+    int     c       = 0;
+
+    char*   p       = str;
+
+    while (*p != '\0') {
+        if ((*p == '\\' && *(p + 1) != '\0') && *(p + 1) == '\\') {
+            c++;
+            p++;
+        }
+        p++;
+    }
+    while (c) {
+        strrep(str, "\\\\", "\\");
+        c--;
     }
 
     return;
