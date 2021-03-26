@@ -1,8 +1,8 @@
 language: c
 os:
     - linux
-    - osx
-osx_image: xcode12.2
+#    - osx
+# osx_image: xcode12.2
 compiler:
     - gcc
     - clang
